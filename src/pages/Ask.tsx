@@ -283,18 +283,7 @@ const AskPage: React.FC = () => {
           </div>
 
           {/* Whiteboard */}
-          <Whiteboard whiteboardData={whiteboardData} className="mb-4 flex-shrink-0" />
-
-          {/* Mr. White */}
-          <div className="flex items-end gap-3 mt-2 flex-shrink-0">
-            <MrWhite state={mrWhiteState} size={140} />
-            <p className="text-xs text-muted-foreground mb-4">
-              {mrWhiteState === "idle" && "Mr. White is ready to help."}
-              {mrWhiteState === "thinking" && "Mr. White is thinking..."}
-              {mrWhiteState === "drawing" && "Drawing on the whiteboard..."}
-              {mrWhiteState === "talking" && "Mr. White is explaining..."}
-            </p>
-          </div>
+          <Whiteboard whiteboardData={whiteboardData} mrWhiteState={mrWhiteState} className="flex-1 min-h-0" />
         </div>
 
         {/* Right - Chat Panel (always visible, internally scrollable) */}
