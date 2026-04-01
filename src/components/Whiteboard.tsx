@@ -386,7 +386,7 @@ const Whiteboard: React.FC<WhiteboardProps> = ({ whiteboardData, mrWhiteState = 
 
             {/* Mr. White character with pointer stick */}
             <g
-              transform="translate(520, 240)"
+              transform="translate(510, 220) scale(1.4)"
               style={{
                 transition: "transform 0.3s ease",
               }}
