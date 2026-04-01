@@ -123,7 +123,8 @@ const Whiteboard: React.FC<WhiteboardProps> = ({ whiteboardData, mrWhiteState = 
     const color = CHALK_COLORS[el.color] || CHALK_COLORS.blue;
     const visible = visibleIndices.has(index);
     const yOffset = getYOffset(index);
-    const fontSize = el.size === "large" ? 28 : el.size === "small" ? 16 : 22;
+    const fontSize = el.size === "large" ? 36 : el.size === "small" ? 22 : 28;
+    const fontWeight = 700;
     const scale = el.size === "large" ? 1.3 : el.size === "small" ? 0.7 : 1;
 
     switch (el.kind) {
