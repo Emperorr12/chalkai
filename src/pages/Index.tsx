@@ -1,5 +1,5 @@
-import React from "react";
-import { Link } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import MrWhite from "../components/MrWhite";
 
@@ -9,6 +9,25 @@ const subjects = [
 ];
 
 const Index: React.FC = () => {
+  const navigate = useNavigate();
+  const [query, setQuery] = useState("");
+  const [shouldPulse, setShouldPulse] = useState(false);
+
+  useEffect(() => {
+    const hasVisited = sessionStorage.getItem("chalk-visited");
+    if (!hasVisited) {
+      setShouldPulse(true);
+      sessionStorage.setItem("chalk-visited", "true");
+    }
+  }, []);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (query.trim()) {
+      navigate(`/ask?q=${encodeURIComponent(query.trim())}`);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
@@ -31,6 +50,27 @@ const Index: React.FC = () => {
         >
           Ask Mr. White anything
         </Link>
+
+        {/* Hero input bar */}
+        <form onSubmit={handleSubmit} className="mt-6 mx-auto max-w-[540px] w-full relative">
+          <input
+            type="text"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Chalk it up..."
+            className={`w-full rounded-full border border-border bg-card px-5 py-3 pr-12 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 transition-shadow${shouldPulse ? " placeholder-pulse" : ""}`}
+          />
+          <button
+            type="submit"
+            className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center hover:bg-primary/90 transition-colors"
+            aria-label="Send question"
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="5" y1="12" x2="19" y2="12" />
+              <polyline points="12 5 19 12 12 19" />
+            </svg>
+          </button>
+        </form>
       </section>
 
       {/* Mr. White greeting */}
