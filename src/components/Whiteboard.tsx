@@ -136,6 +136,7 @@ const Whiteboard: React.FC<WhiteboardProps> = ({ whiteboardData, mrWhiteState = 
             y={yOffset}
             fill={color}
             fontSize={fontSize}
+            fontFamily="'Caveat', cursive"
             fontWeight={fontWeight}
             opacity={visible ? 1 : 0}
             style={{
