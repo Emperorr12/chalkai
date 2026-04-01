@@ -205,10 +205,7 @@ const Index: React.FC = () => {
       {/* Footer */}
       <footer className="border-t border-border/50 py-10">
         <div className="max-w-3xl mx-auto px-6 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <MrWhite state="idle" size={20} />
-            <span className="text-sm text-muted-foreground">Chalk</span>
-          </div>
+          <span className="text-sm font-medium text-muted-foreground">Chalk</span>
           <p className="text-xs text-muted-foreground">
             Every student deserves a great teacher.
           </p>
