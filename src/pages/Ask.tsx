@@ -1,4 +1,5 @@
-import React, { useState, useCallback, useRef } from "react";
+import React, { useState, useCallback, useRef, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import { type MrWhiteState } from "../components/MrWhite";
 import Whiteboard, { type WhiteboardElement } from "../components/Whiteboard";
@@ -43,6 +44,9 @@ const AskPage: React.FC = () => {
   const [startTime] = useState(Date.now());
   const [isStreaming, setIsStreaming] = useState(false);
   const abortRef = useRef<AbortController | null>(null);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const autoSentRef = useRef(false);
+
 
   const handleSend = useCallback(async (message: string, imageData?: string) => {
     // Add student message exactly as typed
@@ -257,6 +261,17 @@ const AskPage: React.FC = () => {
     },
     [handleSend]
   );
+
+  // Auto-send question from query param (homepage input)
+  useEffect(() => {
+    const q = searchParams.get("q");
+    if (q && !autoSentRef.current) {
+      autoSentRef.current = true;
+      setSearchParams({}, { replace: true });
+      setTimeout(() => handleSend(q), 100);
+    }
+  }, [searchParams, setSearchParams, handleSend]);
+
 
   const sessionMinutes = Math.floor((Date.now() - startTime) / 60000);
 
