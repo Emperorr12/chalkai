@@ -279,10 +279,10 @@ const AskPage: React.FC = () => {
     <div className="h-screen bg-background flex flex-col overflow-hidden">
       <Navbar />
       <div className="flex-1 flex flex-col lg:flex-row min-h-0">
-        {/* Left - Whiteboard Area (scrollable if content overflows) */}
-        <div className="flex-[8] flex flex-col items-center p-6 overflow-y-auto min-h-0">
+        {/* Left - Whiteboard Area (dominant) */}
+        <div className="flex-1 flex flex-col items-center p-4 overflow-y-auto min-h-0">
           {/* Subject pills */}
-          <div className="flex flex-wrap gap-2 mb-6 flex-shrink-0">
+          <div className="flex flex-wrap gap-2 mb-4 flex-shrink-0">
             {subjects.map((s) => (
               <button
                 key={s}
@@ -299,11 +299,11 @@ const AskPage: React.FC = () => {
           </div>
 
           {/* Whiteboard */}
-          <Whiteboard whiteboardData={whiteboardData} mrWhiteState={mrWhiteState} className="flex-1 min-h-0" />
+          <Whiteboard whiteboardData={whiteboardData} mrWhiteState={mrWhiteState} className="flex-1 w-full min-h-0" />
         </div>
 
-        {/* Right - Chat Panel */}
-        <div className="flex-[2] border-l border-border min-h-0 max-h-full">
+        {/* Right - Chat Panel (narrow) */}
+        <div className="w-80 lg:w-72 xl:w-80 flex-shrink-0 border-l border-border min-h-0 max-h-full">
           <ChatPanel
             messages={messages}
             mrWhiteState={mrWhiteState}
