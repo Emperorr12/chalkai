@@ -287,7 +287,7 @@ const AskPage: React.FC = () => {
         </div>
 
         {/* Right - Chat Panel (always visible, internally scrollable) */}
-        <div className="flex-[4] border-l border-border min-h-0 max-h-full">
+        <div className="flex-[3] border-l border-border min-h-0 max-h-full">
           <ChatPanel
             messages={messages}
             mrWhiteState={mrWhiteState}
