@@ -260,13 +260,13 @@ const AskPage: React.FC = () => {
   const sessionMinutes = Math.floor((Date.now() - startTime) / 60000);
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div className="h-screen bg-background flex flex-col overflow-hidden">
       <Navbar />
-      <div className="flex-1 flex flex-col lg:flex-row overflow-hidden" style={{ height: "calc(100vh - 56px)" }}>
-        {/* Left - Whiteboard Area */}
-        <div className="flex-[6] flex flex-col items-center justify-center p-6 relative overflow-y-auto">
+      <div className="flex-1 flex flex-col lg:flex-row min-h-0">
+        {/* Left - Whiteboard Area (scrollable if content overflows) */}
+        <div className="flex-[6] flex flex-col items-center p-6 overflow-y-auto min-h-0">
           {/* Subject pills */}
-          <div className="flex flex-wrap gap-2 mb-6">
+          <div className="flex flex-wrap gap-2 mb-6 flex-shrink-0">
             {subjects.map((s) => (
               <button
                 key={s}
@@ -283,10 +283,10 @@ const AskPage: React.FC = () => {
           </div>
 
           {/* Whiteboard */}
-          <Whiteboard whiteboardData={whiteboardData} className="mb-4" />
+          <Whiteboard whiteboardData={whiteboardData} className="mb-4 flex-shrink-0" />
 
           {/* Mr. White */}
-          <div className="flex items-end gap-3 mt-2">
+          <div className="flex items-end gap-3 mt-2 flex-shrink-0">
             <MrWhite state={mrWhiteState} size={140} />
             <p className="text-xs text-muted-foreground mb-4">
               {mrWhiteState === "idle" && "Mr. White is ready to help."}
@@ -297,8 +297,8 @@ const AskPage: React.FC = () => {
           </div>
         </div>
 
-        {/* Right - Chat Panel */}
-        <div className="flex-[4] border-l border-border min-h-0">
+        {/* Right - Chat Panel (always visible, internally scrollable) */}
+        <div className="flex-[4] border-l border-border min-h-0 max-h-full">
           <ChatPanel
             messages={messages}
             mrWhiteState={mrWhiteState}
