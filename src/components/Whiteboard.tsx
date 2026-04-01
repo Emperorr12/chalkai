@@ -32,7 +32,7 @@ const PAD = 24;
 
 type Phase = "idle" | "fading-out" | "drawing" | "wiping";
 
-const Whiteboard: React.FC<WhiteboardProps> = ({ whiteboardData, className = "" }) => {
+const Whiteboard: React.FC<WhiteboardProps> = ({ whiteboardData, mrWhiteState = "idle", className = "" }) => {
   const [phase, setPhase] = useState<Phase>("idle");
   const [activeData, setActiveData] = useState<WhiteboardData | null>(null);
   const [visibleIndices, setVisibleIndices] = useState<Set<number>>(new Set());
