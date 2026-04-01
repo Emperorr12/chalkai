@@ -9,6 +9,16 @@ const subjects = [
 ];
 
 const Index: React.FC = () => {
+  const [heroQuery, setHeroQuery] = useState("");
+  const navigate = useNavigate();
+
+  const handleHeroSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const q = heroQuery.trim();
+    if (!q) return;
+    navigate(`/ask?q=${encodeURIComponent(q)}`);
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
