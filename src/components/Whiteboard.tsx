@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useRef, useCallback } from "react";
+import { type MrWhiteState } from "./MrWhite";
 
 export interface WhiteboardElement {
   kind: "text" | "line" | "arrow" | "circle" | "rect" | "curve" | "path";
@@ -15,6 +16,7 @@ export interface WhiteboardData {
 
 interface WhiteboardProps {
   whiteboardData: WhiteboardData | null;
+  mrWhiteState?: MrWhiteState;
   className?: string;
 }
 
