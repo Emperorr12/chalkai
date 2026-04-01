@@ -52,7 +52,13 @@ TEACHING RULES:
 - Always make the abstract concrete before the formula.
 - Never say "Great question!" — show enthusiasm through your actual response, not hollow affirmations.
 - If a student asks something vague like "explain math" — ask one focused clarifying question before answering.
-- Match your vocabulary to the student's — if they use casual language, stay casual. If technical, go technical.`;
+- Match your vocabulary to the student's — if they use casual language, stay casual. If technical, go technical.
+
+FILE/IMAGE ANALYSIS:
+- When a student uploads a photo of a problem (homework, textbook, worksheet), read it carefully and solve or explain it step by step.
+- Reference the specific problem numbers or text you see in the image.
+- If the image is unclear, say what you can see and ask for clarification.
+- Always use the whiteboard to show your work when solving problems from images.`;
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -60,7 +66,7 @@ serve(async (req) => {
   }
 
   try {
-    const { question, subject, history, confusion_detected, is_first_question } = await req.json();
+    const { question, subject, history, confusion_detected, is_first_question, image_data } = await req.json();
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
@@ -71,7 +77,7 @@ serve(async (req) => {
     if (confusion_detected) contextPrefix += " [Student seems confused — try a completely different angle, simpler analogy, or visual approach]";
 
     // Build messages array with history
-    const messages: { role: string; content: string }[] = [
+    const messages: { role: string; content: unknown }[] = [
       { role: "system", content: SYSTEM_PROMPT },
     ];
 
@@ -84,10 +90,40 @@ serve(async (req) => {
       }
     }
 
-    messages.push({
-      role: "user",
-      content: `${contextPrefix}\n\n${question}`,
-    });
+    // Build the user message — text-only or multimodal with image
+    if (image_data) {
+      // Multimodal message with image
+      const contentParts: unknown[] = [];
+      
+      if (question) {
+        contentParts.push({
+          type: "text",
+          text: `${contextPrefix}\n\n${question}`,
+        });
+      } else {
+        contentParts.push({
+          type: "text",
+          text: `${contextPrefix}\n\nThe student uploaded this image. Analyze it, identify any problems or content, and explain/solve what you see. Reference specific details from the image.`,
+        });
+      }
+
+      contentParts.push({
+        type: "image_url",
+        image_url: {
+          url: image_data, // expects "data:image/...;base64,..."
+        },
+      });
+
+      messages.push({ role: "user", content: contentParts });
+    } else {
+      messages.push({
+        role: "user",
+        content: `${contextPrefix}\n\n${question}`,
+      });
+    }
+
+    // Use a multimodal model that handles images
+    const model = image_data ? "google/gemini-2.5-flash" : "google/gemini-3-flash-preview";
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -96,7 +132,7 @@ serve(async (req) => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-3-flash-preview",
+        model,
         messages,
         stream: true,
       }),
