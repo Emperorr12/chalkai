@@ -304,7 +304,7 @@ const Whiteboard: React.FC<WhiteboardProps> = ({ whiteboardData, mrWhiteState = 
   return (
     <div
       className={`relative ${className}`}
-      style={{ maxWidth: SVG_W + 16, width: "100%" }}
+      style={{ width: "100%", display: "flex", flexDirection: "column" }}
     >
       {/* Whiteboard frame */}
       <div
@@ -316,6 +316,9 @@ const Whiteboard: React.FC<WhiteboardProps> = ({ whiteboardData, mrWhiteState = 
           position: "relative",
           overflow: "hidden",
           boxShadow: "0 4px 20px -4px rgba(0, 0, 0, 0.15)",
+          flex: 1,
+          display: "flex",
+          flexDirection: "column",
         }}
       >
         {/* Eraser button */}
@@ -348,13 +351,16 @@ const Whiteboard: React.FC<WhiteboardProps> = ({ whiteboardData, mrWhiteState = 
             opacity: containerOpacity,
             transition: "opacity 0.3s ease",
             position: "relative",
+            flex: 1,
+            minHeight: 0,
           }}
         >
           <svg
             viewBox={`0 0 ${SVG_W} ${SVG_H}`}
             width="100%"
-            height="auto"
-            style={{ display: "block", minHeight: 240 }}
+            height="100%"
+            preserveAspectRatio="xMidYMid meet"
+            style={{ display: "block" }}
           >
             {/* Chalk texture filter */}
             <defs>
@@ -376,6 +382,96 @@ const Whiteboard: React.FC<WhiteboardProps> = ({ whiteboardData, mrWhiteState = 
             </defs>
 
             {activeData?.elements.map((el, i) => renderElement(el, i))}
+
+            {/* Mr. White character with pointer stick */}
+            <g
+              transform="translate(520, 240)"
+              style={{
+                transition: "transform 0.3s ease",
+              }}
+            >
+              {/* Body */}
+              <path
+                d="M-12 15 C-12 5, -6 2, 0 2 C6 2, 12 5, 12 15 L12 32 L-12 32 Z"
+                fill="#2C2C2C"
+                stroke="#1A1A1A"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+              />
+              {/* Bowtie */}
+              <path
+                d="M-3 3 L0 5 L3 3 L0 2 Z"
+                fill="#3B6FCA"
+                stroke="#2E5BA8"
+                strokeWidth="0.8"
+              />
+              {/* Head */}
+              <ellipse cx="0" cy="-8" rx="10" ry="11" fill="#F5DEB3" stroke="#D4B896" strokeWidth="1.5" />
+              {/* Hair */}
+              <path
+                d="M-10 -12 C-10 -19, -5 -22, 0 -22 C5 -22, 10 -19, 10 -12"
+                fill="#E8E8E8"
+                stroke="#D0D0D0"
+                strokeWidth="1.5"
+              />
+              {/* Glasses */}
+              <circle cx="-4" cy="-9" r="4" stroke="#1A1A1A" strokeWidth="1.2" fill="none" />
+              <circle cx="4" cy="-9" r="4" stroke="#1A1A1A" strokeWidth="1.2" fill="none" />
+              <path d="M0 -9 L0.5 -9" stroke="#1A1A1A" strokeWidth="1" />
+              {/* Eyes */}
+              <circle cx="-4" cy="-9.5" r="1.2" fill="#1A1A1A" />
+              <circle cx="4" cy="-9.5" r="1.2" fill="#1A1A1A" />
+              {/* Mouth */}
+              {mrWhiteState === "talking" ? (
+                <ellipse cx="0" cy="-3" rx="2" ry="1.5" fill="#1A1A1A" opacity="0.7" />
+              ) : (
+                <path d="M-2.5 -3.5 C-1.5 -2, 1.5 -2, 2.5 -3.5" stroke="#1A1A1A" strokeWidth="1" fill="none" strokeLinecap="round" />
+              )}
+              {/* Left arm */}
+              <path
+                d="M-10 12 C-14 10, -15 14, -13 17"
+                stroke="#2C2C2C"
+                strokeWidth="2.5"
+                fill="none"
+                strokeLinecap="round"
+              />
+              {/* Right arm holding pointer stick */}
+              <path
+                d="M10 10 C14 6, 16 2, 18 -2"
+                stroke="#2C2C2C"
+                strokeWidth="2.5"
+                fill="none"
+                strokeLinecap="round"
+              />
+              {/* Pointer stick */}
+              <line
+                x1="17"
+                y1="-1"
+                x2={mrWhiteState === "drawing" ? "-60" : "-30"}
+                y2={mrWhiteState === "drawing" ? "-50" : "-35"}
+                stroke="#8B6914"
+                strokeWidth="2"
+                strokeLinecap="round"
+                style={{ transition: "x2 0.5s ease, y2 0.5s ease" }}
+              />
+              {/* Pointer tip */}
+              <circle
+                cx={mrWhiteState === "drawing" ? "-60" : "-30"}
+                cy={mrWhiteState === "drawing" ? "-50" : "-35"}
+                r="2"
+                fill="#C41E1E"
+                style={{ transition: "cx 0.5s ease, cy 0.5s ease" }}
+              />
+
+              {/* Thinking dots */}
+              {mrWhiteState === "thinking" && (
+                <>
+                  <circle cx="8" cy="-22" r="1.5" fill="#3B6FCA" opacity="0.6" style={{ animation: "dots-pulse 1.2s 0s infinite" }} />
+                  <circle cx="12" cy="-25" r="1.5" fill="#3B6FCA" opacity="0.6" style={{ animation: "dots-pulse 1.2s 0.2s infinite" }} />
+                  <circle cx="16" cy="-22" r="1.5" fill="#3B6FCA" opacity="0.6" style={{ animation: "dots-pulse 1.2s 0.4s infinite" }} />
+                </>
+              )}
+            </g>
           </svg>
 
           {/* Wipe overlay for eraser animation */}
@@ -399,9 +495,12 @@ const Whiteboard: React.FC<WhiteboardProps> = ({ whiteboardData, mrWhiteState = 
           <div
             className="flex items-center justify-center font-chalk text-base"
             style={{
-              height: 240,
               color: "#8B6914",
               opacity: 0.4,
+              position: "absolute",
+              top: "40%",
+              left: "50%",
+              transform: "translate(-50%, -50%)",
             }}
           >
             Waiting for chalk...
