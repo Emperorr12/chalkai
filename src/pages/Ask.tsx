@@ -5,6 +5,7 @@ import { type MrWhiteState } from "../components/MrWhite";
 import Whiteboard, { type WhiteboardElement } from "../components/Whiteboard";
 import ChatPanel, { type ChatMessage } from "../components/ChatPanel";
 import { toast } from "sonner";
+import { MessageSquare, PanelRightClose } from "lucide-react";
 
 const subjects = ["Math", "Science", "History", "Economics", "Coding", "English", "Other"];
 const defaultChips = ["Show me an example", "Explain it simpler", "Go deeper", "Quiz me on this"];
@@ -43,6 +44,7 @@ const AskPage: React.FC = () => {
   const [chalkedCount, setChalkedCount] = useState(0);
   const [startTime] = useState(Date.now());
   const [isStreaming, setIsStreaming] = useState(false);
+  const [chatOpen, setChatOpen] = useState(true);
   const abortRef = useRef<AbortController | null>(null);
   const [searchParams, setSearchParams] = useSearchParams();
   const autoSentRef = useRef(false);
@@ -278,7 +280,7 @@ const AskPage: React.FC = () => {
   return (
     <div className="h-screen bg-background flex flex-col overflow-hidden">
       <Navbar />
-      <div className="flex-1 flex flex-col lg:flex-row min-h-0">
+      <div className="flex-1 flex flex-col lg:flex-row min-h-0 relative">
         {/* Left - Whiteboard Area (dominant) */}
         <div className="flex-1 flex flex-col items-center p-4 overflow-y-auto min-h-0">
           {/* Subject pills */}
@@ -302,8 +304,22 @@ const AskPage: React.FC = () => {
           <Whiteboard whiteboardData={whiteboardData} mrWhiteState={mrWhiteState} className="flex-1 w-full min-h-0" />
         </div>
 
-        {/* Right - Chat Panel (narrow) */}
-        <div className="w-80 lg:w-72 xl:w-80 flex-shrink-0 border-l border-border min-h-0 max-h-full">
+        {/* Toggle button */}
+        <button
+          onClick={() => setChatOpen((o) => !o)}
+          className="absolute right-0 top-1/2 -translate-y-1/2 z-20 bg-card border border-border rounded-l-lg p-2 shadow-md hover:bg-accent transition-colors"
+          style={chatOpen ? { right: '20rem' } : { right: 0 }}
+          aria-label={chatOpen ? "Hide chat" : "Show chat"}
+        >
+          {chatOpen ? <PanelRightClose className="w-4 h-4 text-foreground" /> : <MessageSquare className="w-4 h-4 text-foreground" />}
+        </button>
+
+        {/* Right - Chat Panel (narrow, collapsible) */}
+        <div
+          className={`flex-shrink-0 border-l border-border min-h-0 max-h-full transition-all duration-300 overflow-hidden ${
+            chatOpen ? "w-80 lg:w-72 xl:w-80" : "w-0 border-l-0"
+          }`}
+        >
           <ChatPanel
             messages={messages}
             mrWhiteState={mrWhiteState}
@@ -313,7 +329,7 @@ const AskPage: React.FC = () => {
             isTyping={isTyping}
             chalkedCount={chalkedCount}
             sessionMinutes={sessionMinutes}
-            className="h-full"
+            className="h-full w-80 lg:w-72 xl:w-80"
           />
         </div>
       </div>
