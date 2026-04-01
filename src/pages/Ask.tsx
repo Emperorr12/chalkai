@@ -44,6 +44,8 @@ const AskPage: React.FC = () => {
   const [startTime] = useState(Date.now());
   const [isStreaming, setIsStreaming] = useState(false);
   const abortRef = useRef<AbortController | null>(null);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const autoSentRef = useRef(false);
 
   const handleSend = useCallback(async (message: string, imageData?: string) => {
     // Add student message exactly as typed

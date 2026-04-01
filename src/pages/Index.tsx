@@ -34,21 +34,32 @@ const Index: React.FC = () => {
           Ask any question and watch Mr.&nbsp;White draw the answer step-by-step on a whiteboard.
         </p>
 
-        {/* CTAs */}
-        <div className="flex items-center justify-center gap-3 mb-10">
-          <Link
-            to="/ask"
-            className="inline-flex items-center justify-center px-7 py-3.5 text-sm font-medium rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition-colors shadow-md shadow-primary/20"
-          >
-            Try Chalk instantly
-          </Link>
-          <a
-            href="#how-it-works"
-            className="inline-flex items-center justify-center px-6 py-3.5 text-sm font-medium rounded-lg border border-border text-muted-foreground hover:text-foreground hover:border-foreground/30 transition-colors"
-          >
-            Watch demo
-          </a>
-        </div>
+        {/* Hero Input */}
+        <form onSubmit={handleHeroSubmit} className="max-w-lg mx-auto mb-10">
+          <div className="flex items-center gap-2 bg-card rounded-full px-5 py-3 border border-border focus-within:border-primary transition-colors shadow-lg shadow-primary/5">
+            <input
+              value={heroQuery}
+              onChange={(e) => setHeroQuery(e.target.value)}
+              placeholder='Ask anything… (e.g., What is supply and demand?)'
+              className="flex-1 bg-transparent text-sm text-foreground placeholder:text-muted-foreground outline-none"
+              autoFocus
+            />
+            <button
+              type="submit"
+              disabled={!heroQuery.trim()}
+              className="bg-primary text-primary-foreground rounded-full p-2 disabled:opacity-30 transition-opacity"
+              aria-label="Ask Mr. White"
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="5" y1="12" x2="19" y2="12" />
+                <polyline points="12 5 19 12 12 19" />
+              </svg>
+            </button>
+          </div>
+          <p className="text-xs text-muted-foreground mt-3">
+            No sign-up needed — just ask and watch Mr. White explain it visually.
+          </p>
+        </form>
 
         {/* Interactive whiteboard demo */}
         <HeroWhiteboardDemo />
