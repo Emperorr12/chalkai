@@ -129,6 +129,9 @@ const Index: React.FC = () => {
 
       {/* Subject Chips */}
       <section id="subjects" className="max-w-3xl mx-auto px-6 pb-16">
+        <p className="text-center text-[11px] text-muted-foreground tracking-[0.2em] uppercase mb-4">
+          Or start with a subject
+        </p>
         <div className="flex flex-wrap justify-center gap-2">
           {subjects.map((s) => (
             <Link
