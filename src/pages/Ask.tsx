@@ -140,14 +140,7 @@ const AskPage: React.FC = () => {
 
           {/* Whiteboard */}
           <Whiteboard
-            title={whiteboardTitle}
-            elements={whiteboardElements}
-            isActive={whiteboardActive}
-            onClear={() => {
-              setWhiteboardActive(false);
-              setWhiteboardElements([]);
-              setWhiteboardTitle("");
-            }}
+            whiteboardData={whiteboardActive ? { title: whiteboardTitle, elements: whiteboardElements } : null}
             className="mb-4"
           />
 

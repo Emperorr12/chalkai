@@ -97,9 +97,7 @@ const DemoPage: React.FC = () => {
           </div>
 
           <Whiteboard
-            title={step.whiteboard.title}
-            elements={step.whiteboard.elements}
-            isActive={true}
+            whiteboardData={{ title: step.whiteboard.title, elements: step.whiteboard.elements }}
             className="mb-4"
           />
 
