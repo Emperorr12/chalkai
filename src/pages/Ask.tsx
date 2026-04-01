@@ -262,7 +262,16 @@ const AskPage: React.FC = () => {
     [handleSend]
   );
 
-  const sessionMinutes = Math.floor((Date.now() - startTime) / 60000);
+  // Auto-send question from query param (homepage input)
+  useEffect(() => {
+    const q = searchParams.get("q");
+    if (q && !autoSentRef.current) {
+      autoSentRef.current = true;
+      setSearchParams({}, { replace: true });
+      setTimeout(() => handleSend(q), 100);
+    }
+  }, [searchParams, setSearchParams, handleSend]);
+
 
   return (
     <div className="h-screen bg-background flex flex-col overflow-hidden">
