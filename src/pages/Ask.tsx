@@ -308,7 +308,7 @@ const AskPage: React.FC = () => {
         <button
           onClick={() => setChatOpen((o) => !o)}
           className="absolute right-0 top-1/2 -translate-y-1/2 z-20 bg-card border border-border rounded-l-lg p-2 shadow-md hover:bg-accent transition-colors"
-          style={chatOpen ? { right: '20rem' } : { right: 0 }}
+          style={chatOpen ? { right: '24rem' } : { right: 0 }}
           aria-label={chatOpen ? "Hide chat" : "Show chat"}
         >
           {chatOpen ? <PanelRightClose className="w-4 h-4 text-foreground" /> : <MessageSquare className="w-4 h-4 text-foreground" />}
