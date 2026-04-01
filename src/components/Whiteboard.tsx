@@ -206,6 +206,7 @@ const Whiteboard: React.FC<WhiteboardProps> = ({ whiteboardData, mrWhiteState = 
                 fill={color}
                 fontSize={fontSize}
                 fontFamily="'Caveat', cursive"
+                fontWeight={fontWeight}
                 opacity={visible ? 1 : 0}
                 style={{ transition: "opacity 0.5s ease-out 0.8s" }}
               >
