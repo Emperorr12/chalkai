@@ -329,7 +329,7 @@ const AskPage: React.FC = () => {
             isTyping={isTyping}
             chalkedCount={chalkedCount}
             sessionMinutes={sessionMinutes}
-            className="h-full w-80 lg:w-72 xl:w-80"
+            className="h-full w-96 lg:w-80 xl:w-96"
           />
         </div>
       </div>
