@@ -2,17 +2,12 @@ import React, { useState, useEffect, useCallback } from "react";
 import MrWhite from "./MrWhite";
 import type { MrWhiteState } from "./MrWhite";
 
-const CYCLE_DURATION = 9000; // 9s total loop
-const DRAW_START = 1000;     // start drawing at 1s
-const PAUSE_AT_END = 7500;   // pause before reset
-
 // Derivative curve SVG path data
 const CURVE_PATH = "M 30 110 C 50 110, 60 90, 80 60 C 100 30, 120 20, 150 20 C 180 20, 200 30, 220 50 C 240 70, 260 90, 280 80";
 const TANGENT_PATH = "M 60 100 L 140 30";
 const AXIS_X = "M 20 120 L 290 120";
 const AXIS_Y = "M 30 10 L 30 125";
 
-// Labels that appear sequentially
 const labels = [
   { text: "f(x)", x: 270, y: 70, delay: 1.8 },
   { text: "slope = f'(x)", x: 100, y: 22, delay: 2.8 },
@@ -21,46 +16,109 @@ const labels = [
   { text: "y", x: 18, y: 12, delay: 0.6 },
 ];
 
-const HeroWhiteboardDemo: React.FC = () => {
-  const [phase, setPhase] = useState<"waiting" | "drawing" | "done">("waiting");
-  const [mrWhiteState, setMrWhiteState] = useState<MrWhiteState>("idle");
-  const [cycle, setCycle] = useState(0);
+type Phase = "waiting" | "drawing" | "hold" | "erasing" | "pause";
 
-  const startCycle = useCallback(() => {
+const HeroWhiteboardDemo: React.FC = () => {
+  const [phase, setPhase] = useState<Phase>("waiting");
+  const [mrWhiteState, setMrWhiteState] = useState<MrWhiteState>("idle");
+
+  const runCycle = useCallback(() => {
+    // Phase 1: thinking before drawing
     setPhase("waiting");
     setMrWhiteState("thinking");
 
-    const t1 = setTimeout(() => {
+    const timers: ReturnType<typeof setTimeout>[] = [];
+
+    // 1s: start drawing
+    timers.push(setTimeout(() => {
       setPhase("drawing");
       setMrWhiteState("drawing");
-    }, DRAW_START);
+    }, 1000));
 
-    const t2 = setTimeout(() => {
-      setPhase("done");
+    // 5s: drawing done, hold
+    timers.push(setTimeout(() => {
+      setPhase("hold");
       setMrWhiteState("excited");
-    }, 5000);
+    }, 5000));
 
-    const t3 = setTimeout(() => {
+    // 5.6s: calm down
+    timers.push(setTimeout(() => {
       setMrWhiteState("idle");
-    }, 5600);
+    }, 5600));
 
-    const t4 = setTimeout(() => {
-      setCycle((c) => c + 1);
-    }, CYCLE_DURATION);
+    // 7.5s: start erasing (reverse)
+    timers.push(setTimeout(() => {
+      setPhase("erasing");
+      setMrWhiteState("drawing");
+    }, 7500));
 
-    return () => {
-      clearTimeout(t1);
-      clearTimeout(t2);
-      clearTimeout(t3);
-      clearTimeout(t4);
-    };
+    // 11.5s: fully erased, pause
+    timers.push(setTimeout(() => {
+      setPhase("pause");
+      setMrWhiteState("idle");
+    }, 11500));
+
+    // 12.5s: restart
+    timers.push(setTimeout(() => {
+      runCycle();
+    }, 12500));
+
+    return () => timers.forEach(clearTimeout);
   }, []);
 
   useEffect(() => {
-    return startCycle();
-  }, [cycle, startCycle]);
+    return runCycle();
+  }, [runCycle]);
 
-  const isDrawing = phase === "drawing" || phase === "done";
+  const isVisible = phase === "drawing" || phase === "hold";
+  const isErasing = phase === "erasing";
+
+  // For drawing: strokeDashoffset goes from full → 0 (forward animation)
+  // For erasing: strokeDashoffset goes from 0 → full (reverse via transition)
+  // For waiting/pause: instant hide (no transition)
+  const getStrokeStyle = (dashLen: number, drawDuration: string, drawDelay: string) => {
+    if (phase === "waiting" || phase === "pause") {
+      return {
+        strokeDasharray: dashLen,
+        strokeDashoffset: dashLen,
+        transition: "none",
+      };
+    }
+    if (phase === "drawing" || phase === "hold") {
+      return {
+        strokeDasharray: dashLen,
+        strokeDashoffset: 0,
+        transition: `stroke-dashoffset ${drawDuration} ease-out ${drawDelay}`,
+      };
+    }
+    // erasing — reverse with matching duration, no delay (all erase together)
+    return {
+      strokeDasharray: dashLen,
+      strokeDashoffset: dashLen,
+      transition: `stroke-dashoffset 2.5s ease-in 0s`,
+    };
+  };
+
+  const getLabelOpacity = (delay: number) => {
+    if (phase === "waiting" || phase === "pause") {
+      return { opacity: 0, transition: "none" };
+    }
+    if (isVisible) {
+      return { opacity: 1, transition: `opacity 0.4s ease ${delay}s` };
+    }
+    // erasing
+    return { opacity: 0, transition: "opacity 1.5s ease-in 0s" };
+  };
+
+  const getDotOpacity = () => {
+    if (phase === "waiting" || phase === "pause") {
+      return { opacity: 0, transition: "none" };
+    }
+    if (isVisible) {
+      return { opacity: 1, transition: "opacity 0.3s ease 2.8s" };
+    }
+    return { opacity: 0, transition: "opacity 1.5s ease-in 0s" };
+  };
 
   return (
     <div className="relative max-w-[620px] w-full mx-auto">
@@ -75,11 +133,7 @@ const HeroWhiteboardDemo: React.FC = () => {
 
       {/* Whiteboard */}
       <div className="whiteboard-surface relative overflow-hidden" style={{ minHeight: 200 }}>
-        <svg
-          viewBox="0 0 310 150"
-          className="w-full h-auto"
-          style={{ minHeight: 160 }}
-        >
+        <svg viewBox="0 0 310 150" className="w-full h-auto" style={{ minHeight: 160 }}>
           {/* Axes */}
           <path
             d={AXIS_X}
@@ -87,13 +141,7 @@ const HeroWhiteboardDemo: React.FC = () => {
             strokeWidth="1.5"
             fill="none"
             strokeLinecap="round"
-            className={isDrawing ? "chalk-animate" : ""}
-            style={{
-              strokeDasharray: 270,
-              strokeDashoffset: isDrawing ? 0 : 270,
-              ["--draw-duration" as string]: "0.4s",
-              ["--draw-delay" as string]: "0s",
-            }}
+            style={getStrokeStyle(270, "0.4s", "0s")}
           />
           <path
             d={AXIS_Y}
@@ -101,13 +149,7 @@ const HeroWhiteboardDemo: React.FC = () => {
             strokeWidth="1.5"
             fill="none"
             strokeLinecap="round"
-            className={isDrawing ? "chalk-animate" : ""}
-            style={{
-              strokeDasharray: 115,
-              strokeDashoffset: isDrawing ? 0 : 115,
-              ["--draw-duration" as string]: "0.3s",
-              ["--draw-delay" as string]: "0.2s",
-            }}
+            style={getStrokeStyle(115, "0.3s", "0.2s")}
           />
 
           {/* Main curve f(x) */}
@@ -118,13 +160,7 @@ const HeroWhiteboardDemo: React.FC = () => {
             fill="none"
             strokeLinecap="round"
             strokeLinejoin="round"
-            className={isDrawing ? "chalk-animate" : ""}
-            style={{
-              strokeDasharray: 350,
-              strokeDashoffset: isDrawing ? 0 : 350,
-              ["--draw-duration" as string]: "1.6s",
-              ["--draw-delay" as string]: "0.5s",
-            }}
+            style={getStrokeStyle(350, "1.6s", "0.5s")}
           />
 
           {/* Tangent line */}
@@ -134,14 +170,7 @@ const HeroWhiteboardDemo: React.FC = () => {
             strokeWidth="1.5"
             fill="none"
             strokeLinecap="round"
-            strokeDasharray="4 3"
-            className={isDrawing ? "chalk-animate" : ""}
-            style={{
-              strokeDasharray: 110,
-              strokeDashoffset: isDrawing ? 0 : 110,
-              ["--draw-duration" as string]: "0.8s",
-              ["--draw-delay" as string]: "2.2s",
-            }}
+            style={getStrokeStyle(110, "0.8s", "2.2s")}
           />
 
           {/* Point on curve */}
@@ -150,11 +179,7 @@ const HeroWhiteboardDemo: React.FC = () => {
             cy="55"
             r="4"
             fill="hsl(0, 68%, 60%)"
-            opacity={isDrawing ? 1 : 0}
-            style={{
-              transition: "opacity 0.3s ease",
-              transitionDelay: "2.8s",
-            }}
+            style={getDotOpacity()}
           />
 
           {/* Labels */}
@@ -166,11 +191,7 @@ const HeroWhiteboardDemo: React.FC = () => {
               className="font-chalk"
               fontSize="14"
               fill={l.text.includes("slope") || l.text.includes("tangent") ? "hsl(0, 68%, 60%)" : "#1A1A1A"}
-              opacity={isDrawing ? 1 : 0}
-              style={{
-                transition: "opacity 0.4s ease",
-                transitionDelay: `${l.delay}s`,
-              }}
+              style={getLabelOpacity(l.delay)}
             >
               {l.text}
             </text>
