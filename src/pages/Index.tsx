@@ -73,11 +73,12 @@ const Index: React.FC = () => {
             <p className="text-sm text-muted-foreground mb-6 leading-relaxed">
               Upload your class slides and Mr. White walks you through every concept — drawing, explaining, and quizzing you.
             </p>
-            <button
+            <Link
+              to="/slides"
               className="inline-flex items-center justify-center w-full px-5 py-2.5 text-sm rounded-lg border border-primary text-primary hover:bg-primary/5 transition-colors"
             >
               Upload slides
-            </button>
+            </Link>
           </div>
         </div>
 
