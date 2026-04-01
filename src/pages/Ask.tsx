@@ -5,6 +5,7 @@ import { type MrWhiteState } from "../components/MrWhite";
 import Whiteboard, { type WhiteboardElement } from "../components/Whiteboard";
 import ChatPanel, { type ChatMessage } from "../components/ChatPanel";
 import { toast } from "sonner";
+import { MessageSquare, PanelRightClose } from "lucide-react";
 
 const subjects = ["Math", "Science", "History", "Economics", "Coding", "English", "Other"];
 const defaultChips = ["Show me an example", "Explain it simpler", "Go deeper", "Quiz me on this"];
