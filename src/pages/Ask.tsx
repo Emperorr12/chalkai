@@ -59,6 +59,7 @@ const AskPage: React.FC = () => {
     }
   }, [searchParams, setSearchParams, handleSend]);
 
+  const handleSend = useCallback(async (message: string, imageData?: string) => {
     // Add student message exactly as typed
     setMessages((prev) => [...prev, { role: "student", content: message, imagePreview: imageData }]);
     setMrWhiteState("thinking");
