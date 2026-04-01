@@ -44,9 +44,9 @@ const AskPage: React.FC = () => {
   const [isStreaming, setIsStreaming] = useState(false);
   const abortRef = useRef<AbortController | null>(null);
 
-  const handleSend = useCallback(async (message: string) => {
+  const handleSend = useCallback(async (message: string, imageData?: string) => {
     // Add student message exactly as typed
-    setMessages((prev) => [...prev, { role: "student", content: message }]);
+    setMessages((prev) => [...prev, { role: "student", content: message, imagePreview: imageData }]);
     setMrWhiteState("thinking");
     setIsTyping(true);
     setIsStreaming(true);
