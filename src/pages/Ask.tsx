@@ -78,6 +78,7 @@ const AskPage: React.FC = () => {
           history: recentMessages,
           confusion_detected: confusionDetected,
           is_first_question: isFirstQuestion,
+          image_data: imageData || undefined,
         }),
         signal: controller.signal,
       });
