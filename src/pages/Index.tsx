@@ -25,11 +25,17 @@ const Index: React.FC = () => {
           Ask Mr. White any question and watch him draw out the answer — or import your class
           slides and let him guide you through every concept, one at a time.
         </p>
+        <Link
+          to="/ask"
+          className="inline-flex items-center justify-center mt-6 px-6 py-3 text-sm rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
+        >
+          Ask Mr. White anything
+        </Link>
       </section>
 
       {/* Mr. White greeting */}
       <div className="flex justify-center mb-10">
-        <MrWhite state="idle" size={100} />
+        <MrWhite state="excited" size={160} />
       </div>
 
       {/* Two Mode Cards */}
