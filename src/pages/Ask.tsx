@@ -273,6 +273,8 @@ const AskPage: React.FC = () => {
   }, [searchParams, setSearchParams, handleSend]);
 
 
+  const sessionMinutes = Math.floor((Date.now() - startTime) / 60000);
+
   return (
     <div className="h-screen bg-background flex flex-col overflow-hidden">
       <Navbar />
