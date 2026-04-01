@@ -19,9 +19,9 @@ interface WhiteboardProps {
 }
 
 const CHALK_COLORS = {
-  blue: "#3B6FCA",
-  white: "#F5F5F0",
-  red: "#E05252",
+  blue: "#1A1A1A",
+  white: "#1A1A1A",
+  red: "#C41E1E",
 };
 
 const SVG_W = 640;
