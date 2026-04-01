@@ -44,6 +44,7 @@ const AskPage: React.FC = () => {
   const [chalkedCount, setChalkedCount] = useState(0);
   const [startTime] = useState(Date.now());
   const [isStreaming, setIsStreaming] = useState(false);
+  const [chatOpen, setChatOpen] = useState(true);
   const abortRef = useRef<AbortController | null>(null);
   const [searchParams, setSearchParams] = useSearchParams();
   const autoSentRef = useRef(false);
