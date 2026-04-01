@@ -123,7 +123,8 @@ const Whiteboard: React.FC<WhiteboardProps> = ({ whiteboardData, mrWhiteState = 
     const color = CHALK_COLORS[el.color] || CHALK_COLORS.blue;
     const visible = visibleIndices.has(index);
     const yOffset = getYOffset(index);
-    const fontSize = el.size === "large" ? 28 : el.size === "small" ? 16 : 22;
+    const fontSize = el.size === "large" ? 36 : el.size === "small" ? 22 : 28;
+    const fontWeight = 700;
     const scale = el.size === "large" ? 1.3 : el.size === "small" ? 0.7 : 1;
 
     switch (el.kind) {
@@ -136,6 +137,7 @@ const Whiteboard: React.FC<WhiteboardProps> = ({ whiteboardData, mrWhiteState = 
             fill={color}
             fontSize={fontSize}
             fontFamily="'Caveat', cursive"
+            fontWeight={fontWeight}
             opacity={visible ? 1 : 0}
             style={{
               transition: "opacity 0.5s ease-out",
@@ -204,6 +206,7 @@ const Whiteboard: React.FC<WhiteboardProps> = ({ whiteboardData, mrWhiteState = 
                 fill={color}
                 fontSize={fontSize}
                 fontFamily="'Caveat', cursive"
+                fontWeight={fontWeight}
                 opacity={visible ? 1 : 0}
                 style={{ transition: "opacity 0.5s ease-out 0.8s" }}
               >
@@ -385,7 +388,7 @@ const Whiteboard: React.FC<WhiteboardProps> = ({ whiteboardData, mrWhiteState = 
 
             {/* Mr. White character with pointer stick */}
             <g
-              transform="translate(520, 240)"
+              transform="translate(510, 220) scale(1.4)"
               style={{
                 transition: "transform 0.3s ease",
               }}
