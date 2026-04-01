@@ -1,239 +1,410 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, useCallback } from "react";
 
 export interface WhiteboardElement {
-  kind: "text" | "line" | "arrow" | "circle" | "rect" | "curve";
+  kind: "text" | "line" | "arrow" | "circle" | "rect" | "curve" | "path";
   content: string;
   color: "blue" | "white" | "red";
-  size: "small" | "medium" | "large";
+  size?: "small" | "medium" | "large";
   delay_seconds: number;
 }
 
-interface WhiteboardProps {
+export interface WhiteboardData {
   title?: string;
   elements: WhiteboardElement[];
-  isActive: boolean;
-  compact?: boolean;
-  onClear?: () => void;
+}
+
+interface WhiteboardProps {
+  whiteboardData: WhiteboardData | null;
   className?: string;
 }
 
-const colorMap = {
+const CHALK_COLORS = {
   blue: "#3B6FCA",
-  white: "#1A1A1A",
+  white: "#F5F5F0",
   red: "#E05252",
 };
 
-const sizeMap = {
-  small: { fontSize: 18, shapeScale: 0.7 },
-  medium: { fontSize: 24, shapeScale: 1 },
-  large: { fontSize: 32, shapeScale: 1.3 },
-};
+const SVG_W = 640;
+const SVG_H = 380;
+const PAD = 24;
 
-const Whiteboard: React.FC<WhiteboardProps> = ({
-  title,
-  elements,
-  isActive,
-  compact = false,
-  onClear,
-  className = "",
-}) => {
-  const [visibleCount, setVisibleCount] = useState(0);
-  const [isClearing, setIsClearing] = useState(false);
-  const timerRef = useRef<number | null>(null);
+type Phase = "idle" | "fading-out" | "drawing" | "wiping";
 
+const Whiteboard: React.FC<WhiteboardProps> = ({ whiteboardData, className = "" }) => {
+  const [phase, setPhase] = useState<Phase>("idle");
+  const [activeData, setActiveData] = useState<WhiteboardData | null>(null);
+  const [visibleIndices, setVisibleIndices] = useState<Set<number>>(new Set());
+  const [wipeProgress, setWipeProgress] = useState(0);
+  const timersRef = useRef<number[]>([]);
+  const prevDataRef = useRef<WhiteboardData | null>(null);
+
+  const clearTimers = useCallback(() => {
+    timersRef.current.forEach(clearTimeout);
+    timersRef.current = [];
+  }, []);
+
+  // Handle new data arriving
   useEffect(() => {
-    if (!isActive || elements.length === 0) {
-      setVisibleCount(0);
+    if (whiteboardData === prevDataRef.current) return;
+    prevDataRef.current = whiteboardData;
+    clearTimers();
+
+    if (!whiteboardData || whiteboardData.elements.length === 0) {
+      setPhase("idle");
+      setActiveData(null);
+      setVisibleIndices(new Set());
       return;
     }
-    setVisibleCount(0);
-    let count = 0;
-    const showNext = () => {
-      count++;
-      setVisibleCount(count);
-      if (count < elements.length) {
-        const nextDelay = (elements[count]?.delay_seconds || 0.4) * 1000;
-        timerRef.current = window.setTimeout(showNext, Math.max(nextDelay, 200));
+
+    // If there's existing content, fade out first
+    if (activeData && activeData.elements.length > 0) {
+      setPhase("fading-out");
+      const t = window.setTimeout(() => {
+        setActiveData(whiteboardData);
+        setVisibleIndices(new Set());
+        startDrawing(whiteboardData);
+      }, 300);
+      timersRef.current.push(t);
+    } else {
+      setActiveData(whiteboardData);
+      setVisibleIndices(new Set());
+      startDrawing(whiteboardData);
+    }
+
+    return clearTimers;
+  }, [whiteboardData]);
+
+  const startDrawing = useCallback((data: WhiteboardData) => {
+    setPhase("drawing");
+    data.elements.forEach((el, i) => {
+      const delay = el.delay_seconds * 1000;
+      const t = window.setTimeout(() => {
+        setVisibleIndices((prev) => new Set(prev).add(i));
+      }, delay);
+      timersRef.current.push(t);
+    });
+
+    // Set idle after last element + draw duration
+    const maxDelay = Math.max(...data.elements.map((e) => e.delay_seconds));
+    const t = window.setTimeout(() => setPhase("idle"), (maxDelay + 1.5) * 1000);
+    timersRef.current.push(t);
+  }, []);
+
+  const handleErase = useCallback(() => {
+    clearTimers();
+    setPhase("wiping");
+    setWipeProgress(0);
+
+    const duration = 600;
+    const start = performance.now();
+
+    const animate = (now: number) => {
+      const elapsed = now - start;
+      const progress = Math.min(elapsed / duration, 1);
+      setWipeProgress(progress);
+      if (progress < 1) {
+        requestAnimationFrame(animate);
+      } else {
+        setActiveData(null);
+        setVisibleIndices(new Set());
+        setWipeProgress(0);
+        setPhase("idle");
+        prevDataRef.current = null;
       }
     };
-    const firstDelay = (elements[0]?.delay_seconds || 0) * 1000;
-    timerRef.current = window.setTimeout(showNext, Math.max(firstDelay, 100));
-    return () => {
-      if (timerRef.current) clearTimeout(timerRef.current);
-    };
-  }, [isActive, elements]);
+    requestAnimationFrame(animate);
+  }, [clearTimers]);
 
-  const handleClear = () => {
-    setIsClearing(true);
-    setTimeout(() => {
-      setVisibleCount(0);
-      setIsClearing(false);
-      onClear?.();
-    }, 400);
-  };
-
-  const w = compact ? 320 : 680;
-  const h = compact ? 240 : 400;
+  const getYOffset = (index: number) => 60 + index * 52;
 
   const renderElement = (el: WhiteboardElement, index: number) => {
-    const color = colorMap[el.color] || colorMap.blue;
-    const size = sizeMap[el.size] || sizeMap.medium;
-    const yOffset = 50 + index * 55;
+    const color = CHALK_COLORS[el.color] || CHALK_COLORS.blue;
+    const visible = visibleIndices.has(index);
+    const yOffset = getYOffset(index);
+    const fontSize = el.size === "large" ? 28 : el.size === "small" ? 16 : 22;
+    const scale = el.size === "large" ? 1.3 : el.size === "small" ? 0.7 : 1;
 
     switch (el.kind) {
       case "text":
         return (
           <text
             key={index}
-            x="30"
+            x={PAD}
             y={yOffset}
             fill={color}
-            fontSize={size.fontSize}
-            fontFamily="Caveat, cursive"
-            opacity={index < visibleCount ? 1 : 0}
-            style={{ transition: "opacity 0.5s ease-out" }}
+            fontSize={fontSize}
+            fontFamily="'Caveat', cursive"
+            opacity={visible ? 1 : 0}
+            style={{
+              transition: "opacity 0.5s ease-out",
+              filter: "url(#chalk-texture)",
+            }}
           >
             {el.content}
           </text>
         );
-      case "line":
+
+      case "line": {
+        const lineLen = SVG_W - PAD * 2;
         return (
           <line
             key={index}
-            x1="30"
+            x1={PAD}
             y1={yOffset}
-            x2={w - 60}
+            x2={SVG_W - PAD}
             y2={yOffset}
             stroke={color}
-            strokeWidth={2.5 * size.shapeScale}
+            strokeWidth={2.5 * scale}
             strokeLinecap="round"
-            strokeDasharray={w - 90}
-            strokeDashoffset={index < visibleCount ? 0 : w - 90}
-            style={{ transition: "stroke-dashoffset 1s ease-out" }}
+            strokeDasharray={lineLen}
+            strokeDashoffset={visible ? 0 : lineLen}
+            style={{
+              transition: visible
+                ? "stroke-dashoffset 1.2s ease-out"
+                : "none",
+              filter: "url(#chalk-texture)",
+            }}
           />
         );
-      case "arrow":
+      }
+
+      case "arrow": {
+        const arrowLen = SVG_W * 0.55;
         return (
-          <g
-            key={index}
-            opacity={index < visibleCount ? 1 : 0}
-            style={{ transition: "opacity 0.5s ease-out" }}
-          >
+          <g key={index}>
             <line
-              x1="30"
+              x1={PAD}
               y1={yOffset}
-              x2={w * 0.6}
+              x2={PAD + arrowLen}
               y2={yOffset}
               stroke={color}
-              strokeWidth={2.5 * size.shapeScale}
+              strokeWidth={2.5 * scale}
               strokeLinecap="round"
+              strokeDasharray={arrowLen}
+              strokeDashoffset={visible ? 0 : arrowLen}
+              style={{
+                transition: visible
+                  ? "stroke-dashoffset 1.2s ease-out"
+                  : "none",
+                filter: "url(#chalk-texture)",
+              }}
             />
             <polygon
-              points={`${w * 0.6},${yOffset - 6} ${w * 0.6 + 12},${yOffset} ${w * 0.6},${yOffset + 6}`}
+              points={`${PAD + arrowLen},${yOffset - 6} ${PAD + arrowLen + 14},${yOffset} ${PAD + arrowLen},${yOffset + 6}`}
               fill={color}
+              opacity={visible ? 1 : 0}
+              style={{ transition: "opacity 0.3s ease-out 1s" }}
             />
+            {el.content && (
+              <text
+                x={PAD + arrowLen + 22}
+                y={yOffset + 5}
+                fill={color}
+                fontSize={fontSize}
+                fontFamily="'Caveat', cursive"
+                opacity={visible ? 1 : 0}
+                style={{ transition: "opacity 0.5s ease-out 0.8s" }}
+              >
+                {el.content}
+              </text>
+            )}
           </g>
         );
-      case "circle":
+      }
+
+      case "circle": {
+        const r = 25 * scale;
+        const circumference = 2 * Math.PI * r;
         return (
           <circle
             key={index}
-            cx={w / 2}
+            cx={SVG_W / 2}
             cy={yOffset}
-            r={25 * size.shapeScale}
+            r={r}
             stroke={color}
             strokeWidth={2.5}
             fill="none"
             strokeLinecap="round"
-            strokeDasharray={160 * size.shapeScale}
-            strokeDashoffset={index < visibleCount ? 0 : 160 * size.shapeScale}
-            style={{ transition: "stroke-dashoffset 1s ease-out" }}
+            strokeDasharray={circumference}
+            strokeDashoffset={visible ? 0 : circumference}
+            style={{
+              transition: visible
+                ? "stroke-dashoffset 1.2s ease-out"
+                : "none",
+              filter: "url(#chalk-texture)",
+            }}
           />
         );
-      case "rect":
+      }
+
+      case "rect": {
+        const rw = 120 * scale;
+        const rh = 40 * scale;
+        const perimeter = 2 * (rw + rh);
         return (
           <rect
             key={index}
-            x={30}
-            y={yOffset - 20}
-            width={100 * size.shapeScale}
-            height={40 * size.shapeScale}
+            x={PAD}
+            y={yOffset - rh / 2}
+            width={rw}
+            height={rh}
             stroke={color}
             strokeWidth={2.5}
             fill="none"
-            rx="4"
+            rx={4}
             strokeLinecap="round"
-            strokeDasharray={280 * size.shapeScale}
-            strokeDashoffset={index < visibleCount ? 0 : 280 * size.shapeScale}
-            style={{ transition: "stroke-dashoffset 1s ease-out" }}
+            strokeDasharray={perimeter}
+            strokeDashoffset={visible ? 0 : perimeter}
+            style={{
+              transition: visible
+                ? "stroke-dashoffset 1.2s ease-out"
+                : "none",
+              filter: "url(#chalk-texture)",
+            }}
           />
         );
+      }
+
       case "curve":
+      case "path": {
+        const pathD =
+          el.kind === "path" && el.content
+            ? el.content
+            : `M${PAD} ${yOffset} Q${SVG_W / 3} ${yOffset - 40 * scale} ${SVG_W / 2} ${yOffset} Q${(SVG_W * 2) / 3} ${yOffset + 40 * scale} ${SVG_W - PAD} ${yOffset}`;
+        const estimatedLen = SVG_W;
         return (
           <path
             key={index}
-            d={`M30 ${yOffset} Q${w / 3} ${yOffset - 40 * size.shapeScale} ${w / 2} ${yOffset} Q${w * 2 / 3} ${yOffset + 40 * size.shapeScale} ${w - 60} ${yOffset}`}
+            d={pathD}
             stroke={color}
             strokeWidth={2.5}
             fill="none"
             strokeLinecap="round"
-            strokeDasharray={w}
-            strokeDashoffset={index < visibleCount ? 0 : w}
-            style={{ transition: "stroke-dashoffset 1.2s ease-out" }}
+            strokeDasharray={estimatedLen}
+            strokeDashoffset={visible ? 0 : estimatedLen}
+            style={{
+              transition: visible
+                ? "stroke-dashoffset 1.2s ease-out"
+                : "none",
+              filter: "url(#chalk-texture)",
+            }}
           />
         );
+      }
+
       default:
         return null;
     }
   };
 
+  const containerOpacity = phase === "fading-out" ? 0 : 1;
+
   return (
     <div
-      className={`whiteboard-surface ${className}`}
-      style={{
-        maxWidth: compact ? 320 : 680,
-        width: "100%",
-        opacity: isClearing ? 0 : 1,
-        transition: "opacity 0.4s ease",
-      }}
+      className={`relative ${className}`}
+      style={{ maxWidth: SVG_W + 16, width: "100%" }}
     >
-      {/* Chalk tray decoration */}
-      <div className="absolute top-2 right-2 flex gap-1">
-        <div className="w-4 h-1.5 rounded-full bg-primary opacity-80" />
-        <div className="w-4 h-1.5 rounded-full opacity-80" style={{ backgroundColor: "#E05252" }} />
-        <div className="w-4 h-1.5 rounded-full bg-foreground opacity-30" />
-      </div>
-
-      {/* Top controls */}
-      <div className="absolute top-2 left-2 flex gap-2">
-        {onClear && (
-          <button
-            onClick={handleClear}
-            className="text-xs text-muted-foreground hover:text-foreground transition-colors px-2 py-0.5 rounded"
-            aria-label="Erase whiteboard"
-          >
-            ✕ Erase
-          </button>
-        )}
-      </div>
-
-      {/* Title */}
-      {title && (
-        <div className="font-chalk text-xl text-foreground pt-6 pb-1 px-6 opacity-80">
-          {title}
-        </div>
-      )}
-
-      {/* Drawing area */}
-      <div className="p-6 pt-2">
-        <svg
-          viewBox={`0 0 ${w} ${h}`}
-          width="100%"
-          height="auto"
-          style={{ minHeight: compact ? 180 : 280 }}
+      {/* Whiteboard frame */}
+      <div
+        style={{
+          backgroundColor: "#FFFEF5",
+          border: "8px solid #8B6914",
+          borderRadius: 6,
+          padding: PAD,
+          position: "relative",
+          overflow: "hidden",
+          boxShadow: "0 4px 20px -4px rgba(0, 0, 0, 0.15)",
+        }}
+      >
+        {/* Eraser button */}
+        <button
+          onClick={handleErase}
+          disabled={!activeData || phase === "wiping"}
+          className="absolute top-2 right-2 z-10 text-xs px-2.5 py-1 rounded bg-[#8B6914]/20 text-[#8B6914] hover:bg-[#8B6914]/30 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+          aria-label="Erase whiteboard"
         >
-          {elements.map((el, i) => renderElement(el, i))}
-        </svg>
+          🧽 Erase
+        </button>
+
+        {/* Title */}
+        {activeData?.title && (
+          <div
+            className="font-chalk text-lg mb-1"
+            style={{
+              color: "#8B6914",
+              opacity: containerOpacity,
+              transition: "opacity 0.3s ease",
+            }}
+          >
+            {activeData.title}
+          </div>
+        )}
+
+        {/* SVG drawing area */}
+        <div
+          style={{
+            opacity: containerOpacity,
+            transition: "opacity 0.3s ease",
+            position: "relative",
+          }}
+        >
+          <svg
+            viewBox={`0 0 ${SVG_W} ${SVG_H}`}
+            width="100%"
+            height="auto"
+            style={{ display: "block", minHeight: 240 }}
+          >
+            {/* Chalk texture filter */}
+            <defs>
+              <filter id="chalk-texture" x="-5%" y="-5%" width="110%" height="110%">
+                <feTurbulence
+                  type="fractalNoise"
+                  baseFrequency="0.65"
+                  numOctaves="3"
+                  result="noise"
+                />
+                <feDisplacementMap
+                  in="SourceGraphic"
+                  in2="noise"
+                  scale="1.5"
+                  xChannelSelector="R"
+                  yChannelSelector="G"
+                />
+              </filter>
+            </defs>
+
+            {activeData?.elements.map((el, i) => renderElement(el, i))}
+          </svg>
+
+          {/* Wipe overlay for eraser animation */}
+          {phase === "wiping" && (
+            <div
+              style={{
+                position: "absolute",
+                top: 0,
+                left: 0,
+                height: "100%",
+                width: `${wipeProgress * 100}%`,
+                backgroundColor: "#FFFEF5",
+                transition: "none",
+              }}
+            />
+          )}
+        </div>
+
+        {/* Empty state */}
+        {(!activeData || activeData.elements.length === 0) && phase === "idle" && (
+          <div
+            className="flex items-center justify-center font-chalk text-base"
+            style={{
+              height: 240,
+              color: "#8B6914",
+              opacity: 0.4,
+            }}
+          >
+            Waiting for chalk...
+          </div>
+        )}
       </div>
     </div>
   );
