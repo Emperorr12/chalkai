@@ -275,6 +275,18 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && handleSend()}
+            onPaste={(e) => {
+              const items = e.clipboardData?.items;
+              if (!items) return;
+              for (const item of Array.from(items)) {
+                if (item.type.startsWith("image/")) {
+                  e.preventDefault();
+                  const file = item.getAsFile();
+                  if (file) handleFileRead(file);
+                  return;
+                }
+              }
+            }}
             placeholder={pendingImage ? "Ask about this image..." : "Chalk it up..."}
             className={`flex-1 bg-transparent text-sm text-foreground placeholder:text-muted-foreground outline-none ${
               !hasAnimatedPlaceholder ? "placeholder:animate-pulse-placeholder" : ""
