@@ -47,17 +47,6 @@ const AskPage: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const autoSentRef = useRef(false);
 
-  // Auto-send question from query param (homepage input)
-  useEffect(() => {
-    const q = searchParams.get("q");
-    if (q && !autoSentRef.current) {
-      autoSentRef.current = true;
-      // Clear the query param from URL
-      setSearchParams({}, { replace: true });
-      // Small delay to ensure component is ready
-      setTimeout(() => handleSend(q), 100);
-    }
-  }, [searchParams, setSearchParams, handleSend]);
 
   const handleSend = useCallback(async (message: string, imageData?: string) => {
     // Add student message exactly as typed
