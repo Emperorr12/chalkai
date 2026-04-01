@@ -317,7 +317,7 @@ const AskPage: React.FC = () => {
         {/* Right - Chat Panel (narrow, collapsible) */}
         <div
           className={`flex-shrink-0 border-l border-border min-h-0 max-h-full transition-all duration-300 overflow-hidden ${
-            chatOpen ? "w-80 lg:w-72 xl:w-80" : "w-0 border-l-0"
+            chatOpen ? "w-96 lg:w-80 xl:w-96" : "w-0 border-l-0"
           }`}
         >
           <ChatPanel
