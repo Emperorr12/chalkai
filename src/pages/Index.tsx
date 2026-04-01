@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import React from "react";
+import { Link } from "react-router-dom";
 import Navbar from "../components/Navbar";
-import MrWhite from "../components/MrWhite";
+import HeroWhiteboardDemo from "../components/HeroWhiteboardDemo";
 
 const subjects = [
   "Algebra", "Calculus", "Physics", "Chemistry", "Biology",
@@ -9,128 +9,45 @@ const subjects = [
 ];
 
 const Index: React.FC = () => {
-  const navigate = useNavigate();
-  const [query, setQuery] = useState("");
-  const [shouldPulse, setShouldPulse] = useState(false);
-
-  useEffect(() => {
-    const hasVisited = sessionStorage.getItem("chalk-visited");
-    if (!hasVisited) {
-      setShouldPulse(true);
-      sessionStorage.setItem("chalk-visited", "true");
-    }
-  }, []);
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (query.trim()) {
-      navigate(`/ask?q=${encodeURIComponent(query.trim())}`);
-    }
-  };
-
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
 
       {/* Hero */}
-      <section className="max-w-3xl mx-auto px-6 pt-20 pb-16 text-center">
-        <span className="inline-block text-[11px] font-medium tracking-[0.2em] uppercase text-primary mb-4">
-          MEET MR. WHITE
-        </span>
-        <h1 className="text-[46px] leading-[1.15] font-light text-foreground mb-5">
-          Your personal AI professor.
+      <section className="max-w-3xl mx-auto px-6 pt-16 pb-10 text-center">
+        <h1 className="text-[42px] md:text-[52px] leading-[1.1] font-semibold text-foreground mb-4 tracking-tight">
+          Understand anything in seconds
+          <br />
+          <span className="text-primary">— explained visually</span>
         </h1>
-        <p className="text-muted-foreground max-w-[540px] mx-auto text-base leading-relaxed">
-          Ask Mr. White any question and watch him draw out the answer — or import your class
-          slides and let him guide you through every concept, one at a time.
+        <p className="text-muted-foreground max-w-[480px] mx-auto text-base leading-relaxed mb-8">
+          Ask any question and watch Mr.&nbsp;White draw the answer step-by-step on a whiteboard.
         </p>
-        <Link
-          to="/ask"
-          className="inline-flex items-center justify-center mt-6 px-6 py-3 text-sm rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
-        >
-          Ask Mr. White anything
-        </Link>
 
-        {/* Hero input bar */}
-        <form onSubmit={handleSubmit} className="mt-6 mx-auto max-w-[540px] w-full relative">
-          <input
-            type="text"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="Chalk it up..."
-            className={`w-full rounded-full border border-border bg-card px-5 py-3 pr-12 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 transition-shadow${shouldPulse ? " placeholder-pulse" : ""}`}
-          />
-          <button
-            type="submit"
-            className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center hover:bg-primary/90 transition-colors"
-            aria-label="Send question"
+        {/* CTAs */}
+        <div className="flex items-center justify-center gap-3 mb-10">
+          <Link
+            to="/ask"
+            className="inline-flex items-center justify-center px-7 py-3.5 text-sm font-medium rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition-colors shadow-md shadow-primary/20"
           >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <line x1="5" y1="12" x2="19" y2="12" />
-              <polyline points="12 5 19 12 12 19" />
-            </svg>
-          </button>
-        </form>
-      </section>
-
-      {/* Mr. White greeting */}
-      <div className="flex justify-center mb-10">
-        <MrWhite state="excited" size={160} />
-      </div>
-
-      {/* Two Mode Cards */}
-      <section className="max-w-3xl mx-auto px-6 pb-16">
-        <div className="grid md:grid-cols-2 gap-5">
-          {/* Ask Card */}
-          <div className="bg-card rounded-xl p-8 border border-border/60 hover:border-primary/30 transition-colors">
-            <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-5">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-primary">
-                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            </div>
-            <h3 className="text-lg font-medium text-foreground mb-2">Ask Mr. White</h3>
-            <p className="text-sm text-muted-foreground mb-6 leading-relaxed">
-              Type or speak any question. Mr. White draws the answer on his whiteboard in real time.
-            </p>
-            <Link
-              to="/ask"
-              className="inline-flex items-center justify-center w-full px-5 py-2.5 text-sm rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
-            >
-              Ask a question
-            </Link>
-          </div>
-
-          {/* Slides Card */}
-          <div className="bg-card rounded-xl p-8 border border-border/60 hover:border-primary/30 transition-colors">
-            <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-5">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-primary">
-                <rect x="2" y="3" width="20" height="14" rx="2" ry="2" strokeLinecap="round" strokeLinejoin="round" />
-                <line x1="8" y1="21" x2="16" y2="21" strokeLinecap="round" />
-                <line x1="12" y1="17" x2="12" y2="21" strokeLinecap="round" />
-              </svg>
-            </div>
-            <h3 className="text-lg font-medium text-foreground mb-2">Import my slides</h3>
-            <p className="text-sm text-muted-foreground mb-6 leading-relaxed">
-              Upload your class slides and Mr. White walks you through every concept — drawing, explaining, and quizzing you.
-            </p>
-            <Link
-              to="/slides"
-              className="inline-flex items-center justify-center w-full px-5 py-2.5 text-sm rounded-lg border border-primary text-primary hover:bg-primary/5 transition-colors"
-            >
-              Upload slides
-            </Link>
-          </div>
+            Try Chalk instantly
+          </Link>
+          <a
+            href="#how-it-works"
+            className="inline-flex items-center justify-center px-6 py-3.5 text-sm font-medium rounded-lg border border-border text-muted-foreground hover:text-foreground hover:border-foreground/30 transition-colors"
+          >
+            Watch demo
+          </a>
         </div>
 
-        <p className="text-center text-xs text-muted-foreground mt-6">
-          Free to start · No signup required · Works for any subject
-        </p>
+        {/* Interactive whiteboard demo */}
+        <HeroWhiteboardDemo />
       </section>
 
       {/* Subject Chips */}
-      <section id="subjects" className="max-w-3xl mx-auto px-6 pb-16">
+      <section id="subjects" className="max-w-3xl mx-auto px-6 pb-12">
         <p className="text-center text-[11px] text-muted-foreground tracking-[0.2em] uppercase mb-4">
-          Start with a subject
+          Works for any subject
         </p>
         <div className="flex flex-wrap justify-center gap-2">
           {subjects.map((s) => (
@@ -145,44 +62,66 @@ const Index: React.FC = () => {
         </div>
       </section>
 
+      {/* Two Mode Cards */}
+      <section className="max-w-3xl mx-auto px-6 pb-16">
+        <div className="grid md:grid-cols-2 gap-5">
+          <div className="bg-card rounded-xl p-8 border border-border/60 hover:border-primary/30 transition-colors">
+            <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-5">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-primary">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </div>
+            <h3 className="text-lg font-medium text-foreground mb-2">Ask Mr. White</h3>
+            <p className="text-sm text-muted-foreground mb-6 leading-relaxed">
+              Type any question. Mr.&nbsp;White draws the answer on his whiteboard in real time.
+            </p>
+            <Link
+              to="/ask"
+              className="inline-flex items-center justify-center w-full px-5 py-2.5 text-sm rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
+            >
+              Ask a question
+            </Link>
+          </div>
+
+          <div className="bg-card rounded-xl p-8 border border-border/60 hover:border-primary/30 transition-colors">
+            <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-5">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-primary">
+                <rect x="2" y="3" width="20" height="14" rx="2" ry="2" strokeLinecap="round" strokeLinejoin="round" />
+                <line x1="8" y1="21" x2="16" y2="21" strokeLinecap="round" />
+                <line x1="12" y1="17" x2="12" y2="21" strokeLinecap="round" />
+              </svg>
+            </div>
+            <h3 className="text-lg font-medium text-foreground mb-2">Import my slides</h3>
+            <p className="text-sm text-muted-foreground mb-6 leading-relaxed">
+              Upload class slides and Mr.&nbsp;White walks you through every concept.
+            </p>
+            <Link
+              to="/slides"
+              className="inline-flex items-center justify-center w-full px-5 py-2.5 text-sm rounded-lg border border-primary text-primary hover:bg-primary/5 transition-colors"
+            >
+              Upload slides
+            </Link>
+          </div>
+        </div>
+      </section>
+
       {/* How It Works */}
       <section id="how-it-works" className="max-w-3xl mx-auto px-6 pb-20">
         <h2 className="text-2xl font-light text-foreground text-center mb-12">How it works</h2>
-        <div className="grid md:grid-cols-2 gap-12">
-          <div>
-            <h3 className="text-sm font-medium text-primary mb-4 uppercase tracking-wider">Ask Anything</h3>
-            <ol className="space-y-4 text-sm text-muted-foreground">
-              <li className="flex gap-3">
-                <span className="w-5 h-5 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xs flex-shrink-0 mt-0.5">1</span>
-                Type or speak your question
-              </li>
-              <li className="flex gap-3">
-                <span className="w-5 h-5 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xs flex-shrink-0 mt-0.5">2</span>
-                Mr. White draws the answer on his whiteboard
-              </li>
-              <li className="flex gap-3">
-                <span className="w-5 h-5 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xs flex-shrink-0 mt-0.5">3</span>
-                Ask follow-ups, go deeper, get quizzed
-              </li>
-            </ol>
-          </div>
-          <div>
-            <h3 className="text-sm font-medium text-primary mb-4 uppercase tracking-wider">Import Slides</h3>
-            <ol className="space-y-4 text-sm text-muted-foreground">
-              <li className="flex gap-3">
-                <span className="w-5 h-5 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xs flex-shrink-0 mt-0.5">1</span>
-                Upload your PDF or PowerPoint
-              </li>
-              <li className="flex gap-3">
-                <span className="w-5 h-5 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xs flex-shrink-0 mt-0.5">2</span>
-                Mr. White reads your slides
-              </li>
-              <li className="flex gap-3">
-                <span className="w-5 h-5 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xs flex-shrink-0 mt-0.5">3</span>
-                He guides you through — highlight anything to ask about it
-              </li>
-            </ol>
-          </div>
+        <div className="grid md:grid-cols-3 gap-8 text-center">
+          {[
+            { step: "1", title: "Ask anything", desc: "Type or speak your question" },
+            { step: "2", title: "Watch it drawn", desc: "Mr. White draws the answer on his whiteboard" },
+            { step: "3", title: "Go deeper", desc: "Ask follow-ups, get quizzed, master the topic" },
+          ].map((item) => (
+            <div key={item.step}>
+              <div className="w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center text-sm font-medium mx-auto mb-3">
+                {item.step}
+              </div>
+              <h3 className="text-sm font-medium text-foreground mb-1">{item.title}</h3>
+              <p className="text-sm text-muted-foreground">{item.desc}</p>
+            </div>
+          ))}
         </div>
       </section>
 
