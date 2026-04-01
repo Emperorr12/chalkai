@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useRef } from "react";
 import Navbar from "../components/Navbar";
-import MrWhite, { type MrWhiteState } from "../components/MrWhite";
+import { type MrWhiteState } from "../components/MrWhite";
 import Whiteboard, { type WhiteboardElement } from "../components/Whiteboard";
 import ChatPanel, { type ChatMessage } from "../components/ChatPanel";
 import { toast } from "sonner";
