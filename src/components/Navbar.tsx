@@ -24,6 +24,7 @@ const Navbar: React.FC = () => {
               <a href="#subjects" className="hover:text-foreground transition-colors">Subjects</a>
             </>
           )}
+          <Link to="/exam-prep" className="hover:text-foreground transition-colors">Exam Prep</Link>
           <Link to="/demo" className="hover:text-foreground transition-colors">Demo</Link>
         </div>
 
