@@ -124,6 +124,7 @@ const AskPage: React.FC = () => {
           role: "mr_white",
           content:
             "You've been crushing it — 5 concepts today! Ready to go unlimited? Upgrade to Pro and I'll never make you stop. 🎓",
+          timestamp: Date.now(),
         },
       ]);
       setQuickChips(["Upgrade to Pro", "Ask anything"]);
