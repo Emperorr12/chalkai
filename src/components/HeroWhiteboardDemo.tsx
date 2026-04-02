@@ -204,7 +204,7 @@ const HeroWhiteboardDemo: React.FC = () => {
         </svg>
 
         {/* Mr. White in corner */}
-        <div className="absolute bottom-2 right-2">
+        <div className="absolute bottom-2 right-12">
           <MrWhite state={mrWhiteState} size={140} />
         </div>
       </div>
