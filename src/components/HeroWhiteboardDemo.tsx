@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import MrWhite from "./MrWhite";
 import type { MrWhiteState } from "./MrWhite";
 
@@ -16,108 +16,113 @@ const labels = [
   { text: "y", x: 18, y: 12, delay: 0.6 },
 ];
 
-type Phase = "waiting" | "drawing" | "hold" | "erasing" | "pause";
+// Phases: drawing → hold → erasing → drawn-blank
+// "drawn-blank" is a brief moment where everything is already erased,
+// before we restart. We never use transition:"none" mid-cycle.
+type Phase = "drawing" | "hold" | "erasing" | "drawn-blank";
 
 const HeroWhiteboardDemo: React.FC = () => {
-  const [phase, setPhase] = useState<Phase>("waiting");
-  const [mrWhiteState, setMrWhiteState] = useState<MrWhiteState>("idle");
+  const [phase, setPhase] = useState<Phase>("drawing");
+  const [mrWhiteState, setMrWhiteState] = useState<MrWhiteState>("drawing");
+  const timersRef = useRef<ReturnType<typeof setTimeout>[]>([]);
 
-  const runCycle = useCallback(() => {
-    // Phase 1: thinking before drawing
-    setPhase("waiting");
-    setMrWhiteState("thinking");
-
-    const timers: ReturnType<typeof setTimeout>[] = [];
-
-    // 1s: start drawing
-    timers.push(setTimeout(() => {
-      setPhase("drawing");
-      setMrWhiteState("drawing");
-    }, 1000));
-
-    // 5s: drawing done, hold
-    timers.push(setTimeout(() => {
-      setPhase("hold");
-      setMrWhiteState("excited");
-    }, 5000));
-
-    // 5.6s: calm down
-    timers.push(setTimeout(() => {
-      setMrWhiteState("idle");
-    }, 5600));
-
-    // 7.5s: start erasing (reverse)
-    timers.push(setTimeout(() => {
-      setPhase("erasing");
-      setMrWhiteState("drawing");
-    }, 7500));
-
-    // 11.5s: fully erased, pause
-    timers.push(setTimeout(() => {
-      setPhase("pause");
-      setMrWhiteState("idle");
-    }, 11500));
-
-    // 12.5s: restart
-    timers.push(setTimeout(() => {
-      runCycle();
-    }, 12500));
-
-    return () => timers.forEach(clearTimeout);
+  const clearTimers = useCallback(() => {
+    timersRef.current.forEach(clearTimeout);
+    timersRef.current = [];
   }, []);
 
+  const schedule = useCallback((fn: () => void, ms: number) => {
+    timersRef.current.push(setTimeout(fn, ms));
+  }, []);
+
+  const runCycle = useCallback(() => {
+    clearTimers();
+
+    // Start: drawing phase (strokes animate in over ~4s)
+    setPhase("drawing");
+    setMrWhiteState("drawing");
+
+    // 4.5s: done drawing, hold and celebrate
+    schedule(() => {
+      setPhase("hold");
+      setMrWhiteState("excited");
+    }, 4500);
+
+    // 5.1s: calm down
+    schedule(() => {
+      setMrWhiteState("idle");
+    }, 5100);
+
+    // 7s: start erasing (smooth reverse over ~3s)
+    schedule(() => {
+      setPhase("erasing");
+      setMrWhiteState("drawing");
+    }, 7000);
+
+    // 10s: erase complete, brief blank
+    schedule(() => {
+      setPhase("drawn-blank");
+      setMrWhiteState("thinking");
+    }, 10000);
+
+    // 11s: restart cycle
+    schedule(() => {
+      runCycle();
+    }, 11000);
+  }, [clearTimers, schedule]);
+
   useEffect(() => {
-    return runCycle();
-  }, [runCycle]);
+    runCycle();
+    return clearTimers;
+  }, [runCycle, clearTimers]);
 
-  const isVisible = phase === "drawing" || phase === "hold";
-  const isErasing = phase === "erasing";
-
-  // For drawing: strokeDashoffset goes from full → 0 (forward animation)
-  // For erasing: strokeDashoffset goes from 0 → full (reverse via transition)
-  // For waiting/pause: instant hide (no transition)
   const getStrokeStyle = (dashLen: number, drawDuration: string, drawDelay: string) => {
-    if (phase === "waiting" || phase === "pause") {
-      return {
-        strokeDasharray: dashLen,
-        strokeDashoffset: dashLen,
-        transition: "none",
-      };
+    switch (phase) {
+      case "drawing":
+      case "hold":
+        return {
+          strokeDasharray: dashLen,
+          strokeDashoffset: 0,
+          transition: `stroke-dashoffset ${drawDuration} ease-out ${drawDelay}`,
+        };
+      case "erasing":
+        return {
+          strokeDasharray: dashLen,
+          strokeDashoffset: dashLen,
+          transition: "stroke-dashoffset 2.8s ease-in-out 0s",
+        };
+      case "drawn-blank":
+        // Already erased — keep hidden, no abrupt jump
+        return {
+          strokeDasharray: dashLen,
+          strokeDashoffset: dashLen,
+          transition: "stroke-dashoffset 0.01s linear 0s",
+        };
     }
-    if (phase === "drawing" || phase === "hold") {
-      return {
-        strokeDasharray: dashLen,
-        strokeDashoffset: 0,
-        transition: `stroke-dashoffset ${drawDuration} ease-out ${drawDelay}`,
-      };
-    }
-    // erasing — reverse with matching duration, no delay (all erase together)
-    return {
-      strokeDasharray: dashLen,
-      strokeDashoffset: dashLen,
-      transition: `stroke-dashoffset 2.5s ease-in 0s`,
-    };
   };
 
   const getLabelOpacity = (delay: number) => {
-    if (phase === "waiting" || phase === "pause") {
-      return { opacity: 0, transition: "none" };
+    switch (phase) {
+      case "drawing":
+      case "hold":
+        return { opacity: 1, transition: `opacity 0.5s ease-out ${delay}s` };
+      case "erasing":
+        return { opacity: 0, transition: "opacity 2s ease-in-out 0s" };
+      case "drawn-blank":
+        return { opacity: 0, transition: "opacity 0.01s linear 0s" };
     }
-    if (isVisible) {
-      return { opacity: 1, transition: `opacity 0.4s ease ${delay}s` };
-    }
-    // erasing
-    return { opacity: 0, transition: "opacity 1.5s ease-in 0s" };
   };
 
   const getDotOpacity = () => {
-    if (phase === "waiting" || phase === "pause") {
-      return { opacity: 0, transition: "none" };
+    switch (phase) {
+      case "drawing":
+      case "hold":
+        return { opacity: 1, transition: "opacity 0.4s ease-out 2.8s" };
+      case "erasing":
+        return { opacity: 0, transition: "opacity 2s ease-in-out 0s" };
+      case "drawn-blank":
+        return { opacity: 0, transition: "opacity 0.01s linear 0s" };
     }
-    if (isVisible) {
-      return { opacity: 1, transition: "opacity 0.3s ease 2.8s" };
-    }
-    return { opacity: 0, transition: "opacity 1.5s ease-in 0s" };
   };
 
   return (
@@ -141,7 +146,7 @@ const HeroWhiteboardDemo: React.FC = () => {
             strokeWidth="1.5"
             fill="none"
             strokeLinecap="round"
-            style={getStrokeStyle(270, "0.4s", "0s")}
+            style={getStrokeStyle(270, "0.5s", "0s")}
           />
           <path
             d={AXIS_Y}
@@ -149,7 +154,7 @@ const HeroWhiteboardDemo: React.FC = () => {
             strokeWidth="1.5"
             fill="none"
             strokeLinecap="round"
-            style={getStrokeStyle(115, "0.3s", "0.2s")}
+            style={getStrokeStyle(115, "0.4s", "0.2s")}
           />
 
           {/* Main curve f(x) */}
@@ -160,7 +165,7 @@ const HeroWhiteboardDemo: React.FC = () => {
             fill="none"
             strokeLinecap="round"
             strokeLinejoin="round"
-            style={getStrokeStyle(350, "1.6s", "0.5s")}
+            style={getStrokeStyle(350, "1.8s", "0.5s")}
           />
 
           {/* Tangent line */}
@@ -170,7 +175,7 @@ const HeroWhiteboardDemo: React.FC = () => {
             strokeWidth="1.5"
             fill="none"
             strokeLinecap="round"
-            style={getStrokeStyle(110, "0.8s", "2.2s")}
+            style={getStrokeStyle(110, "0.9s", "2.2s")}
           />
 
           {/* Point on curve */}
