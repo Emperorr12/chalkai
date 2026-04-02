@@ -191,9 +191,6 @@ const AskPage: React.FC = () => {
 
       const aiResponse: AIResponse = JSON.parse(rawText);
 
-      setIsTyping(false);
-      setMessages((prev) => [...prev, { role: "mr_white", content: aiResponse.message, timestamp: Date.now() }]);
-
       // Save lesson data
       const wbData = aiResponse.whiteboard?.active && aiResponse.whiteboard.elements
         ? { title: aiResponse.whiteboard.title || "", elements: aiResponse.whiteboard.elements }
@@ -207,7 +204,8 @@ const AskPage: React.FC = () => {
         subject: activeSubject,
       });
 
-      // Sequence: voice first → then whiteboard draws
+      // Sequence: voice loads → message appears + voice plays → whiteboard draws
+      // Keep "thinking" state while TTS audio is fetching
       const startWhiteboard = () => {
         if (wbData) {
           setWhiteboardData(wbData);
@@ -221,16 +219,26 @@ const AskPage: React.FC = () => {
             }
           }, drawDuration);
         } else {
-          setMrWhiteState("idle");
+          const finalState = aiResponse.mr_white_state || "idle";
+          setMrWhiteState(finalState);
+          if (finalState !== "idle") {
+            setTimeout(() => setMrWhiteState("idle"), 3000);
+          }
         }
       };
 
-      // Play TTS — when it ends, start whiteboard drawing
-      setMrWhiteState("talking");
+      // Voice onStart: reveal the message in chat (synced with audio)
+      const revealMessage = () => {
+        setIsTyping(false);
+        setMessages((prev) => [...prev, { role: "mr_white", content: aiResponse.message, timestamp: Date.now() }]);
+        setMrWhiteState("talking");
+      };
+
+      // Speak — keeps "thinking" until audio is ready, then reveals text + plays voice
       speak(
         aiResponse.message,
-        () => setMrWhiteState("talking"),
-        () => startWhiteboard(),
+        revealMessage,
+        startWhiteboard,
       );
 
       // Track the topic if detected
