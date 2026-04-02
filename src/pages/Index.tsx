@@ -100,7 +100,7 @@ const Index: React.FC = () => {
               to="/ask"
               className="inline-flex items-center justify-center w-full px-5 py-2.5 text-sm rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
             >
-              Stop being confused
+              Ask Now
             </Link>
           </div>
 
