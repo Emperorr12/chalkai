@@ -120,8 +120,7 @@ const AskPage: React.FC = () => {
       setTimeout(() => setMrWhiteState("idle"), 3000);
       return;
     }
-
-    incrementDailyCount();
+    if (!isPro) incrementDailyCount();
 
     setMrWhiteState("thinking");
     setIsTyping(true);
