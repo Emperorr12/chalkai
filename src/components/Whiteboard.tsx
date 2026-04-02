@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef, useCallback } from "react";
 import { type MrWhiteState } from "./MrWhite";
 import HighlightAskTooltip from "./HighlightAskTooltip";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 export interface WhiteboardElement {
   kind: "text" | "line" | "arrow" | "circle" | "rect" | "curve" | "path";
