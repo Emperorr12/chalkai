@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect, useCallback } from "react";
 import { Mic, Loader2 } from "lucide-react";
 import MrWhite, { type MrWhiteState } from "./MrWhite";
+import HighlightAskTooltip from "./HighlightAskTooltip";
 
 export interface ChatMessage {
   role: "mr_white" | "student";
