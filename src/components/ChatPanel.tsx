@@ -326,41 +326,67 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
           containerRef={scrollRef as React.RefObject<HTMLElement>}
           onAsk={(text) => onSend(`Can you explain this in more detail: "${text}"?`)}
         />
-        {messages.map((msg, i) => (
-          <div
-            key={i}
-            className={`flex animate-fade-in-up ${
-              msg.role === "student" ? "justify-end" : "justify-start"
-            }`}
-          >
-            {msg.role === "mr_white" && (
-              <MrWhite state="idle" size={28} className="mr-2 mt-1 flex-shrink-0" />
-            )}
-            <div
-              {...(msg.role === "mr_white" ? { "data-mr-white-msg": true } : {})}
-              className={`max-w-[80%] text-sm leading-relaxed ${
-                msg.role === "student"
-                  ? "student-bubble"
-                  : "chalk-bubble"
-              }`}
-            >
-              {msg.imagePreview && (
-                <img
-                  src={msg.imagePreview}
-                  alt="Uploaded problem"
-                  className="max-w-full max-h-48 rounded-md mb-2 border border-border"
-                />
-              )}
-              {msg.fileName && !msg.imagePreview && (
-                <div className="flex items-center gap-2 mb-2 px-2 py-1.5 bg-background/30 rounded border border-border/50 text-xs">
-                  <span className="font-medium">{msg.fileName.split('.').pop()?.toUpperCase()}</span>
-                  <span className="truncate opacity-70">{msg.fileName}</span>
+        {messages.map((msg, i) => {
+          // Find the student question that precedes this mr_white answer
+          const prevStudentMsg = msg.role === "mr_white" && i > 0
+            ? messages.slice(0, i).reverse().find((m) => m.role === "student")
+            : null;
+          const isSaved = prevStudentMsg && savedConceptQuestions?.has(prevStudentMsg.content);
+          const canSave = msg.role === "mr_white" && prevStudentMsg && onSaveConcept && i > 0;
+
+          return (
+            <div key={i}>
+              <div
+                className={`flex animate-fade-in-up ${
+                  msg.role === "student" ? "justify-end" : "justify-start"
+                }`}
+              >
+                {msg.role === "mr_white" && (
+                  <MrWhite state="idle" size={28} className="mr-2 mt-1 flex-shrink-0" />
+                )}
+                <div
+                  {...(msg.role === "mr_white" ? { "data-mr-white-msg": true } : {})}
+                  className={`max-w-[80%] text-sm leading-relaxed ${
+                    msg.role === "student"
+                      ? "student-bubble"
+                      : "chalk-bubble"
+                  }`}
+                >
+                  {msg.imagePreview && (
+                    <img
+                      src={msg.imagePreview}
+                      alt="Uploaded problem"
+                      className="max-w-full max-h-48 rounded-md mb-2 border border-border"
+                    />
+                  )}
+                  {msg.fileName && !msg.imagePreview && (
+                    <div className="flex items-center gap-2 mb-2 px-2 py-1.5 bg-background/30 rounded border border-border/50 text-xs">
+                      <span className="font-medium">{msg.fileName.split('.').pop()?.toUpperCase()}</span>
+                      <span className="truncate opacity-70">{msg.fileName}</span>
+                    </div>
+                  )}
+                  {msg.content}
+                </div>
+              </div>
+              {canSave && (
+                <div className="ml-9 mt-1 mb-1">
+                  <button
+                    onClick={() => onSaveConcept(prevStudentMsg!.content, msg.content)}
+                    disabled={!!isSaved}
+                    className={`text-[11px] px-2.5 py-1 rounded-full border transition-colors inline-flex items-center gap-1 ${
+                      isSaved
+                        ? "border-green-300 text-green-600 cursor-default"
+                        : "border-border text-muted-foreground hover:border-primary hover:text-primary"
+                    }`}
+                  >
+                    <Bookmark className="w-3 h-3" />
+                    {isSaved ? "Saved" : "Save concept"}
+                  </button>
                 </div>
               )}
-              {msg.content}
             </div>
-          </div>
-        ))}
+          );
+        })}
 
         {isTyping && (
           <div className="flex justify-start animate-fade-in-up">
