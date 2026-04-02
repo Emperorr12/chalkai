@@ -206,12 +206,13 @@ const MrWhite: React.FC<MrWhiteProps> = ({ state = "idle", size = 140, className
             transform={state === "drawing" ? "rotate(-30, 114, 71)" : "rotate(15, 101, 95)"}
           />
 
-          {/* Thinking dots */}
+          {/* Thinking dots + text */}
           {state === "thinking" && (
             <>
               <circle cx="88" cy="28" r="2.5" fill="#3B6FCA" opacity="0.6" style={{ animation: "dots-pulse 1.2s 0s infinite" }} />
               <circle cx="95" cy="22" r="2.5" fill="#3B6FCA" opacity="0.6" style={{ animation: "dots-pulse 1.2s 0.2s infinite" }} />
               <circle cx="102" cy="28" r="2.5" fill="#3B6FCA" opacity="0.6" style={{ animation: "dots-pulse 1.2s 0.4s infinite" }} />
+              <text x="95" y="16" textAnchor="middle" fontSize="10" fill="#3B6FCA" opacity="0.5" fontFamily="Caveat, cursive" style={{ animation: "dots-pulse 1.5s infinite" }}>...</text>
             </>
           )}
 
