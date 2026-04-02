@@ -220,7 +220,8 @@
   .animate-think,
   .animate-excited,
   .animate-celebrate,
-  .animate-lean {
+  .animate-lean,
+  .animate-mic-pulse {
     animation: none;
   }
   .chalk-animate {
