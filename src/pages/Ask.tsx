@@ -213,7 +213,7 @@ const AskPage: React.FC = () => {
           </div>
 
           {/* Whiteboard */}
-          <Whiteboard whiteboardData={whiteboardData} mrWhiteState={mrWhiteState} className="flex-1 w-full min-h-0" />
+          <Whiteboard whiteboardData={whiteboardData} mrWhiteState={mrWhiteState} className="flex-1 w-full min-h-0" onAskAbout={(text) => handleSend(`Can you explain this in more detail: "${text}"?`)} />
         </div>
 
         {/* Toggle button */}

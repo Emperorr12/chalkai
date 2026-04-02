@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useRef, useCallback } from "react";
 import { type MrWhiteState } from "./MrWhite";
+import HighlightAskTooltip from "./HighlightAskTooltip";
 
 export interface WhiteboardElement {
   kind: "text" | "line" | "arrow" | "circle" | "rect" | "curve" | "path";
@@ -18,6 +19,7 @@ interface WhiteboardProps {
   whiteboardData: WhiteboardData | null;
   mrWhiteState?: MrWhiteState;
   className?: string;
+  onAskAbout?: (text: string) => void;
 }
 
 const CHALK_COLORS = {
@@ -32,7 +34,8 @@ const PAD = 24;
 
 type Phase = "idle" | "fading-out" | "drawing" | "wiping";
 
-const Whiteboard: React.FC<WhiteboardProps> = ({ whiteboardData, mrWhiteState = "idle", className = "" }) => {
+const Whiteboard: React.FC<WhiteboardProps> = ({ whiteboardData, mrWhiteState = "idle", className = "", onAskAbout }) => {
+  const whiteboardContainerRef = useRef<HTMLDivElement>(null);
   const [phase, setPhase] = useState<Phase>("idle");
   const [activeData, setActiveData] = useState<WhiteboardData | null>(null);
   const [visibleIndices, setVisibleIndices] = useState<Set<number>>(new Set());
@@ -495,6 +498,49 @@ const Whiteboard: React.FC<WhiteboardProps> = ({ whiteboardData, mrWhiteState = 
               )}
             </g>
           </svg>
+
+          {/* Selectable text overlay for highlight-and-ask */}
+          {activeData && activeData.elements.length > 0 && onAskAbout && (
+            <div
+              ref={whiteboardContainerRef}
+              className="absolute inset-0 pointer-events-auto"
+              style={{ userSelect: "text" }}
+            >
+              <HighlightAskTooltip
+                containerRef={whiteboardContainerRef as React.RefObject<HTMLElement>}
+                onAsk={(text) => onAskAbout(text)}
+              />
+              {/* Invisible but selectable text elements matching whiteboard content */}
+              <svg
+                viewBox={`0 0 ${SVG_W} ${SVG_H}`}
+                width="100%"
+                height="100%"
+                preserveAspectRatio="xMidYMid meet"
+                style={{ display: "block", position: "absolute", top: 0, left: 0 }}
+              >
+                {activeData.elements.map((el, i) => {
+                  if (el.kind !== "text" || !visibleIndices.has(i)) return null;
+                  const yOffset = getYOffset(i);
+                  const fontSize = el.size === "large" ? 36 : el.size === "small" ? 22 : 28;
+                  return (
+                    <text
+                      key={`sel-${i}`}
+                      x={PAD}
+                      y={yOffset}
+                      fontSize={fontSize}
+                      fontFamily="'Caveat', cursive"
+                      fontWeight={700}
+                      fill="transparent"
+                      style={{ cursor: "text", userSelect: "text" }}
+                      data-mr-white-msg="true"
+                    >
+                      {el.content}
+                    </text>
+                  );
+                })}
+              </svg>
+            </div>
+          )}
 
           {/* Wipe overlay for eraser animation */}
           {phase === "wiping" && (
