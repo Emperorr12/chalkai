@@ -24,8 +24,8 @@ const Index: React.FC = () => {
       <Navbar />
 
       {/* Hero */}
-      <section className="max-w-3xl mx-auto px-6 pt-16 pb-10 text-center">
-        <h1 className="text-[42px] md:text-[52px] leading-[1.1] font-semibold text-foreground mb-4 tracking-tight">
+      <section className="max-w-3xl mx-auto px-6 pt-6 sm:pt-16 pb-6 sm:pb-10 text-center">
+        <h1 className="text-[32px] sm:text-[42px] md:text-[52px] leading-[1.1] font-semibold text-foreground mb-3 sm:mb-4 tracking-tight">
           Understand anything in seconds
           <br />
           <span className="text-primary">— explained visually</span>
