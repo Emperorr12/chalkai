@@ -317,6 +317,23 @@ const AskPage: React.FC = () => {
     }
   }, [searchParams, setSearchParams, handleSend]);
 
+  // Handle checkout success
+  const checkoutHandledRef = useRef(false);
+  useEffect(() => {
+    if (searchParams.get("checkout") === "success" && !checkoutHandledRef.current) {
+      checkoutHandledRef.current = true;
+      setSearchParams({}, { replace: true });
+      refreshSubscription();
+      setMrWhiteState("celebrating");
+      setShowCelebration(true);
+      setMessages((prev) => [
+        ...prev,
+        { role: "mr_white", content: "Welcome to Chalk Pro! Now let's really get to work. 🎉🎓" },
+      ]);
+      setTimeout(() => setMrWhiteState("idle"), 4000);
+    }
+  }, [searchParams, setSearchParams, refreshSubscription]);
+
   const sessionMinutes = Math.floor((Date.now() - startTime) / 60000);
 
   return (
