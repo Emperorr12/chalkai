@@ -158,8 +158,8 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
               <polyline points="17 8 12 3 7 8" />
               <line x1="12" y1="3" x2="12" y2="15" />
             </svg>
-            <p className="text-sm font-medium text-primary">Drop image here</p>
-            <p className="text-xs text-muted-foreground">Photos of problems, worksheets, textbooks</p>
+            <p className="text-sm font-medium text-primary">Drop file here</p>
+            <p className="text-xs text-muted-foreground">Images, PDFs, text files, CSVs</p>
           </div>
         </div>
       )}
