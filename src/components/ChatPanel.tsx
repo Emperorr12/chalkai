@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect, useCallback } from "react";
-import { Mic, Loader2, Bookmark } from "lucide-react";
+import { Mic, Loader2, Bookmark, RotateCcw } from "lucide-react";
 import { type MrWhiteState } from "./MrWhite";
 import HighlightAskTooltip from "./HighlightAskTooltip";
 
