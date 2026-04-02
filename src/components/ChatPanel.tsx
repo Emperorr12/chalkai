@@ -395,7 +395,11 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
 
       {/* Quick chips */}
       {quickChips.length > 0 && (
-        <div className="flex gap-2 px-4 py-2 overflow-x-auto flex-shrink-0">
+        <div
+          key={quickChips.join(",")}
+          className="flex gap-2 px-4 py-2 overflow-x-auto flex-shrink-0"
+          style={{ animation: "fade-in 0.2s ease-out" }}
+        >
           {quickChips.map((chip) => (
             <button
               key={chip}
