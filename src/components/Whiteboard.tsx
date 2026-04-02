@@ -266,7 +266,7 @@ const Whiteboard: React.FC<WhiteboardProps> = ({
           backgroundColor: "#FFFEF5",
           border: "8px solid #8B6914",
           borderRadius: 6,
-          padding: PAD,
+          padding: pad,
           position: "relative",
           overflow: "hidden",
           boxShadow: "0 4px 20px -4px rgba(0, 0, 0, 0.15)",
