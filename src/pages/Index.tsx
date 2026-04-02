@@ -36,7 +36,7 @@ const Index: React.FC = () => {
 
         {/* Hero Input */}
         <form onSubmit={handleHeroSubmit} className="max-w-lg mx-auto mb-8 sm:mb-10">
-          <div className="flex items-center gap-2 bg-card rounded-full px-4 sm:px-5 py-2.5 sm:py-3 border border-border focus-within:border-primary transition-colors shadow-lg shadow-primary/5">
+          <div className="flex items-center gap-2 bg-card rounded-full px-5 py-3 border border-border focus-within:border-primary transition-colors shadow-lg shadow-primary/5">
             <input
               value={heroQuery}
               onChange={(e) => setHeroQuery(e.target.value)}
