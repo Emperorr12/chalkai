@@ -105,18 +105,18 @@ const AskPage: React.FC = () => {
       fileType: fileData?.type,
     }]);
 
-    // Check daily free limit
-    if (hasReachedLimit()) {
+    // Check daily free limit (skip for Pro users)
+    if (!isPro && hasReachedLimit()) {
       setMrWhiteState("excited");
       setMessages((prev) => [
         ...prev,
         {
           role: "mr_white",
           content:
-            "You've been on a roll today — 5 concepts already! Upgrade to Pro for unlimited sessions. I'll be here waiting. 🎓",
+            "You've been crushing it — 5 concepts today! Ready to go unlimited? Upgrade to Pro and I'll never make you stop. 🎓",
         },
       ]);
-      setQuickChips(["See Chalk Pro", "Ask anything"]);
+      setQuickChips(["Upgrade to Pro", "Ask anything"]);
       setTimeout(() => setMrWhiteState("idle"), 3000);
       return;
     }
