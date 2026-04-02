@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import { MessageSquare, PanelRightClose } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useLearningProfile } from "@/hooks/useLearningProfile";
+import { useSavedConcepts } from "@/hooks/useSavedConcepts";
 
 const subjects = ["Math", "Science", "History", "Economics", "Coding", "English", "Other"];
 const defaultChips = ["Ask anything", "Explain simpler", "Go deeper", "Quiz me"];
@@ -44,6 +45,7 @@ interface AIResponse {
 const AskPage: React.FC = () => {
   const { user } = useAuth();
   const { trackTopic, trackSimplification, trackSession, getProfileSummary, markMastered } = useLearningProfile();
+  const { saveConcept, concepts } = useSavedConcepts();
 
   const [activeSubject, setActiveSubject] = useState("Math");
   const [messages, setMessages] = useState<ChatMessage[]>([
@@ -266,6 +268,14 @@ const AskPage: React.FC = () => {
             quickChips={quickChips}
             onSend={handleSend}
             onChipClick={handleChipClick}
+            onSaveConcept={user ? (question, explanation) => saveConcept({
+              question,
+              explanation,
+              whiteboard_data: whiteboardData,
+              subject: activeSubject,
+              topic: currentTopic || undefined,
+            }) : undefined}
+            savedConceptQuestions={new Set(concepts.map((c) => c.question))}
             isTyping={isTyping}
             chalkedCount={chalkedCount}
             sessionMinutes={sessionMinutes}
