@@ -200,6 +200,12 @@
 .animate-confetti { animation: confetti-fall 1.2s ease-out forwards; }
 .animate-star { animation: star-burst 0.6s ease-out forwards; }
 
+@keyframes mic-pulse {
+  0%, 100% { transform: scale(1); opacity: 0.6; }
+  50% { transform: scale(1.4); opacity: 0; }
+}
+.animate-mic-pulse { animation: mic-pulse 1s ease-in-out infinite; }
+
 /* Chalk drawing animation for SVG paths */
 .chalk-animate {
   animation: chalk-draw var(--draw-duration, 1s) ease-out forwards;
