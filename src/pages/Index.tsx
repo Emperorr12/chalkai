@@ -24,19 +24,19 @@ const Index: React.FC = () => {
       <Navbar />
 
       {/* Hero */}
-      <section className="max-w-3xl mx-auto px-6 pt-6 sm:pt-16 pb-6 sm:pb-10 text-center">
-        <h1 className="text-[32px] sm:text-[42px] md:text-[52px] leading-[1.1] font-semibold text-foreground mb-3 sm:mb-4 tracking-tight">
+      <section className="max-w-3xl mx-auto px-6 pt-10 sm:pt-16 pb-8 sm:pb-10 text-center">
+        <h1 className="text-[40px] sm:text-[42px] md:text-[52px] leading-[1.08] font-semibold text-foreground mb-4 tracking-tight">
           Understand anything in seconds
           <br />
           <span className="text-primary">— explained visually</span>
         </h1>
-        <p className="text-muted-foreground max-w-[480px] mx-auto text-sm sm:text-base leading-relaxed mb-6 sm:mb-8">
+        <p className="text-muted-foreground max-w-[480px] mx-auto text-[15px] sm:text-base leading-relaxed mb-8">
           Ask any question and watch Mr.&nbsp;White draw the answer step-by-step on a whiteboard.
         </p>
 
         {/* Hero Input */}
-        <form onSubmit={handleHeroSubmit} className="max-w-lg mx-auto mb-6 sm:mb-10">
-          <div className="flex items-center gap-2 bg-card rounded-full px-4 sm:px-5 py-2.5 sm:py-3 border border-border focus-within:border-primary transition-colors shadow-lg shadow-primary/5">
+        <form onSubmit={handleHeroSubmit} className="max-w-lg mx-auto mb-8 sm:mb-10">
+          <div className="flex items-center gap-2 bg-card rounded-full px-5 py-3 border border-border focus-within:border-primary transition-colors shadow-lg shadow-primary/5">
             <input
               value={heroQuery}
               onChange={(e) => setHeroQuery(e.target.value)}
