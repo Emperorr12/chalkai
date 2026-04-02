@@ -63,7 +63,7 @@ serve(async (req) => {
   }
 
   try {
-    const { question, subject, history, confusion_detected, is_first_question, file_data, file_type, file_name } = await req.json();
+    const { question, subject, history, confusion_detected, is_first_question, file_data, file_type, file_name, student_profile } = await req.json();
 
     const ANTHROPIC_API_KEY = Deno.env.get("ANTHROPIC_API_KEY");
     if (!ANTHROPIC_API_KEY) {
