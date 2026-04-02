@@ -89,6 +89,25 @@ const AskPage: React.FC = () => {
       fileName: fileData?.name,
       fileType: fileData?.type,
     }]);
+
+    // Check daily free limit
+    if (hasReachedLimit()) {
+      setMrWhiteState("excited");
+      setMessages((prev) => [
+        ...prev,
+        {
+          role: "mr_white",
+          content:
+            "You've been on a roll today — 5 concepts already! Upgrade to Pro for unlimited sessions. I'll be here waiting. 🎓",
+        },
+      ]);
+      setQuickChips(["See Chalk Pro", "Ask anything"]);
+      setTimeout(() => setMrWhiteState("idle"), 3000);
+      return;
+    }
+
+    incrementDailyCount();
+
     setMrWhiteState("thinking");
     setIsTyping(true);
     setErrorMessage(null);
