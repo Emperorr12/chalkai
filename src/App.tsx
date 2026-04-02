@@ -13,6 +13,7 @@ import AuthPage from "./pages/Auth";
 import NotFound from "./pages/NotFound";
 import ConceptsPage from "./pages/Concepts";
 import LessonsPage from "./pages/Lessons";
+import ProgressPage from "./pages/Progress";
 
 const queryClient = new QueryClient();
 
@@ -31,6 +32,7 @@ const App = () => (
             <Route path="/exam-prep" element={<ExamPrepPage />} />
             <Route path="/concepts" element={<ConceptsPage />} />
             <Route path="/lessons" element={<LessonsPage />} />
+            <Route path="/progress" element={<ProgressPage />} />
             <Route path="/demo" element={<DemoPage />} />
             <Route path="*" element={<NotFound />} />
           </Routes>

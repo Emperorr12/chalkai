@@ -41,6 +41,7 @@ const Navbar: React.FC = () => {
             <Link to="/exam-prep" className="hover:text-foreground transition-colors">Exam Prep</Link>
             {user && <Link to="/concepts" className="hover:text-foreground transition-colors">My Concepts</Link>}
             {user && <Link to="/lessons" className="hover:text-foreground transition-colors">My Lessons</Link>}
+            {user && <Link to="/progress" className="hover:text-foreground transition-colors">Progress</Link>}
             <Link to="/demo" className="hover:text-foreground transition-colors">Demo</Link>
             {!isPro && (
               <button
