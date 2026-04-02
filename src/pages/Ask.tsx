@@ -43,7 +43,7 @@ const AskPage: React.FC = () => {
   const [whiteboardData, setWhiteboardData] = useState<{ title: string; elements: WhiteboardElement[] } | null>(null);
   const [chalkedCount, setChalkedCount] = useState(0);
   const [startTime] = useState(Date.now());
-  const [isStreaming, setIsStreaming] = useState(false);
+  
   const [chatOpen, setChatOpen] = useState(true);
   const abortRef = useRef<AbortController | null>(null);
   const [searchParams, setSearchParams] = useSearchParams();
@@ -55,7 +55,7 @@ const AskPage: React.FC = () => {
     setMessages((prev) => [...prev, { role: "student", content: message, imagePreview: imageData }]);
     setMrWhiteState("thinking");
     setIsTyping(true);
-    setIsStreaming(true);
+    
 
     // Build context: last 4 messages
     const recentMessages = messages.slice(-4).map((m) => ({
@@ -94,151 +94,37 @@ const AskPage: React.FC = () => {
         throw new Error(errData.error || `Error ${resp.status}`);
       }
 
-      if (!resp.body) throw new Error("No response body");
+      const aiResponse: AIResponse = await resp.json();
 
       setIsTyping(false);
-      setMrWhiteState("talking");
 
-      // Stream the response
-      const reader = resp.body.getReader();
-      const decoder = new TextDecoder();
-      let textBuffer = "";
-      let fullResponse = "";
-      let streamDone = false;
+      // Add Mr. White's message
+      setMessages((prev) => [...prev, { role: "mr_white", content: aiResponse.message }]);
 
-      // Create the assistant message
-      setMessages((prev) => [...prev, { role: "mr_white", content: "" }]);
+      // Set Mr. White state
+      if (aiResponse.mr_white_state) {
+        setMrWhiteState(aiResponse.mr_white_state);
+      }
 
-      const updateLastMessage = (content: string) => {
-        setMessages((prev) => {
-          const updated = [...prev];
-          const last = updated[updated.length - 1];
-          if (last?.role === "mr_white") {
-            updated[updated.length - 1] = { ...last, content };
-          }
-          return updated;
+      // Update whiteboard
+      if (aiResponse.whiteboard?.active && aiResponse.whiteboard.elements) {
+        setWhiteboardData({
+          title: aiResponse.whiteboard.title || "",
+          elements: aiResponse.whiteboard.elements,
         });
-      };
-
-      while (!streamDone) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        textBuffer += decoder.decode(value, { stream: true });
-
-        let newlineIndex: number;
-        while ((newlineIndex = textBuffer.indexOf("\n")) !== -1) {
-          let line = textBuffer.slice(0, newlineIndex);
-          textBuffer = textBuffer.slice(newlineIndex + 1);
-
-          if (line.endsWith("\r")) line = line.slice(0, -1);
-          if (line.startsWith(":") || line.trim() === "") continue;
-          if (!line.startsWith("data: ")) continue;
-
-          const jsonStr = line.slice(6).trim();
-          if (jsonStr === "[DONE]") {
-            streamDone = true;
-            break;
-          }
-
-          try {
-            const parsed = JSON.parse(jsonStr);
-            const content = parsed.choices?.[0]?.delta?.content as string | undefined;
-            if (content) {
-              fullResponse += content;
-              // Try to extract the message field for live display
-              const messageMatch = fullResponse.match(/"message"\s*:\s*"((?:[^"\\]|\\.)*)"/);
-              if (messageMatch) {
-                // Unescape JSON string
-                const displayText = messageMatch[1]
-                  .replace(/\\n/g, "\n")
-                  .replace(/\\"/g, '"')
-                  .replace(/\\\\/g, "\\");
-                updateLastMessage(displayText);
-              } else {
-                // Show raw streaming while building up
-                // Try to get partial message content
-                const partialMatch = fullResponse.match(/"message"\s*:\s*"((?:[^"\\]|\\.)*)/);
-                if (partialMatch) {
-                  const displayText = partialMatch[1]
-                    .replace(/\\n/g, "\n")
-                    .replace(/\\"/g, '"')
-                    .replace(/\\\\/g, "\\");
-                  updateLastMessage(displayText);
-                }
-              }
-            }
-          } catch {
-            // Incomplete JSON, put back
-            textBuffer = line + "\n" + textBuffer;
-            break;
-          }
-        }
+        setMrWhiteState("drawing");
+        const drawDuration = (aiResponse.whiteboard.elements.length || 1) * 800;
+        setTimeout(() => setMrWhiteState("idle"), drawDuration);
       }
 
-      // Final flush
-      if (textBuffer.trim()) {
-        for (let raw of textBuffer.split("\n")) {
-          if (!raw) continue;
-          if (raw.endsWith("\r")) raw = raw.slice(0, -1);
-          if (raw.startsWith(":") || raw.trim() === "") continue;
-          if (!raw.startsWith("data: ")) continue;
-          const jsonStr = raw.slice(6).trim();
-          if (jsonStr === "[DONE]") continue;
-          try {
-            const parsed = JSON.parse(jsonStr);
-            const content = parsed.choices?.[0]?.delta?.content as string | undefined;
-            if (content) fullResponse += content;
-          } catch { /* ignore */ }
-        }
-      }
-
-      // Parse the complete JSON response
-      try {
-        // Clean up potential markdown fences
-        let cleaned = fullResponse.trim();
-        if (cleaned.startsWith("```json")) cleaned = cleaned.slice(7);
-        if (cleaned.startsWith("```")) cleaned = cleaned.slice(3);
-        if (cleaned.endsWith("```")) cleaned = cleaned.slice(0, -3);
-        cleaned = cleaned.trim();
-
-        const aiResponse: AIResponse = JSON.parse(cleaned);
-
-        // Final message update with clean text
-        updateLastMessage(aiResponse.message);
-
-        // Set Mr. White state
-        if (aiResponse.mr_white_state) {
-          setMrWhiteState(aiResponse.mr_white_state);
-        }
-
-        // Update whiteboard
-        if (aiResponse.whiteboard?.active && aiResponse.whiteboard.elements) {
-          setWhiteboardData({
-            title: aiResponse.whiteboard.title || "",
-            elements: aiResponse.whiteboard.elements,
-          });
-          setMrWhiteState("drawing");
-          const drawDuration = (aiResponse.whiteboard.elements.length || 1) * 800;
-          setTimeout(() => setMrWhiteState("idle"), drawDuration);
-        }
-
-        // Update chips
-        if (aiResponse.quick_chips && aiResponse.quick_chips.length > 0) {
-          setQuickChips(aiResponse.quick_chips);
-        } else {
-          setQuickChips(defaultChips);
-        }
-
-        setChalkedCount((c) => c + 1);
-      } catch (parseErr) {
-        console.error("Failed to parse AI response:", parseErr, fullResponse);
-        // If parsing fails, at least show what we streamed
-        if (!fullResponse.trim()) {
-          updateLastMessage("Hmm, I got a bit tangled up there. Could you ask that again?");
-        }
+      // Update chips
+      if (aiResponse.quick_chips && aiResponse.quick_chips.length > 0) {
+        setQuickChips(aiResponse.quick_chips);
+      } else {
         setQuickChips(defaultChips);
       }
 
+      setChalkedCount((c) => c + 1);
       setMrWhiteState((prev) => (prev === "drawing" ? prev : "idle"));
     } catch (err: unknown) {
       if (err instanceof Error && err.name === "AbortError") return;
@@ -252,7 +138,6 @@ const AskPage: React.FC = () => {
       ]);
       setMrWhiteState("idle");
     } finally {
-      setIsStreaming(false);
       setIsTyping(false);
     }
   }, [messages, activeSubject]);
