@@ -14,6 +14,7 @@ import MasteryCelebration from "@/components/MasteryCelebration";
 import PricingModal from "@/components/PricingModal";
 import { hasReachedLimit, incrementDailyCount } from "@/hooks/useDailyQuestionLimit";
 import { useLessons } from "@/hooks/useLessons";
+import { useSubscription } from "@/hooks/useSubscription";
 
 const subjects = ["Math", "Science", "History", "Economics", "Coding", "English", "Other"];
 const defaultChips = ["Ask anything", "Explain simpler", "Go deeper", "Quiz me"];
