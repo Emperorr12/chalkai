@@ -41,11 +41,17 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
   const [hasAnimatedPlaceholder, setHasAnimatedPlaceholder] = useState(false);
   const [pendingFile, setPendingFile] = useState<{ data: string; name: string; type: string; isImage: boolean } | null>(null);
   const [isDragging, setIsDragging] = useState(false);
+  const [isRecording, setIsRecording] = useState(false);
+  const [isProcessingSpeech, setIsProcessingSpeech] = useState(false);
+  const [speechError, setSpeechError] = useState<string | null>(null);
+  const [interimText, setInterimText] = useState("");
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const userScrolledRef = useRef(false);
   const dragCounterRef = useRef(0);
+  const recognitionRef = useRef<any>(null);
+  const autoSubmitTimerRef = useRef<number | null>(null);
 
   useEffect(() => {
     if (!userScrolledRef.current && scrollRef.current) {
