@@ -65,10 +65,13 @@ const AskPage: React.FC = () => {
     return () => mql.removeEventListener('change', onChange);
   }, []);
 
-  const [activeSubject, setActiveSubject] = useState("Math");
+  const [activeSubject, setActiveSubject] = useState(() => {
+    return localStorage.getItem("chalk_last_subject") || "Math";
+  });
   const [messages, setMessages] = useState<ChatMessage[]>([
-    { role: "mr_white", content: "What should we tackle today? I'm warmed up and my chalk is ready! 🎓" },
+    { role: "mr_white", content: "What should we tackle today? I'm warmed up and my chalk is ready! 🎓", timestamp: Date.now() },
   ]);
+  const [lastQuestion, setLastQuestion] = useState<{ text: string; fileData?: { data: string; type: string; name: string } } | null>(null);
   const [mrWhiteState, setMrWhiteState] = useState<MrWhiteState>("idle");
   const [quickChips, setQuickChips] = useState(defaultChips);
   const [isTyping, setIsTyping] = useState(false);
@@ -95,14 +98,21 @@ const AskPage: React.FC = () => {
     };
   }, [startTime, user, trackSession]);
 
+  // Save subject to localStorage
+  useEffect(() => {
+    localStorage.setItem("chalk_last_subject", activeSubject);
+  }, [activeSubject]);
+
   const handleSend = useCallback(async (message: string, fileData?: { data: string; type: string; name: string }) => {
     const isImage = fileData?.type.startsWith("image/");
+    setLastQuestion({ text: message, fileData });
     setMessages((prev) => [...prev, { 
       role: "student", 
       content: message, 
       imagePreview: isImage ? fileData?.data : undefined,
       fileName: fileData?.name,
       fileType: fileData?.type,
+      timestamp: Date.now(),
     }]);
 
     // Check daily free limit (skip for Pro users)
@@ -114,6 +124,7 @@ const AskPage: React.FC = () => {
           role: "mr_white",
           content:
             "You've been crushing it — 5 concepts today! Ready to go unlimited? Upgrade to Pro and I'll never make you stop. 🎓",
+          timestamp: Date.now(),
         },
       ]);
       setQuickChips(["Upgrade to Pro", "Ask anything"]);
@@ -181,7 +192,7 @@ const AskPage: React.FC = () => {
       const aiResponse: AIResponse = JSON.parse(rawText);
 
       setIsTyping(false);
-      setMessages((prev) => [...prev, { role: "mr_white", content: aiResponse.message }]);
+      setMessages((prev) => [...prev, { role: "mr_white", content: aiResponse.message, timestamp: Date.now() }]);
 
       // Save lesson data
       const wbData = aiResponse.whiteboard?.active && aiResponse.whiteboard.elements
@@ -239,18 +250,19 @@ const AskPage: React.FC = () => {
       if (err instanceof Error && err.name === "AbortError") return;
       console.error("Chat error:", err);
       setIsTyping(false);
-      const errMsg = err instanceof Error ? err.message : "Something went wrong";
-      setErrorMessage(errMsg);
-      toast.error(errMsg);
-      setMessages((prev) => [
-        ...prev,
-        { role: "mr_white", content: "Oops, my chalk broke! Let me try that again — could you rephrase?" },
-      ]);
+      setErrorMessage("Something went wrong");
       setMrWhiteState("idle");
     } finally {
       setIsTyping(false);
     }
   }, [messages, activeSubject, user, currentTopic, trackTopic, trackSimplification, getProfileSummary]);
+
+  const handleRetry = useCallback(() => {
+    if (lastQuestion) {
+      setErrorMessage(null);
+      handleSend(lastQuestion.text, lastQuestion.fileData);
+    }
+  }, [lastQuestion, handleSend]);
 
   const handleChipClick = useCallback(
     (chip: string) => {
@@ -327,7 +339,7 @@ const AskPage: React.FC = () => {
       setShowCelebration(true);
       setMessages((prev) => [
         ...prev,
-        { role: "mr_white", content: "Welcome to Chalk Pro! Now let's really get to work. 🎉🎓" },
+        { role: "mr_white", content: "Welcome to Chalk Pro! Now let's really get to work. 🎉🎓", timestamp: Date.now() },
       ]);
       setTimeout(() => setMrWhiteState("idle"), 4000);
     }
@@ -411,6 +423,8 @@ const AskPage: React.FC = () => {
             sessionMinutes={sessionMinutes}
             errorMessage={errorMessage}
             onListeningChange={handleListeningChange}
+            activeSubject={activeSubject}
+            onRetry={handleRetry}
             className="h-full w-full"
           />
         </div>
