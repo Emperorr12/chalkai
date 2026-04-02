@@ -336,7 +336,7 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
           </button>
           <button
             onClick={handleSend}
-            disabled={!input.trim() && !pendingImage}
+            disabled={!input.trim() && !pendingFile}
             className="bg-primary text-primary-foreground rounded-full p-1.5 disabled:opacity-30 transition-opacity"
             aria-label="Send message"
           >
