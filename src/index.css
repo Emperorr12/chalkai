@@ -121,8 +121,8 @@
 }
 
 @keyframes mr-white-blink {
-  0%, 92%, 100% { opacity: 0; }
-  95%, 97% { opacity: 1; }
+  0%, 95%, 100% { opacity: 0; }
+  96%, 99% { opacity: 1; }
 }
 
 @keyframes mr-white-bounce {
@@ -131,8 +131,8 @@
 }
 
 @keyframes mr-white-think {
-  0%, 100% { transform: rotate(0deg); }
-  50% { transform: rotate(6deg); }
+  0%, 100% { transform: rotate(-6deg); }
+  50% { transform: rotate(0deg); }
 }
 
 @keyframes mr-white-excited {
@@ -189,7 +189,7 @@
 }
 
 .animate-breathe { animation: mr-white-breathe 3.5s ease-in-out infinite; }
-.animate-blink { animation: mr-white-blink 4.5s ease-in-out infinite; }
+.animate-blink { animation: mr-white-blink 5s ease-in-out infinite; }
 .animate-bounce-talk { animation: mr-white-bounce 0.45s ease-in-out infinite; }
 .animate-think { animation: mr-white-think 2s ease-in-out infinite; }
 .animate-excited { animation: mr-white-excited 0.6s ease-in-out; }

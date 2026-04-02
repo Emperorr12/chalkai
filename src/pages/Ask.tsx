@@ -103,14 +103,10 @@ const AskPage: React.FC = () => {
       const aiResponse: AIResponse = JSON.parse(rawText);
 
       setIsTyping(false);
+      setMrWhiteState("talking");
 
       // Add Mr. White's message
       setMessages((prev) => [...prev, { role: "mr_white", content: aiResponse.message }]);
-
-      // Set Mr. White state
-      if (aiResponse.mr_white_state) {
-        setMrWhiteState(aiResponse.mr_white_state);
-      }
 
       // Update whiteboard
       if (aiResponse.whiteboard?.active && aiResponse.whiteboard.elements) {
@@ -120,7 +116,19 @@ const AskPage: React.FC = () => {
         });
         setMrWhiteState("drawing");
         const drawDuration = (aiResponse.whiteboard.elements.length || 1) * 800;
-        setTimeout(() => setMrWhiteState("idle"), drawDuration);
+        setTimeout(() => {
+          // After drawing, apply the API's state or fall back to idle
+          const finalState = aiResponse.mr_white_state || "idle";
+          setMrWhiteState(finalState);
+          if (finalState !== "idle") {
+            setTimeout(() => setMrWhiteState("idle"), 3000);
+          }
+        }, drawDuration);
+      } else {
+        // No whiteboard — use API state then return to idle after 3s
+        const finalState = aiResponse.mr_white_state || "talking";
+        setMrWhiteState(finalState);
+        setTimeout(() => setMrWhiteState("idle"), 3000);
       }
 
       // Update chips
@@ -131,7 +139,6 @@ const AskPage: React.FC = () => {
       }
 
       setChalkedCount((c) => c + 1);
-      setMrWhiteState((prev) => (prev === "drawing" ? prev : "idle"));
     } catch (err: unknown) {
       if (err instanceof Error && err.name === "AbortError") return;
       console.error("Chat error:", err);

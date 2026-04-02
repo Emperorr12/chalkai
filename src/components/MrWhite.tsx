@@ -206,12 +206,13 @@ const MrWhite: React.FC<MrWhiteProps> = ({ state = "idle", size = 140, className
             transform={state === "drawing" ? "rotate(-30, 114, 71)" : "rotate(15, 101, 95)"}
           />
 
-          {/* Thinking dots */}
+          {/* Thinking dots + text */}
           {state === "thinking" && (
             <>
               <circle cx="88" cy="28" r="2.5" fill="#3B6FCA" opacity="0.6" style={{ animation: "dots-pulse 1.2s 0s infinite" }} />
               <circle cx="95" cy="22" r="2.5" fill="#3B6FCA" opacity="0.6" style={{ animation: "dots-pulse 1.2s 0.2s infinite" }} />
               <circle cx="102" cy="28" r="2.5" fill="#3B6FCA" opacity="0.6" style={{ animation: "dots-pulse 1.2s 0.4s infinite" }} />
+              <text x="95" y="16" textAnchor="middle" fontSize="10" fill="#3B6FCA" opacity="0.5" fontFamily="Caveat, cursive" style={{ animation: "dots-pulse 1.5s infinite" }}>...</text>
             </>
           )}
 
@@ -228,6 +229,8 @@ const MrWhite: React.FC<MrWhiteProps> = ({ state = "idle", size = 140, className
             <>
               <polygon points="100,30 102,35 107,35 103,38 105,43 100,40 95,43 97,38 93,35 98,35" fill="#3B6FCA" opacity="0.7" style={{ animation: "star-burst 0.6s ease-out forwards" }} />
               <polygon points="42,32 43,35 46,35 44,37 45,40 42,38 39,40 40,37 38,35 41,35" fill="#3B6FCA" opacity="0.5" style={{ animation: "star-burst 0.6s 0.15s ease-out forwards" }} />
+              <polygon points="55,18 56,21 59,21 57,23 58,26 55,24 52,26 53,23 51,21 54,21" fill="#3B6FCA" opacity="0.6" style={{ animation: "star-burst 0.6s 0.08s ease-out forwards" }} />
+              <polygon points="85,15 86,18 89,18 87,20 88,23 85,21 82,23 83,20 81,18 84,18" fill="#3B6FCA" opacity="0.4" style={{ animation: "star-burst 0.6s 0.22s ease-out forwards" }} />
             </>
           )}
         </svg>
@@ -236,21 +239,26 @@ const MrWhite: React.FC<MrWhiteProps> = ({ state = "idle", size = 140, className
       {/* Celebrating confetti */}
       {state === "celebrating" && (
         <div className="absolute inset-0 pointer-events-none overflow-visible">
-          {[...Array(8)].map((_, i) => (
-            <div
-              key={i}
-              className="absolute animate-confetti"
-              style={{
-                left: `${20 + Math.random() * 60}%`,
-                top: `-10%`,
-                width: 6,
-                height: 6,
-                borderRadius: i % 2 === 0 ? "50%" : "1px",
-                backgroundColor: i % 3 === 0 ? "#3B6FCA" : i % 3 === 1 ? "#E05252" : "#F5DEB3",
-                animationDelay: `${i * 0.1}s`,
-              }}
-            />
-          ))}
+          {[...Array(12)].map((_, i) => {
+            const angle = (i / 12) * 360;
+            const dist = 30 + Math.random() * 30;
+            return (
+              <div
+                key={i}
+                className="absolute animate-confetti"
+                style={{
+                  left: `${50 + Math.cos(angle * Math.PI / 180) * dist}%`,
+                  top: `${40 + Math.sin(angle * Math.PI / 180) * dist}%`,
+                  width: i % 3 === 0 ? 8 : 5,
+                  height: i % 3 === 0 ? 3 : 5,
+                  borderRadius: i % 2 === 0 ? "50%" : "1px",
+                  backgroundColor: ["#3B6FCA", "#E05252", "#F5DEB3", "#4CAF50"][i % 4],
+                  animationDelay: `${i * 0.07}s`,
+                  transform: `rotate(${angle}deg)`,
+                }}
+              />
+            );
+          })}
         </div>
       )}
     </div>
