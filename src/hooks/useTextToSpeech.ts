@@ -122,7 +122,12 @@ export function useTextToSpeech() {
     onStart?: () => void,
     onEnd?: () => void,
   ) => {
-    if (!voiceEnabled) return;
+    if (!voiceEnabled) {
+      // When voice is disabled, fire callbacks immediately so callers can sync
+      onStart?.();
+      onEnd?.();
+      return;
+    }
 
     stop();
 
