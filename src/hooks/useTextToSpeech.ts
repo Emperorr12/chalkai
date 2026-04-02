@@ -64,6 +64,7 @@ export function useTextToSpeech() {
 
   const speakFallback = useCallback((text: string, onStart: () => void, onEnd: () => void) => {
     if (!window.speechSynthesis) {
+      onStart();
       onEnd();
       return;
     }
@@ -122,7 +123,12 @@ export function useTextToSpeech() {
     onStart?: () => void,
     onEnd?: () => void,
   ) => {
-    if (!voiceEnabled) return;
+    if (!voiceEnabled) {
+      // When voice is disabled, fire callbacks immediately so callers can sync
+      onStart?.();
+      onEnd?.();
+      return;
+    }
 
     stop();
 
