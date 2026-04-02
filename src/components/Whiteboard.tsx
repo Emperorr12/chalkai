@@ -612,14 +612,16 @@ const Whiteboard: React.FC<WhiteboardProps> = ({
         </div>
 
         <div
-          className="absolute transition-all duration-700 ease-in-out z-10"
+          className={`absolute z-10 ${activeElementIndex >= 0 ? "mr-white-floating" : "mr-white-idle-float"}`}
           style={{
-            bottom: isMobile ? 4 : 8,
-            right: isMobile ? 8 : 16,
-            ...(phase === "drawing" && hasContent ? { transform: "translateX(-10px)" } : {}),
+            transition: "top 0.8s ease-in-out, left 0.8s ease-in-out, bottom 0.8s ease-in-out, right 0.8s ease-in-out",
+            ...mrWhitePosition,
           }}
         >
-          <MrWhite state={mrWhiteState} size={isMobile ? 80 : 120} />
+          <MrWhite
+            state={activeElementIndex >= 0 ? "drawing" : mrWhiteState}
+            size={mrWhiteSize}
+          />
         </div>
 
         {!hasContent && phase === "idle" && (
