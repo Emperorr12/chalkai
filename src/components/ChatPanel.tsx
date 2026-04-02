@@ -17,6 +17,7 @@ interface ChatPanelProps {
   chalkedCount?: number;
   sessionMinutes?: number;
   className?: string;
+  errorMessage?: string | null;
 }
 
 const ChatPanel: React.FC<ChatPanelProps> = ({
@@ -29,6 +30,7 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
   chalkedCount = 0,
   sessionMinutes = 0,
   className = "",
+  errorMessage = null,
 }) => {
   const [input, setInput] = useState("");
   const [hasAnimatedPlaceholder, setHasAnimatedPlaceholder] = useState(false);
@@ -245,6 +247,13 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
               {chip}
             </button>
           ))}
+        </div>
+      )}
+
+      {/* Error message */}
+      {errorMessage && (
+        <div className="px-4 py-2 text-xs text-destructive bg-destructive/10 border-t border-destructive/20">
+          ⚠️ {errorMessage}
         </div>
       )}
 

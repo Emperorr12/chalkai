@@ -42,6 +42,7 @@ const AskPage: React.FC = () => {
   const [isTyping, setIsTyping] = useState(false);
   const [whiteboardData, setWhiteboardData] = useState<{ title: string; elements: WhiteboardElement[] } | null>(null);
   const [chalkedCount, setChalkedCount] = useState(0);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [startTime] = useState(Date.now());
   
   const [chatOpen, setChatOpen] = useState(true);
@@ -55,6 +56,7 @@ const AskPage: React.FC = () => {
     setMessages((prev) => [...prev, { role: "student", content: message, imagePreview: imageData }]);
     setMrWhiteState("thinking");
     setIsTyping(true);
+    setErrorMessage(null);
     
 
     // Build context: last 4 messages
@@ -89,12 +91,16 @@ const AskPage: React.FC = () => {
         signal: controller.signal,
       });
 
+      const rawText = await resp.text();
+      console.log("[mr-white-chat] Raw response:", rawText);
+
       if (!resp.ok) {
-        const errData = await resp.json().catch(() => ({ error: "Request failed" }));
-        throw new Error(errData.error || `Error ${resp.status}`);
+        let errMsg = `Error ${resp.status}`;
+        try { errMsg = JSON.parse(rawText).error || errMsg; } catch {}
+        throw new Error(errMsg);
       }
 
-      const aiResponse: AIResponse = await resp.json();
+      const aiResponse: AIResponse = JSON.parse(rawText);
 
       setIsTyping(false);
 
@@ -130,8 +136,9 @@ const AskPage: React.FC = () => {
       if (err instanceof Error && err.name === "AbortError") return;
       console.error("Chat error:", err);
       setIsTyping(false);
-      const errorMessage = err instanceof Error ? err.message : "Something went wrong";
-      toast.error(errorMessage);
+      const errMsg = err instanceof Error ? err.message : "Something went wrong";
+      setErrorMessage(errMsg);
+      toast.error(errMsg);
       setMessages((prev) => [
         ...prev,
         { role: "mr_white", content: "Oops, my chalk broke! Let me try that again — could you rephrase?" },
@@ -214,6 +221,7 @@ const AskPage: React.FC = () => {
             isTyping={isTyping}
             chalkedCount={chalkedCount}
             sessionMinutes={sessionMinutes}
+            errorMessage={errorMessage}
             className="h-full w-96 lg:w-80 xl:w-96"
           />
         </div>
