@@ -65,10 +65,13 @@ const AskPage: React.FC = () => {
     return () => mql.removeEventListener('change', onChange);
   }, []);
 
-  const [activeSubject, setActiveSubject] = useState("Math");
+  const [activeSubject, setActiveSubject] = useState(() => {
+    return localStorage.getItem("chalk_last_subject") || "Math";
+  });
   const [messages, setMessages] = useState<ChatMessage[]>([
-    { role: "mr_white", content: "What should we tackle today? I'm warmed up and my chalk is ready! 🎓" },
+    { role: "mr_white", content: "What should we tackle today? I'm warmed up and my chalk is ready! 🎓", timestamp: Date.now() },
   ]);
+  const [lastQuestion, setLastQuestion] = useState<{ text: string; fileData?: { data: string; type: string; name: string } } | null>(null);
   const [mrWhiteState, setMrWhiteState] = useState<MrWhiteState>("idle");
   const [quickChips, setQuickChips] = useState(defaultChips);
   const [isTyping, setIsTyping] = useState(false);
