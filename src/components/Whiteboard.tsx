@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef, useCallback } from "react";
+import React, { useEffect, useState, useRef, useCallback, useMemo } from "react";
 import MrWhite, { type MrWhiteState } from "./MrWhite";
 import HighlightAskTooltip from "./HighlightAskTooltip";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -35,8 +35,52 @@ const SVG_W = 640;
 const SVG_H = 400;
 const PAD = 28;
 
-// Unique ID counter for clip paths
-let clipIdCounter = 0;
+/** Compute the approximate center position of an element in SVG coordinates */
+function getElementPosition(
+  el: WhiteboardElement,
+  index: number,
+  svgW: number,
+  svgH: number,
+  pad: number,
+  isMobile: boolean,
+): { x: number; y: number } {
+  const autoY = (isMobile ? 44 : 56) + index * (isMobile ? 42 : 50);
+
+  switch (el.kind) {
+    case "text":
+      return { x: pad + 40, y: autoY };
+    case "line":
+    case "arrow": {
+      const m = el.content.match(/([\d.]+),([\d.]+)\s+to\s+([\d.]+),([\d.]+)/i);
+      if (m) {
+        return { x: (Number(m[1]) + Number(m[3])) / 2, y: (Number(m[2]) + Number(m[4])) / 2 };
+      }
+      return { x: svgW / 2, y: autoY };
+    }
+    case "circle": {
+      const m = el.content.match(/([\d.]+),([\d.]+)/);
+      if (m) return { x: Number(m[1]), y: Number(m[2]) };
+      return { x: svgW / 2, y: autoY };
+    }
+    case "rect": {
+      const m = el.content.match(/([\d.]+),([\d.]+)\s+([\d.]+)\s+([\d.]+)/);
+      if (m) return { x: Number(m[1]) + Number(m[3]) / 2, y: Number(m[2]) + Number(m[4]) / 2 };
+      return { x: pad + 70, y: autoY };
+    }
+    case "point": {
+      const m = el.content.match(/([\d.]+),([\d.]+)/);
+      if (m) return { x: Number(m[1]), y: Number(m[2]) };
+      return { x: svgW / 2, y: autoY };
+    }
+    case "axis":
+      return { x: pad + 40, y: svgH - 60 };
+    case "curve":
+    case "path":
+      return { x: svgW / 3, y: autoY };
+    default:
+      return { x: svgW / 2, y: autoY };
+  }
+}
 
 const Whiteboard: React.FC<WhiteboardProps> = ({
   whiteboardData,
@@ -45,15 +89,18 @@ const Whiteboard: React.FC<WhiteboardProps> = ({
   onAskAbout,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
+  const svgContainerRef = useRef<HTMLDivElement>(null);
   const isMobile = useIsMobile();
   const [phase, setPhase] = useState<"idle" | "fading-out" | "drawing">("idle");
   const [activeData, setActiveData] = useState<WhiteboardData | null>(null);
   const prevDataRef = useRef<WhiteboardData | null>(null);
   const [drawKey, setDrawKey] = useState(0);
+  const [activeElementIndex, setActiveElementIndex] = useState(-1);
 
   const svgW = isMobile ? 380 : SVG_W;
   const svgH = isMobile ? 300 : SVG_H;
   const pad = isMobile ? 16 : PAD;
+  const mrWhiteSize = isMobile ? 64 : 100;
 
   useEffect(() => {
     if (whiteboardData === prevDataRef.current) return;
@@ -62,6 +109,7 @@ const Whiteboard: React.FC<WhiteboardProps> = ({
     if (!whiteboardData || whiteboardData.elements.length === 0) {
       setPhase("idle");
       setActiveData(null);
+      setActiveElementIndex(-1);
       return;
     }
 
@@ -80,14 +128,55 @@ const Whiteboard: React.FC<WhiteboardProps> = ({
     }
   }, [whiteboardData]);
 
+  // Animate Mr. White through element positions as they draw
+  useEffect(() => {
+    if (phase !== "drawing" || !activeData || activeData.elements.length === 0) {
+      setActiveElementIndex(-1);
+      return;
+    }
+
+    const timers: ReturnType<typeof setTimeout>[] = [];
+
+    activeData.elements.forEach((el, i) => {
+      const delayMs = (el.delay_seconds ?? i * 0.4) * 1000;
+      timers.push(setTimeout(() => setActiveElementIndex(i), delayMs));
+    });
+
+    // Return to rest after last element finishes drawing
+    const lastEl = activeData.elements[activeData.elements.length - 1];
+    const lastDelay = (lastEl.delay_seconds ?? (activeData.elements.length - 1) * 0.4) * 1000;
+    timers.push(setTimeout(() => setActiveElementIndex(-1), lastDelay + 2000));
+
+    return () => timers.forEach(clearTimeout);
+  }, [phase, activeData, drawKey]);
+
   const handleErase = useCallback(() => {
     setPhase("fading-out");
+    setActiveElementIndex(-1);
     setTimeout(() => {
       setActiveData(null);
       setPhase("idle");
       prevDataRef.current = null;
     }, 300);
   }, []);
+
+  // Compute Mr. White's position as CSS percentages within the container
+  const mrWhitePosition = useMemo(() => {
+    const dynamicH = isMobile ? svgH : Math.max(SVG_H, (activeData?.elements.length || 0) * 50 + 80);
+    // Default: bottom-right
+    if (activeElementIndex < 0 || !activeData || activeElementIndex >= activeData.elements.length) {
+      return { bottom: isMobile ? 4 : 8, right: isMobile ? 8 : 16, top: "auto" as const, left: "auto" as const };
+    }
+
+    const el = activeData.elements[activeElementIndex];
+    const pos = getElementPosition(el, activeElementIndex, svgW, dynamicH, pad, isMobile);
+
+    // Convert SVG coords to percentage of container, offset so Mr. White sits to the right/below
+    const leftPct = Math.min(Math.max((pos.x / svgW) * 100 - 5, 2), 75);
+    const topPct = Math.min(Math.max((pos.y / dynamicH) * 100 - 15, 2), 70);
+
+    return { top: `${topPct}%`, left: `${leftPct}%`, bottom: "auto" as const, right: "auto" as const };
+  }, [activeElementIndex, activeData, svgW, svgH, pad, isMobile]);
 
   // Auto-layout: compute Y positions for elements that don't specify coordinates
   const getAutoY = (index: number) => (isMobile ? 44 : 56) + index * (isMobile ? 42 : 50);
