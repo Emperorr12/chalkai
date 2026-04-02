@@ -204,41 +204,31 @@ const AskPage: React.FC = () => {
         subject: activeSubject,
       });
 
-      // Sequence: voice loads → message appears + voice plays → whiteboard draws
-      // Keep "thinking" state while TTS audio is fetching
-      const startWhiteboard = () => {
-        if (wbData) {
-          setWhiteboardData(wbData);
-          setMrWhiteState("drawing");
-          const drawDuration = (wbData.elements.length || 1) * 800;
-          setTimeout(() => {
-            const finalState = aiResponse.mr_white_state || "idle";
-            setMrWhiteState(finalState);
-            if (finalState !== "idle") {
-              setTimeout(() => setMrWhiteState("idle"), 3000);
-            }
-          }, drawDuration);
-        } else {
-          const finalState = aiResponse.mr_white_state || "idle";
-          setMrWhiteState(finalState);
-          if (finalState !== "idle") {
-            setTimeout(() => setMrWhiteState("idle"), 3000);
-          }
-        }
-      };
-
-      // Voice onStart: reveal the message in chat (synced with audio)
-      const revealMessage = () => {
+      // Voice + whiteboard draw simultaneously, then settle when voice ends
+      const onVoiceStart = () => {
+        // Reveal message text + start whiteboard drawing at the same time as voice
         setIsTyping(false);
         setMessages((prev) => [...prev, { role: "mr_white", content: aiResponse.message, timestamp: Date.now() }]);
         setMrWhiteState("talking");
+
+        if (wbData) {
+          setWhiteboardData(wbData);
+        }
       };
 
-      // Speak — keeps "thinking" until audio is ready, then reveals text + plays voice
+      const onVoiceEnd = () => {
+        const finalState = aiResponse.mr_white_state || "idle";
+        setMrWhiteState(finalState);
+        if (finalState !== "idle") {
+          setTimeout(() => setMrWhiteState("idle"), 3000);
+        }
+      };
+
+      // Speak — keeps "thinking" until audio is ready, then reveals text + draws + plays voice together
       speak(
         aiResponse.message,
-        revealMessage,
-        startWhiteboard,
+        onVoiceStart,
+        onVoiceEnd,
       );
 
       // Track the topic if detected
