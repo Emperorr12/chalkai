@@ -85,7 +85,7 @@ const Whiteboard: React.FC<WhiteboardProps> = ({
     }, 300);
   }, []);
 
-  const getY = (index: number) => 60 + index * 52;
+  const getY = (index: number) => (isMobile ? 44 : 60) + index * (isMobile ? 40 : 52);
 
   const renderElement = (el: WhiteboardElement, index: number) => {
     const color = CHALK_COLORS[el.color] || CHALK_COLORS.blue;
