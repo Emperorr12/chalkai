@@ -182,15 +182,25 @@ const AskPage: React.FC = () => {
       setIsTyping(false);
       setMessages((prev) => [...prev, { role: "mr_white", content: aiResponse.message }]);
 
+      // Save lesson data
+      const wbData = aiResponse.whiteboard?.active && aiResponse.whiteboard.elements
+        ? { title: aiResponse.whiteboard.title || "", elements: aiResponse.whiteboard.elements }
+        : null;
+
+      saveLesson({
+        question: message,
+        message: aiResponse.message,
+        whiteboard: wbData,
+        audio_text: aiResponse.message,
+        subject: activeSubject,
+      });
+
       // Sequence: voice first → then whiteboard draws
       const startWhiteboard = () => {
-        if (aiResponse.whiteboard?.active && aiResponse.whiteboard.elements) {
-          setWhiteboardData({
-            title: aiResponse.whiteboard.title || "",
-            elements: aiResponse.whiteboard.elements,
-          });
+        if (wbData) {
+          setWhiteboardData(wbData);
           setMrWhiteState("drawing");
-          const drawDuration = (aiResponse.whiteboard.elements.length || 1) * 800;
+          const drawDuration = (wbData.elements.length || 1) * 800;
           setTimeout(() => {
             const finalState = aiResponse.mr_white_state || "idle";
             setMrWhiteState(finalState);
