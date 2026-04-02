@@ -257,7 +257,7 @@ const AskPage: React.FC = () => {
         </button>
 
         {/* Chat - static scrollable on mobile, collapsible sidebar on desktop */}
-        <div className="flex-shrink-0 h-[60vh] lg:h-auto lg:flex-none lg:border-l lg:border-border lg:transition-all lg:duration-300 lg:overflow-hidden lg:w-96 xl:w-96"
+        <div className="flex-1 min-h-0 lg:flex-none lg:h-auto lg:border-l lg:border-border lg:transition-all lg:duration-300 lg:overflow-hidden lg:w-96 xl:w-96"
           style={chatOpen ? undefined : { width: 0 }}
         >
           <ChatPanel
