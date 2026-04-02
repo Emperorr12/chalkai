@@ -138,7 +138,6 @@ const AskPage: React.FC = () => {
       ]);
       setMrWhiteState("idle");
     } finally {
-      setIsStreaming(false);
       setIsTyping(false);
     }
   }, [messages, activeSubject]);
