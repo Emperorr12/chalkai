@@ -64,6 +64,7 @@ export function useTextToSpeech() {
 
   const speakFallback = useCallback((text: string, onStart: () => void, onEnd: () => void) => {
     if (!window.speechSynthesis) {
+      onStart();
       onEnd();
       return;
     }
