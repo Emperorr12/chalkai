@@ -42,6 +42,7 @@ const AskPage: React.FC = () => {
   const [isTyping, setIsTyping] = useState(false);
   const [whiteboardData, setWhiteboardData] = useState<{ title: string; elements: WhiteboardElement[] } | null>(null);
   const [chalkedCount, setChalkedCount] = useState(0);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [startTime] = useState(Date.now());
   
   const [chatOpen, setChatOpen] = useState(true);
