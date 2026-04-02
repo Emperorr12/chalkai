@@ -55,7 +55,7 @@ const AskPage: React.FC = () => {
     setMessages((prev) => [...prev, { role: "student", content: message, imagePreview: imageData }]);
     setMrWhiteState("thinking");
     setIsTyping(true);
-    setIsStreaming(true);
+    
 
     // Build context: last 4 messages
     const recentMessages = messages.slice(-4).map((m) => ({
