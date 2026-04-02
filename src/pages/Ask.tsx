@@ -318,8 +318,8 @@ const AskPage: React.FC = () => {
         </button>
 
         {/* Chat - static scrollable on mobile, collapsible sidebar on desktop */}
-        <div className="flex-1 min-h-0 lg:flex-none lg:h-auto lg:border-l lg:border-border lg:transition-all lg:duration-300 lg:overflow-hidden"
-          style={chatOpen ? { width: '38%' } : { width: 0 }}
+        <div className="flex-1 min-h-0 w-full lg:flex-none lg:h-auto lg:border-l lg:border-border lg:transition-all lg:duration-300 lg:overflow-hidden"
+          style={typeof window !== 'undefined' && window.innerWidth >= 1024 ? (chatOpen ? { width: '38%' } : { width: 0 }) : undefined}
         >
           <ChatPanel
             messages={messages}
