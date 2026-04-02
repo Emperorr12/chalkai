@@ -17,12 +17,14 @@ interface ChatPanelProps {
   quickChips: string[];
   onSend: (message: string, fileData?: { data: string; type: string; name: string }) => void;
   onChipClick: (chip: string) => void;
+  onSaveConcept?: (question: string, explanation: string) => void;
   isTyping?: boolean;
   chalkedCount?: number;
   sessionMinutes?: number;
   className?: string;
   errorMessage?: string | null;
   onListeningChange?: (listening: boolean) => void;
+  savedConceptQuestions?: Set<string>;
 }
 
 const ChatPanel: React.FC<ChatPanelProps> = ({
@@ -31,12 +33,14 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
   quickChips,
   onSend,
   onChipClick,
+  onSaveConcept,
   isTyping = false,
   chalkedCount = 0,
   sessionMinutes = 0,
   className = "",
   errorMessage = null,
   onListeningChange,
+  savedConceptQuestions,
 }) => {
   const [input, setInput] = useState("");
   const [hasAnimatedPlaceholder, setHasAnimatedPlaceholder] = useState(false);
