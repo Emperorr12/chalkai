@@ -60,6 +60,7 @@ const AskPage: React.FC = () => {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [startTime] = useState(Date.now());
   const [currentTopic, setCurrentTopic] = useState<string>("");
+  const [showCelebration, setShowCelebration] = useState(false);
   
   const [chatOpen, setChatOpen] = useState(true);
   const abortRef = useRef<AbortController | null>(null);
@@ -200,9 +201,12 @@ const AskPage: React.FC = () => {
 
   const handleChipClick = useCallback(
     (chip: string) => {
-      // "Chalk it up" marks current topic as mastered
+      // "Chalk it up" marks current topic as mastered and triggers celebration
       if (chip.toLowerCase().includes("chalk") && currentTopic && user) {
         markMastered(currentTopic, activeSubject);
+        setMrWhiteState("celebrating");
+        setShowCelebration(true);
+        setTimeout(() => setMrWhiteState("idle"), 2000);
       }
       handleSend(chip);
     },
