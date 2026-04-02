@@ -14,6 +14,7 @@ import MasteryCelebration from "@/components/MasteryCelebration";
 import PricingModal from "@/components/PricingModal";
 import { hasReachedLimit, incrementDailyCount } from "@/hooks/useDailyQuestionLimit";
 import { useLessons } from "@/hooks/useLessons";
+import { useSubscription } from "@/hooks/useSubscription";
 
 const subjects = ["Math", "Science", "History", "Economics", "Coding", "English", "Other"];
 const defaultChips = ["Ask anything", "Explain simpler", "Go deeper", "Quiz me"];
@@ -53,6 +54,7 @@ const AskPage: React.FC = () => {
   const { saveConcept, concepts } = useSavedConcepts();
   const { speak, stop: stopTTS, isPlaying: isTTSPlaying, voiceEnabled, setVoiceEnabled } = useTextToSpeech();
   const { saveLesson } = useLessons();
+  const { isPro, tier, startCheckout, refresh: refreshSubscription } = useSubscription();
 
   // Track if we're at desktop (lg) breakpoint
   const [isDesktop, setIsDesktop] = useState(() => typeof window !== 'undefined' && window.innerWidth >= 1024);
@@ -103,23 +105,22 @@ const AskPage: React.FC = () => {
       fileType: fileData?.type,
     }]);
 
-    // Check daily free limit
-    if (hasReachedLimit()) {
+    // Check daily free limit (skip for Pro users)
+    if (!isPro && hasReachedLimit()) {
       setMrWhiteState("excited");
       setMessages((prev) => [
         ...prev,
         {
           role: "mr_white",
           content:
-            "You've been on a roll today — 5 concepts already! Upgrade to Pro for unlimited sessions. I'll be here waiting. 🎓",
+            "You've been crushing it — 5 concepts today! Ready to go unlimited? Upgrade to Pro and I'll never make you stop. 🎓",
         },
       ]);
-      setQuickChips(["See Chalk Pro", "Ask anything"]);
+      setQuickChips(["Upgrade to Pro", "Ask anything"]);
       setTimeout(() => setMrWhiteState("idle"), 3000);
       return;
     }
-
-    incrementDailyCount();
+    if (!isPro) incrementDailyCount();
 
     setMrWhiteState("thinking");
     setIsTyping(true);
@@ -254,7 +255,7 @@ const AskPage: React.FC = () => {
   const handleChipClick = useCallback(
     (chip: string) => {
       // Open pricing modal
-      if (chip.toLowerCase().includes("see chalk pro")) {
+      if (chip.toLowerCase().includes("upgrade to pro") || chip.toLowerCase().includes("see chalk pro")) {
         setShowPricing(true);
         return;
       }
@@ -314,6 +315,23 @@ const AskPage: React.FC = () => {
       setTimeout(() => handleSend(q), 100);
     }
   }, [searchParams, setSearchParams, handleSend]);
+
+  // Handle checkout success
+  const checkoutHandledRef = useRef(false);
+  useEffect(() => {
+    if (searchParams.get("checkout") === "success" && !checkoutHandledRef.current) {
+      checkoutHandledRef.current = true;
+      setSearchParams({}, { replace: true });
+      refreshSubscription();
+      setMrWhiteState("celebrating");
+      setShowCelebration(true);
+      setMessages((prev) => [
+        ...prev,
+        { role: "mr_white", content: "Welcome to Chalk Pro! Now let's really get to work. 🎉🎓" },
+      ]);
+      setTimeout(() => setMrWhiteState("idle"), 4000);
+    }
+  }, [searchParams, setSearchParams, refreshSubscription]);
 
   const sessionMinutes = Math.floor((Date.now() - startTime) / 60000);
 
@@ -406,7 +424,7 @@ const AskPage: React.FC = () => {
         />
 
         {/* Pricing modal */}
-        <PricingModal open={showPricing} onOpenChange={setShowPricing} />
+        <PricingModal open={showPricing} onOpenChange={setShowPricing} isPro={isPro} currentTier={tier} onStartCheckout={startCheckout} />
       </div>
     </div>
   );
