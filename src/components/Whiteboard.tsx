@@ -499,6 +499,49 @@ const Whiteboard: React.FC<WhiteboardProps> = ({ whiteboardData, mrWhiteState = 
             </g>
           </svg>
 
+          {/* Selectable text overlay for highlight-and-ask */}
+          {activeData && activeData.elements.length > 0 && onAskAbout && (
+            <div
+              ref={whiteboardContainerRef}
+              className="absolute inset-0 pointer-events-auto"
+              style={{ userSelect: "text" }}
+            >
+              <HighlightAskTooltip
+                containerRef={whiteboardContainerRef as React.RefObject<HTMLElement>}
+                onAsk={(text) => onAskAbout(text)}
+              />
+              {/* Invisible but selectable text elements matching whiteboard content */}
+              <svg
+                viewBox={`0 0 ${SVG_W} ${SVG_H}`}
+                width="100%"
+                height="100%"
+                preserveAspectRatio="xMidYMid meet"
+                style={{ display: "block", position: "absolute", top: 0, left: 0 }}
+              >
+                {activeData.elements.map((el, i) => {
+                  if (el.kind !== "text" || !visibleIndices.has(i)) return null;
+                  const yOffset = getYOffset(i);
+                  const fontSize = el.size === "large" ? 36 : el.size === "small" ? 22 : 28;
+                  return (
+                    <text
+                      key={`sel-${i}`}
+                      x={PAD}
+                      y={yOffset}
+                      fontSize={fontSize}
+                      fontFamily="'Caveat', cursive"
+                      fontWeight={700}
+                      fill="transparent"
+                      style={{ cursor: "text", userSelect: "text" }}
+                      data-mr-white-msg="true"
+                    >
+                      {el.content}
+                    </text>
+                  );
+                })}
+              </svg>
+            </div>
+          )}
+
           {/* Wipe overlay for eraser animation */}
           {phase === "wiping" && (
             <div
