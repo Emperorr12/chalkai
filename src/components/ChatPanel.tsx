@@ -317,7 +317,7 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
                 }
               }
             }}
-            placeholder={pendingImage ? "Ask about this image..." : "Chalk it up..."}
+            placeholder={pendingFile ? (pendingFile.isImage ? "Ask about this image..." : "Ask about this file...") : "Chalk it up..."}
             className={`flex-1 bg-transparent text-sm text-foreground placeholder:text-muted-foreground outline-none ${
               !hasAnimatedPlaceholder ? "placeholder:animate-pulse-placeholder" : ""
             }`}
