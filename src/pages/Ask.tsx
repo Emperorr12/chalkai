@@ -191,7 +191,7 @@ const AskPage: React.FC = () => {
       const aiResponse: AIResponse = JSON.parse(rawText);
 
       setIsTyping(false);
-      setMessages((prev) => [...prev, { role: "mr_white", content: aiResponse.message }]);
+      setMessages((prev) => [...prev, { role: "mr_white", content: aiResponse.message, timestamp: Date.now() }]);
 
       // Save lesson data
       const wbData = aiResponse.whiteboard?.active && aiResponse.whiteboard.elements
