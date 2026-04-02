@@ -103,6 +103,18 @@ const MrWhite: React.FC<MrWhiteProps> = ({ state = "idle", size = 140, className
           {/* ── Nose ── */}
           <path d="M70 53 C68 55, 69 57, 71.5 56" stroke="#C4A882" strokeWidth="1.5" fill="none" />
 
+          {/* ── Beard ── */}
+          <path
+            d="M52 58 C52 72, 60 80, 70 80 C80 80, 88 72, 88 58"
+            fill="#E8E8E8"
+            stroke="#D0D0D0"
+            strokeWidth="1.8"
+          />
+          {/* Beard texture strokes */}
+          <path d="M58 62 C59 70, 63 76, 67 78" stroke="#D4D4D4" strokeWidth="1.2" fill="none" />
+          <path d="M82 62 C81 70, 77 76, 73 78" stroke="#D4D4D4" strokeWidth="1.2" fill="none" />
+          <path d="M70 64 C70 70, 70 76, 70 80" stroke="#D4D4D4" strokeWidth="1" fill="none" />
+
           {/* ── Mouth ── */}
           {state === "talking" ? (
             <ellipse cx="70" cy="61" rx="4" ry="3" fill="#1A1A1A" opacity="0.7">
