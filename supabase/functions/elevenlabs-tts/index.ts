@@ -31,7 +31,7 @@ serve(async (req) => {
   const trimmed = text.slice(0, 5000);
 
   const response = await fetch(
-    "https://api.elevenlabs.io/v1/text-to-speech/pNInz6obpgDQGcFmaJgB",
+    "https://api.elevenlabs.io/v1/text-to-speech/QIhD5ivPGEoYZQDocuHI",
     {
       method: "POST",
       headers: {
