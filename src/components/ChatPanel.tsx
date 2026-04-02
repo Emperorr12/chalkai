@@ -35,6 +35,7 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
   sessionMinutes = 0,
   className = "",
   errorMessage = null,
+  onListeningChange,
 }) => {
   const [input, setInput] = useState("");
   const [hasAnimatedPlaceholder, setHasAnimatedPlaceholder] = useState(false);
