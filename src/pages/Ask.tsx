@@ -93,7 +93,9 @@ const AskPage: React.FC = () => {
           history: recentMessages,
           confusion_detected: confusionDetected,
           is_first_question: isFirstQuestion,
-          image_data: imageData || undefined,
+          file_data: fileData?.data || undefined,
+          file_type: fileData?.type || undefined,
+          file_name: fileData?.name || undefined,
         }),
         signal: controller.signal,
       });
