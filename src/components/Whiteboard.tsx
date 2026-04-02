@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useRef, useCallback } from "react";
 import { type MrWhiteState } from "./MrWhite";
+import HighlightAskTooltip from "./HighlightAskTooltip";
 
 export interface WhiteboardElement {
   kind: "text" | "line" | "arrow" | "circle" | "rect" | "curve" | "path";
@@ -18,6 +19,7 @@ interface WhiteboardProps {
   whiteboardData: WhiteboardData | null;
   mrWhiteState?: MrWhiteState;
   className?: string;
+  onAskAbout?: (text: string) => void;
 }
 
 const CHALK_COLORS = {
@@ -32,7 +34,8 @@ const PAD = 24;
 
 type Phase = "idle" | "fading-out" | "drawing" | "wiping";
 
-const Whiteboard: React.FC<WhiteboardProps> = ({ whiteboardData, mrWhiteState = "idle", className = "" }) => {
+const Whiteboard: React.FC<WhiteboardProps> = ({ whiteboardData, mrWhiteState = "idle", className = "", onAskAbout }) => {
+  const whiteboardContainerRef = useRef<HTMLDivElement>(null);
   const [phase, setPhase] = useState<Phase>("idle");
   const [activeData, setActiveData] = useState<WhiteboardData | null>(null);
   const [visibleIndices, setVisibleIndices] = useState<Set<number>>(new Set());
