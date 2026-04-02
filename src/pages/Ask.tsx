@@ -5,7 +5,7 @@ import { type MrWhiteState } from "../components/MrWhite";
 import Whiteboard, { type WhiteboardElement } from "../components/Whiteboard";
 import ChatPanel, { type ChatMessage } from "../components/ChatPanel";
 import { toast } from "sonner";
-import { MessageSquare, PanelRightClose } from "lucide-react";
+import { MessageSquare, PanelRightClose, ChevronDown, ChevronUp } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useLearningProfile } from "@/hooks/useLearningProfile";
 
@@ -59,6 +59,7 @@ const AskPage: React.FC = () => {
   const [currentTopic, setCurrentTopic] = useState<string>("");
   
   const [chatOpen, setChatOpen] = useState(true);
+  const [subjectsOpen, setSubjectsOpen] = useState(true);
   const abortRef = useRef<AbortController | null>(null);
   const [searchParams, setSearchParams] = useSearchParams();
   const autoSentRef = useRef(false);
@@ -227,23 +228,32 @@ const AskPage: React.FC = () => {
       <Navbar />
       <div className="flex-1 flex flex-col lg:flex-row min-h-0 relative overflow-hidden">
         {/* Whiteboard */}
-        <div className="flex flex-col items-center p-2 lg:p-4 flex-shrink-0 lg:flex-1 lg:overflow-y-auto lg:min-h-0">
-          <div className="flex flex-wrap gap-1.5 lg:gap-2 mb-2 lg:mb-4 flex-shrink-0">
-            {subjects.map((s) => (
-              <button
-                key={s}
-                onClick={() => setActiveSubject(s)}
-                className={`text-xs px-2.5 py-1 lg:px-3 lg:py-1.5 rounded-full border transition-colors ${
-                  activeSubject === s
-                    ? "border-primary bg-primary text-primary-foreground"
-                    : "border-border text-muted-foreground hover:border-primary hover:text-primary"
-                }`}
-              >
-                {s}
-              </button>
-            ))}
+        <div className="flex flex-col items-center p-2 lg:p-4 lg:flex-1 lg:overflow-y-auto lg:min-h-0" style={{ flexShrink: 0, flexGrow: subjectsOpen ? 0 : 1 }}>
+          {/* Subject chips - collapsible on mobile */}
+          <div className="w-full lg:mb-4 flex-shrink-0">
+            <button
+              onClick={() => setSubjectsOpen((o) => !o)}
+              className="flex items-center gap-1 text-xs text-muted-foreground mb-1.5 lg:hidden"
+            >
+              {activeSubject} {subjectsOpen ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
+            </button>
+            <div className={`flex-wrap gap-1.5 lg:gap-2 ${subjectsOpen ? 'flex' : 'hidden'} lg:flex mb-2 lg:mb-0`}>
+              {subjects.map((s) => (
+                <button
+                  key={s}
+                  onClick={() => { setActiveSubject(s); setSubjectsOpen(false); }}
+                  className={`text-xs px-2.5 py-1 lg:px-3 lg:py-1.5 rounded-full border transition-colors ${
+                    activeSubject === s
+                      ? "border-primary bg-primary text-primary-foreground"
+                      : "border-border text-muted-foreground hover:border-primary hover:text-primary"
+                  }`}
+                >
+                  {s}
+                </button>
+              ))}
+            </div>
           </div>
-          <Whiteboard whiteboardData={whiteboardData} mrWhiteState={mrWhiteState} className="w-full min-h-[200px] lg:flex-1 lg:min-h-0" onAskAbout={(text) => handleSend(`Can you explain this in more detail: "${text}"?`)} />
+          <Whiteboard whiteboardData={whiteboardData} mrWhiteState={mrWhiteState} className="w-full flex-1 min-h-[160px] lg:min-h-0" onAskAbout={(text) => handleSend(`Can you explain this in more detail: "${text}"?`)} />
         </div>
 
         {/* Toggle button - desktop only */}
@@ -256,8 +266,8 @@ const AskPage: React.FC = () => {
           {chatOpen ? <PanelRightClose className="w-4 h-4 text-foreground" /> : <MessageSquare className="w-4 h-4 text-foreground" />}
         </button>
 
-        {/* Chat - static scrollable on mobile, collapsible sidebar on desktop */}
-        <div className="flex-1 min-h-0 lg:flex-none lg:h-auto lg:border-l lg:border-border lg:transition-all lg:duration-300 lg:overflow-hidden lg:w-96 xl:w-96"
+        {/* Chat - condensed on mobile, collapsible sidebar on desktop */}
+        <div className="flex-1 min-h-0 max-h-[45vh] lg:max-h-none lg:flex-none lg:h-auto lg:border-l lg:border-border lg:transition-all lg:duration-300 lg:overflow-hidden lg:w-96 xl:w-96"
           style={chatOpen ? undefined : { width: 0 }}
         >
           <ChatPanel
