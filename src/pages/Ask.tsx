@@ -264,8 +264,8 @@ const AskPage: React.FC = () => {
         </button>
 
         {/* Chat - static scrollable on mobile, collapsible sidebar on desktop */}
-        <div className="flex-1 min-h-0 lg:flex-none lg:h-auto lg:border-l lg:border-border lg:transition-all lg:duration-300 lg:overflow-hidden lg:w-96 xl:w-96"
-          style={chatOpen ? undefined : { width: 0 }}
+        <div className="flex-1 min-h-0 lg:flex-none lg:h-auto lg:border-l lg:border-border lg:transition-all lg:duration-300 lg:overflow-hidden"
+          style={chatOpen ? { width: '38%' } : { width: 0 }}
         >
           <ChatPanel
             messages={messages}
@@ -286,7 +286,7 @@ const AskPage: React.FC = () => {
             sessionMinutes={sessionMinutes}
             errorMessage={errorMessage}
             onListeningChange={handleListeningChange}
-            className="h-full w-full lg:w-96 xl:w-96"
+            className="h-full w-full"
           />
         </div>
 

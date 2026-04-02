@@ -105,6 +105,20 @@ const Whiteboard: React.FC<WhiteboardProps> = ({
       animation: `chalk-fade 0.5s ease-out ${delay} forwards`,
     };
 
+    // Override delay to enforce 0.4s stagger regardless of AI response
+    const staggerDelay = `${index * 0.4}s`;
+
+    const drawStyle: React.CSSProperties = {
+      strokeDasharray: 1,
+      strokeDashoffset: 1,
+      animation: `chalk-draw 1.2s ease-out ${staggerDelay} forwards`,
+    };
+
+    const fadeStyle: React.CSSProperties = {
+      opacity: 0,
+      animation: `chalk-fade 0.5s ease-out ${staggerDelay} forwards`,
+    };
+
     switch (el.kind) {
       case "text":
         return (
