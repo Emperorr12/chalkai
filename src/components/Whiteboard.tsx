@@ -40,10 +40,16 @@ const Whiteboard: React.FC<WhiteboardProps> = ({
   onAskAbout,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
+  const isMobile = useIsMobile();
   const [phase, setPhase] = useState<"idle" | "fading-out" | "drawing">("idle");
   const [activeData, setActiveData] = useState<WhiteboardData | null>(null);
   const prevDataRef = useRef<WhiteboardData | null>(null);
   const [drawKey, setDrawKey] = useState(0);
+
+  // On mobile, use a smaller viewBox so content appears larger
+  const svgW = isMobile ? 380 : SVG_W;
+  const svgH = isMobile ? 280 : SVG_H;
+  const pad = isMobile ? 16 : PAD;
 
   useEffect(() => {
     if (whiteboardData === prevDataRef.current) return;
