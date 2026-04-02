@@ -233,13 +233,19 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
         )}
       </div>
 
-      {/* Pending image preview */}
-      {pendingImage && (
+      {/* Pending file preview */}
+      {pendingFile && (
         <div className="px-4 py-2 border-t border-border flex items-center gap-2 bg-muted/30">
-          <img src={pendingImage} alt="Pending upload" className="h-12 w-12 object-cover rounded border border-border" />
-          <span className="text-xs text-muted-foreground flex-1 truncate">{pendingImageName}</span>
+          {pendingFile.isImage ? (
+            <img src={pendingFile.data} alt="Pending upload" className="h-12 w-12 object-cover rounded border border-border" />
+          ) : (
+            <div className="h-12 w-12 rounded border border-border bg-muted flex items-center justify-center text-xs text-muted-foreground font-medium">
+              {pendingFile.name.split('.').pop()?.toUpperCase()}
+            </div>
+          )}
+          <span className="text-xs text-muted-foreground flex-1 truncate">{pendingFile.name}</span>
           <button
-            onClick={() => { setPendingImage(null); setPendingImageName(""); }}
+            onClick={() => setPendingFile(null)}
             className="text-muted-foreground hover:text-foreground p-1"
             aria-label="Remove attachment"
           >
