@@ -56,18 +56,32 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
     return () => clearTimeout(timer);
   }, []);
 
+  const SUPPORTED_IMAGE_TYPES = ["image/jpeg", "image/png", "image/gif", "image/webp"];
+  const SUPPORTED_DOC_TYPES = ["application/pdf", "text/plain", "text/csv", "text/markdown", "application/json"];
+  const ALL_SUPPORTED = [...SUPPORTED_IMAGE_TYPES, ...SUPPORTED_DOC_TYPES];
+
   const handleFileRead = useCallback((file: File) => {
-    if (!file.type.startsWith("image/")) {
-      return; // Only images for now
+    const isImage = SUPPORTED_IMAGE_TYPES.includes(file.type);
+    const isDoc = SUPPORTED_DOC_TYPES.includes(file.type);
+    
+    if (!isImage && !isDoc) {
+      // Try by extension
+      const ext = file.name.split('.').pop()?.toLowerCase();
+      const extMap: Record<string, boolean> = { pdf: true, txt: true, csv: true, md: true, json: true };
+      if (!ext || !extMap[ext]) return;
     }
-    if (file.size > 10 * 1024 * 1024) {
-      return; // 10MB limit
-    }
+    
+    if (file.size > 20 * 1024 * 1024) return; // 20MB limit
+
     const reader = new FileReader();
     reader.onload = (e) => {
       const dataUrl = e.target?.result as string;
-      setPendingImage(dataUrl);
-      setPendingImageName(file.name);
+      setPendingFile({
+        data: dataUrl,
+        name: file.name,
+        type: file.type || `application/${file.name.split('.').pop()}`,
+        isImage: SUPPORTED_IMAGE_TYPES.includes(file.type),
+      });
     };
     reader.readAsDataURL(file);
   }, []);
