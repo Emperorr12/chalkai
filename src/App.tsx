@@ -13,6 +13,7 @@ import AuthPage from "./pages/Auth";
 import NotFound from "./pages/NotFound";
 import ConceptsPage from "./pages/Concepts";
 import LessonsPage from "./pages/Lessons";
+import ProgressPage from "./pages/Progress";
 
 const queryClient = new QueryClient();
 
