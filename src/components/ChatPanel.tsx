@@ -88,11 +88,11 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
 
   const handleSend = () => {
     const trimmed = input.trim();
-    if (!trimmed && !pendingImage) return;
-    onSend(trimmed || "Solve this problem", pendingImage || undefined);
+    if (!trimmed && !pendingFile) return;
+    const defaultMsg = pendingFile?.isImage ? "What's in this image?" : "Analyze this file";
+    onSend(trimmed || defaultMsg, pendingFile ? { data: pendingFile.data, type: pendingFile.type, name: pendingFile.name } : undefined);
     setInput("");
-    setPendingImage(null);
-    setPendingImageName("");
+    setPendingFile(null);
   };
 
   const handleScroll = () => {
