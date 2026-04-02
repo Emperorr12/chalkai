@@ -222,6 +222,7 @@ const AskPage: React.FC = () => {
             isTyping={isTyping}
             chalkedCount={chalkedCount}
             sessionMinutes={sessionMinutes}
+            errorMessage={errorMessage}
             className="h-full w-96 lg:w-80 xl:w-96"
           />
         </div>
