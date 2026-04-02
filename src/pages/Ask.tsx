@@ -274,6 +274,37 @@ const AskPage: React.FC = () => {
     setMrWhiteState(listening ? "listening" : "idle");
   }, []);
 
+  const handleReplay = useCallback((question: string, message: string) => {
+    // Find matching lesson from localStorage
+    const raw = localStorage.getItem("chalk_lesson_history");
+    if (!raw) return;
+    const lessons = JSON.parse(raw);
+    const lesson = [...lessons].reverse().find(
+      (l: any) => l.question === question && l.message === message
+    );
+    if (!lesson) return;
+
+    // Clear whiteboard, then replay
+    setWhiteboardData(null);
+    setTimeout(() => {
+      setMrWhiteState("talking");
+      speak(
+        lesson.audio_text,
+        () => setMrWhiteState("talking"),
+        () => {
+          if (lesson.whiteboard && lesson.whiteboard.elements?.length > 0) {
+            setWhiteboardData(lesson.whiteboard);
+            setMrWhiteState("drawing");
+            const dur = (lesson.whiteboard.elements.length || 1) * 800;
+            setTimeout(() => setMrWhiteState("idle"), dur);
+          } else {
+            setMrWhiteState("idle");
+          }
+        },
+      );
+    }, 100);
+  }, [speak]);
+
   // Auto-send question from query param
   useEffect(() => {
     const q = searchParams.get("q");
