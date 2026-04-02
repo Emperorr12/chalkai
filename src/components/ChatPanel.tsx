@@ -30,6 +30,7 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
   chalkedCount = 0,
   sessionMinutes = 0,
   className = "",
+  errorMessage = null,
 }) => {
   const [input, setInput] = useState("");
   const [hasAnimatedPlaceholder, setHasAnimatedPlaceholder] = useState(false);
