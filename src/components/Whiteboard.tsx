@@ -160,7 +160,7 @@ const Whiteboard: React.FC<WhiteboardProps> = ({
               fill={color}
               style={{
                 opacity: 0,
-                animation: `chalk-fade 0.3s ease-out calc(${el.delay_seconds}s + 1s) forwards`,
+                animation: `chalk-fade 0.3s ease-out calc(${staggerDelay} + 1s) forwards`,
               }}
             />
             {el.content && (
@@ -173,7 +173,7 @@ const Whiteboard: React.FC<WhiteboardProps> = ({
                 fontWeight={700}
                 style={{
                   opacity: 0,
-                  animation: `chalk-fade 0.5s ease-out calc(${el.delay_seconds}s + 0.8s) forwards`,
+                  animation: `chalk-fade 0.5s ease-out calc(${staggerDelay} + 0.8s) forwards`,
                 }}
               >
                 {el.content}
