@@ -339,7 +339,7 @@ const AskPage: React.FC = () => {
       setShowCelebration(true);
       setMessages((prev) => [
         ...prev,
-        { role: "mr_white", content: "Welcome to Chalk Pro! Now let's really get to work. 🎉🎓" },
+        { role: "mr_white", content: "Welcome to Chalk Pro! Now let's really get to work. 🎉🎓", timestamp: Date.now() },
       ]);
       setTimeout(() => setMrWhiteState("idle"), 4000);
     }
