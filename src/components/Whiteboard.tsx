@@ -369,13 +369,13 @@ const Whiteboard: React.FC<WhiteboardProps> = ({
         {/* Empty state */}
         {!hasContent && phase === "idle" && (
           <div
-            className="flex items-center justify-center text-base"
+            className="flex items-center justify-center text-2xl lg:text-3xl"
             style={{
               fontFamily: "'Caveat', cursive",
               color: "#8B6914",
               opacity: 0.4,
               position: "absolute",
-              top: "40%",
+              top: "50%",
               left: "50%",
               transform: "translate(-50%, -50%)",
             }}
