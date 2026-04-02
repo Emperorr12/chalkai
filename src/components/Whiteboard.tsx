@@ -336,7 +336,7 @@ const Whiteboard: React.FC<WhiteboardProps> = ({
                 onAsk={(text) => onAskAbout(text)}
               />
               <svg
-                viewBox={`0 0 ${svgW} ${svgH}`}
+                viewBox={`0 0 ${svgW} ${dynamicSvgH}`}
                 width="100%"
                 preserveAspectRatio="xMidYMid meet"
                 style={{ display: "block", position: "absolute", top: 0, left: 0 }}
