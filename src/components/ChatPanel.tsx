@@ -21,6 +21,7 @@ interface ChatPanelProps {
   sessionMinutes?: number;
   className?: string;
   errorMessage?: string | null;
+  onListeningChange?: (listening: boolean) => void;
 }
 
 const ChatPanel: React.FC<ChatPanelProps> = ({
