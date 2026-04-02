@@ -247,8 +247,11 @@ const Whiteboard: React.FC<WhiteboardProps> = ({
 
   const hasContent = activeData && activeData.elements.length > 0;
 
+  // Dynamically scale viewBox height to element count so text auto-sizes to fill the board
+  const dynamicSvgH = isMobile ? svgH : Math.max(SVG_H, (activeData?.elements.length || 0) * 52 + 80);
+
   return (
-    <div className={`relative ${className}`} style={{ width: "100%" }}>
+    <div className={`relative ${className}`} style={{ width: "100%", height: isMobile ? undefined : "100%" }}>
       {/* CSS animations */}
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Caveat:wght@400;700&display=swap');
@@ -270,6 +273,9 @@ const Whiteboard: React.FC<WhiteboardProps> = ({
           position: "relative",
           overflow: "hidden",
           boxShadow: "0 4px 20px -4px rgba(0, 0, 0, 0.15)",
+          height: isMobile ? undefined : "100%",
+          display: "flex",
+          flexDirection: "column",
         }}
       >
         {/* Eraser */}
@@ -303,13 +309,16 @@ const Whiteboard: React.FC<WhiteboardProps> = ({
             opacity: phase === "fading-out" ? 0 : 1,
             transition: "opacity 0.3s ease",
             position: "relative",
+            flex: isMobile ? undefined : 1,
+            minHeight: 0,
           }}
         >
           <svg
             key={drawKey}
-            viewBox={`0 0 ${svgW} ${svgH}`}
+            viewBox={`0 0 ${svgW} ${dynamicSvgH}`}
             width="100%"
-            preserveAspectRatio="xMidYMid meet"
+            height={isMobile ? undefined : "100%"}
+            preserveAspectRatio="xMidYMin meet"
             style={{ display: "block" }}
           >
             {activeData?.elements.map((el, i) => renderElement(el, i))}
@@ -327,7 +336,7 @@ const Whiteboard: React.FC<WhiteboardProps> = ({
                 onAsk={(text) => onAskAbout(text)}
               />
               <svg
-                viewBox={`0 0 ${svgW} ${svgH}`}
+                viewBox={`0 0 ${svgW} ${dynamicSvgH}`}
                 width="100%"
                 preserveAspectRatio="xMidYMid meet"
                 style={{ display: "block", position: "absolute", top: 0, left: 0 }}
