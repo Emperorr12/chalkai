@@ -247,8 +247,11 @@ const Whiteboard: React.FC<WhiteboardProps> = ({
 
   const hasContent = activeData && activeData.elements.length > 0;
 
+  // Dynamically scale viewBox height to element count so text auto-sizes to fill the board
+  const dynamicSvgH = isMobile ? svgH : Math.max(SVG_H, (activeData?.elements.length || 0) * 52 + 80);
+
   return (
-    <div className={`relative ${className}`} style={{ width: "100%" }}>
+    <div className={`relative ${className}`} style={{ width: "100%", height: isMobile ? undefined : "100%" }}>
       {/* CSS animations */}
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Caveat:wght@400;700&display=swap');
@@ -312,7 +315,7 @@ const Whiteboard: React.FC<WhiteboardProps> = ({
         >
           <svg
             key={drawKey}
-            viewBox={`0 0 ${svgW} ${desktopSvgH}`}
+            viewBox={`0 0 ${svgW} ${dynamicSvgH}`}
             width="100%"
             height={isMobile ? undefined : "100%"}
             preserveAspectRatio="xMidYMin meet"
