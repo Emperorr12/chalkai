@@ -10,6 +10,8 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useLearningProfile } from "@/hooks/useLearningProfile";
 import { useSavedConcepts } from "@/hooks/useSavedConcepts";
 import MasteryCelebration from "@/components/MasteryCelebration";
+import PricingModal from "@/components/PricingModal";
+import { hasReachedLimit, incrementDailyCount } from "@/hooks/useDailyQuestionLimit";
 
 const subjects = ["Math", "Science", "History", "Economics", "Coding", "English", "Other"];
 const defaultChips = ["Ask anything", "Explain simpler", "Go deeper", "Quiz me"];
