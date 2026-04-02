@@ -149,8 +149,123 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
     if (file) handleFileRead(file);
     if (fileInputRef.current) fileInputRef.current.value = "";
   }, [handleFileRead]);
+  const stopRecording = useCallback(() => {
+    if (recognitionRef.current) {
+      recognitionRef.current.stop();
+      recognitionRef.current = null;
+    }
+    setIsRecording(false);
+    setInterimText("");
+    onListeningChange?.(false);
+    if (autoSubmitTimerRef.current) {
+      clearTimeout(autoSubmitTimerRef.current);
+      autoSubmitTimerRef.current = null;
+    }
+  }, [onListeningChange]);
 
-  return (
+  const startRecording = useCallback(() => {
+    setSpeechError(null);
+    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      setSpeechError("Speech recognition not supported in this browser");
+      return;
+    }
+
+    const recognition = new SpeechRecognition();
+    recognition.continuous = false;
+    recognition.interimResults = true;
+    recognition.lang = "en-US";
+    recognitionRef.current = recognition;
+
+    recognition.onstart = () => {
+      setIsRecording(true);
+      setIsProcessingSpeech(false);
+      onListeningChange?.(true);
+    };
+
+    let finalTranscript = "";
+
+    recognition.onresult = (event: any) => {
+      let interim = "";
+      finalTranscript = "";
+      for (let i = 0; i < event.results.length; i++) {
+        const transcript = event.results[i][0].transcript;
+        if (event.results[i].isFinal) {
+          finalTranscript += transcript;
+        } else {
+          interim += transcript;
+        }
+      }
+
+      if (finalTranscript) {
+        setInput(finalTranscript);
+        setInterimText("");
+      } else {
+        setInterimText(interim);
+      }
+
+      // Reset auto-submit timer on new speech
+      if (autoSubmitTimerRef.current) clearTimeout(autoSubmitTimerRef.current);
+      autoSubmitTimerRef.current = window.setTimeout(() => {
+        if (finalTranscript) {
+          setIsProcessingSpeech(true);
+          setTimeout(() => {
+            onSend(finalTranscript);
+            setInput("");
+            setIsRecording(false);
+            setIsProcessingSpeech(false);
+            setInterimText("");
+            onListeningChange?.(false);
+          }, 300);
+        }
+      }, 1500);
+    };
+
+    recognition.onerror = (event: any) => {
+      console.error("Speech recognition error:", event.error);
+      if (event.error !== "aborted") {
+        setSpeechError("Didn't catch that — try again?");
+      }
+      setIsRecording(false);
+      setIsProcessingSpeech(false);
+      onListeningChange?.(false);
+    };
+
+    recognition.onend = () => {
+      // If we have final text and no auto-submit fired yet, submit
+      if (finalTranscript && !autoSubmitTimerRef.current) {
+        setIsProcessingSpeech(true);
+        setTimeout(() => {
+          onSend(finalTranscript);
+          setInput("");
+          setIsRecording(false);
+          setIsProcessingSpeech(false);
+          onListeningChange?.(false);
+        }, 300);
+      }
+      setIsRecording(false);
+      setInterimText("");
+    };
+
+    recognition.start();
+  }, [onSend, onListeningChange]);
+
+  const toggleRecording = useCallback(() => {
+    if (isRecording) {
+      stopRecording();
+    } else {
+      startRecording();
+    }
+  }, [isRecording, startRecording, stopRecording]);
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      if (recognitionRef.current) recognitionRef.current.stop();
+      if (autoSubmitTimerRef.current) clearTimeout(autoSubmitTimerRef.current);
+    };
+  }, []);
+
     <div
       className={`flex flex-col h-full bg-background relative ${className}`}
       onDragEnter={handleDragEnter}
