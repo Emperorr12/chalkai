@@ -121,8 +121,8 @@
 }
 
 @keyframes mr-white-blink {
-  0%, 92%, 100% { opacity: 0; }
-  95%, 97% { opacity: 1; }
+  0%, 95%, 100% { opacity: 0; }
+  96%, 99% { opacity: 1; }
 }
 
 @keyframes mr-white-bounce {
