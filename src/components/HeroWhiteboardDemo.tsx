@@ -200,7 +200,7 @@ const HeroWhiteboardDemo: React.FC = () => {
 
         {/* Mr. White in corner */}
         <div className="absolute bottom-2 right-2">
-          <MrWhite state={mrWhiteState} size={72} />
+          <MrWhite state={mrWhiteState} size={100} />
         </div>
       </div>
     </div>
