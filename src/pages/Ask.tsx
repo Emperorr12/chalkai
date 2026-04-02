@@ -249,13 +249,7 @@ const AskPage: React.FC = () => {
       if (err instanceof Error && err.name === "AbortError") return;
       console.error("Chat error:", err);
       setIsTyping(false);
-      const errMsg = err instanceof Error ? err.message : "Something went wrong";
-      setErrorMessage(errMsg);
-      toast.error(errMsg);
-      setMessages((prev) => [
-        ...prev,
-        { role: "mr_white", content: "Oops, my chalk broke! Let me try that again — could you rephrase?" },
-      ]);
+      setErrorMessage("Something went wrong");
       setMrWhiteState("idle");
     } finally {
       setIsTyping(false);
