@@ -172,13 +172,12 @@ const MrWhite: React.FC<MrWhiteProps> = ({ state = "idle", size = 140, className
 
           {/* ── State overlays ── */}
 
-          {/* Thinking: dots above head */}
+          {/* Thinking: thought bubble dots above head */}
           {state === "thinking" && (
             <>
-              <circle cx="88" cy="26" r="2.5" fill="#3B6FCA" opacity="0.6" style={{ animation: "dots-pulse 1.2s 0s infinite" }} />
-              <circle cx="95" cy="20" r="2.5" fill="#3B6FCA" opacity="0.6" style={{ animation: "dots-pulse 1.2s 0.2s infinite" }} />
-              <circle cx="102" cy="26" r="2.5" fill="#3B6FCA" opacity="0.6" style={{ animation: "dots-pulse 1.2s 0.4s infinite" }} />
-              <text x="95" y="14" textAnchor="middle" fontSize="11" fill="#3B6FCA" opacity="0.5" fontFamily="'Caveat', cursive" style={{ animation: "dots-pulse 1.5s infinite" }}>...</text>
+              <circle cx="92" cy="12" r="3.5" fill="#3B6FCA" opacity="0.7" style={{ animation: "dots-pulse 1.2s 0s infinite" }} />
+              <circle cx="100" cy="6" r="3.5" fill="#3B6FCA" opacity="0.7" style={{ animation: "dots-pulse 1.2s 0.25s infinite" }} />
+              <circle cx="108" cy="12" r="3.5" fill="#3B6FCA" opacity="0.7" style={{ animation: "dots-pulse 1.2s 0.5s infinite" }} />
             </>
           )}
 
