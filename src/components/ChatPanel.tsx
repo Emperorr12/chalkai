@@ -216,6 +216,12 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
                   className="max-w-full max-h-48 rounded-md mb-2 border border-border"
                 />
               )}
+              {msg.fileName && !msg.imagePreview && (
+                <div className="flex items-center gap-2 mb-2 px-2 py-1.5 bg-background/30 rounded border border-border/50 text-xs">
+                  <span className="font-medium">{msg.fileName.split('.').pop()?.toUpperCase()}</span>
+                  <span className="truncate opacity-70">{msg.fileName}</span>
+                </div>
+              )}
               {msg.content}
             </div>
           </div>
