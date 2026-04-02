@@ -225,9 +225,9 @@ const AskPage: React.FC = () => {
   return (
     <div className="h-screen bg-background flex flex-col overflow-hidden">
       <Navbar />
-      <div className="flex-1 flex flex-col lg:flex-row min-h-0 relative">
-        {/* Whiteboard - hidden on mobile */}
-        <div className="hidden lg:flex flex-1 flex-col items-center p-4 overflow-y-auto min-h-0">
+      <div className="flex-1 flex flex-col lg:flex-row min-h-0 relative overflow-y-auto lg:overflow-hidden">
+        {/* Whiteboard */}
+        <div className="flex flex-col items-center p-4 flex-shrink-0 lg:flex-1 lg:overflow-y-auto lg:min-h-0">
           <div className="flex flex-wrap gap-2 mb-4 flex-shrink-0">
             {subjects.map((s) => (
               <button
@@ -243,7 +243,7 @@ const AskPage: React.FC = () => {
               </button>
             ))}
           </div>
-          <Whiteboard whiteboardData={whiteboardData} mrWhiteState={mrWhiteState} className="flex-1 w-full min-h-0" onAskAbout={(text) => handleSend(`Can you explain this in more detail: "${text}"?`)} />
+          <Whiteboard whiteboardData={whiteboardData} mrWhiteState={mrWhiteState} className="w-full min-h-[280px] lg:flex-1 lg:min-h-0" onAskAbout={(text) => handleSend(`Can you explain this in more detail: "${text}"?`)} />
         </div>
 
         {/* Toggle button - desktop only */}
@@ -256,8 +256,8 @@ const AskPage: React.FC = () => {
           {chatOpen ? <PanelRightClose className="w-4 h-4 text-foreground" /> : <MessageSquare className="w-4 h-4 text-foreground" />}
         </button>
 
-        {/* Chat - full width on mobile, collapsible sidebar on desktop */}
-        <div className="flex-1 lg:flex-none lg:flex-shrink-0 lg:border-l lg:border-border min-h-0 max-h-full lg:transition-all lg:duration-300 lg:overflow-hidden lg:w-96 xl:w-96"
+        {/* Chat - static scrollable on mobile, collapsible sidebar on desktop */}
+        <div className="flex-shrink-0 h-[60vh] lg:h-auto lg:flex-none lg:border-l lg:border-border lg:transition-all lg:duration-300 lg:overflow-hidden lg:w-96 xl:w-96"
           style={chatOpen ? undefined : { width: 0 }}
         >
           <ChatPanel
