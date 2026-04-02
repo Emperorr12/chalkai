@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef, useCallback } from "react";
-import { type MrWhiteState } from "./MrWhite";
+import MrWhite, { type MrWhiteState } from "./MrWhite";
 import HighlightAskTooltip from "./HighlightAskTooltip";
 import { useIsMobile } from "@/hooks/use-mobile";
 
@@ -368,6 +368,24 @@ const Whiteboard: React.FC<WhiteboardProps> = ({
           )}
         </div>
 
+        {/* Mr. White on the board */}
+        <div
+          className="absolute transition-all duration-700 ease-in-out z-10"
+          style={{
+            bottom: isMobile ? 4 : 8,
+            right: isMobile ? 8 : 16,
+            // When drawing, shift him toward the content area
+            ...(phase === "drawing" && hasContent
+              ? { transform: "translateX(-10px)" }
+              : {}),
+          }}
+        >
+          <MrWhite
+            state={mrWhiteState}
+            size={isMobile ? 80 : 120}
+          />
+        </div>
+
         {/* Empty state */}
         {!hasContent && phase === "idle" && (
           <div
@@ -377,7 +395,7 @@ const Whiteboard: React.FC<WhiteboardProps> = ({
               color: "#8B6914",
               opacity: 0.4,
               position: "absolute",
-              top: "50%",
+              top: "45%",
               left: "50%",
               transform: "translate(-50%, -50%)",
             }}

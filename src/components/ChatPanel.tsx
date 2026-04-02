@@ -294,24 +294,19 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
         </div>
       )}
 
-      {/* Header */}
-      <div className="flex items-center gap-3 px-4 py-3 border-b border-border">
-        <MrWhite state={mrWhiteState} size={40} />
-        <div className="flex-1">
-          <div className="text-sm font-medium text-foreground">Mr. White</div>
-          <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-            <span className="w-1.5 h-1.5 rounded-full bg-green-500" />
-            Ready to teach
-          </div>
-        </div>
+      {/* Header — compact transcript label */}
+      <div className="flex items-center gap-2 px-4 py-2.5 border-b border-border">
+        <span className="w-1.5 h-1.5 rounded-full bg-green-500 flex-shrink-0" />
+        <span className="text-sm font-medium text-foreground">Mr. White's Notes</span>
+        <div className="flex-1" />
         <div className="flex items-center gap-3 text-xs text-muted-foreground">
           {chalkedCount > 0 && (
             <span className="bg-primary/10 text-primary px-2 py-0.5 rounded-full">
-              {chalkedCount} chalked up
+              {chalkedCount} chalked
             </span>
           )}
           {sessionMinutes > 0 && (
-            <span>Studying for {sessionMinutes} min</span>
+            <span>{sessionMinutes} min</span>
           )}
         </div>
       </div>
@@ -342,7 +337,8 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
                 }`}
               >
                 {msg.role === "mr_white" && (
-                  <MrWhite state="idle" size={28} className="mr-2 mt-1 flex-shrink-0" />
+                  <span className="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center mr-2 mt-0.5 flex-shrink-0 text-[10px] text-primary font-bold">W</span>
+                )}
                 )}
                 <div
                   {...(msg.role === "mr_white" ? { "data-mr-white-msg": true } : {})}
@@ -390,7 +386,7 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
 
         {isTyping && (
           <div className="flex justify-start animate-fade-in-up">
-            <MrWhite state="thinking" size={28} className="mr-2 mt-1 flex-shrink-0" />
+            <span className="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center mr-2 mt-0.5 flex-shrink-0 text-[10px] text-primary font-bold">W</span>
             <div className="chalk-bubble flex gap-1.5 items-center">
               <span className="w-2 h-2 rounded-full bg-primary" style={{ animation: "dots-pulse 1.2s 0s infinite" }} />
               <span className="w-2 h-2 rounded-full bg-primary" style={{ animation: "dots-pulse 1.2s 0.2s infinite" }} />
