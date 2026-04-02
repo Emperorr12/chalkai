@@ -172,6 +172,10 @@ const AskPage: React.FC = () => {
     [handleSend]
   );
 
+  const handleListeningChange = useCallback((listening: boolean) => {
+    setMrWhiteState(listening ? "listening" : "idle");
+  }, []);
+
   // Auto-send question from query param (homepage input)
   useEffect(() => {
     const q = searchParams.get("q");
