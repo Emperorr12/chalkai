@@ -54,7 +54,7 @@ serve(async (req) => {
   }
 
   try {
-    const { question, subject, history, confusion_detected, is_first_question } = await req.json();
+    const { question, subject, history, confusion_detected, is_first_question, file_data, file_type, file_name } = await req.json();
 
     const ANTHROPIC_API_KEY = Deno.env.get("ANTHROPIC_API_KEY");
     if (!ANTHROPIC_API_KEY) {
@@ -69,7 +69,7 @@ serve(async (req) => {
     }
 
     // Build conversation history
-    const messages: Array<{ role: string; content: string }> = [];
+    const messages: Array<{ role: string; content: any }> = [];
 
     if (history && Array.isArray(history)) {
       for (const msg of history.slice(-6)) {
@@ -80,10 +80,60 @@ serve(async (req) => {
       }
     }
 
-    // Add current question
+    // Build current user message content blocks
+    const userContent: any[] = [];
+    
+    if (file_data && file_type) {
+      const isImage = file_type.startsWith("image/");
+      
+      if (isImage) {
+        // Extract base64 from data URL
+        const base64Match = file_data.match(/^data:([^;]+);base64,(.+)$/);
+        if (base64Match) {
+          userContent.push({
+            type: "image",
+            source: {
+              type: "base64",
+              media_type: base64Match[1],
+              data: base64Match[2],
+            },
+          });
+        }
+      } else {
+        // For documents (PDF, text, etc.) — extract text content
+        const base64Match = file_data.match(/^data:([^;]+);base64,(.+)$/);
+        if (base64Match) {
+          if (file_type === "application/pdf") {
+            // Send PDF as document to Claude
+            userContent.push({
+              type: "document",
+              source: {
+                type: "base64",
+                media_type: "application/pdf",
+                data: base64Match[2],
+              },
+            });
+          } else {
+            // Text-based files — decode and send as text
+            const decoded = atob(base64Match[2]);
+            userContent.push({
+              type: "text",
+              text: `[File: ${file_name || "uploaded file"}]\n\n${decoded}`,
+            });
+          }
+        }
+      }
+    }
+
+    // Add the question text
+    userContent.push({
+      type: "text",
+      text: `${contextPrefix}\n\nStudent question: ${question}\n\nRespond as Mr. White. Return raw JSON only.`,
+    });
+
     messages.push({
       role: "user",
-      content: `${contextPrefix}\n\nStudent question: ${question}\n\nRespond as Mr. White. Return raw JSON only.`,
+      content: userContent,
     });
 
     // Call Claude
