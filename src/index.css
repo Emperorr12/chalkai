@@ -131,8 +131,8 @@
 }
 
 @keyframes mr-white-think {
-  0%, 100% { transform: rotate(0deg); }
-  50% { transform: rotate(6deg); }
+  0%, 100% { transform: rotate(-6deg); }
+  50% { transform: rotate(0deg); }
 }
 
 @keyframes mr-white-excited {
