@@ -172,6 +172,13 @@ const AskPage: React.FC = () => {
       setMrWhiteState("talking");
       setMessages((prev) => [...prev, { role: "mr_white", content: aiResponse.message }]);
 
+      // Auto-play TTS for the response
+      speak(
+        aiResponse.message,
+        () => setMrWhiteState("talking"),
+        () => setMrWhiteState("idle"),
+      );
+
       // Track the topic if detected
       if (aiResponse.topic_detected && user) {
         setCurrentTopic(aiResponse.topic_detected);
