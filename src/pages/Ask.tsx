@@ -226,7 +226,8 @@ const AskPage: React.FC = () => {
     <div className="h-screen bg-background flex flex-col overflow-hidden">
       <Navbar />
       <div className="flex-1 flex flex-col lg:flex-row min-h-0 relative">
-        <div className="flex-1 flex flex-col items-center p-4 overflow-y-auto min-h-0">
+        {/* Whiteboard - hidden on mobile */}
+        <div className="hidden lg:flex flex-1 flex-col items-center p-4 overflow-y-auto min-h-0">
           <div className="flex flex-wrap gap-2 mb-4 flex-shrink-0">
             {subjects.map((s) => (
               <button
@@ -245,19 +246,19 @@ const AskPage: React.FC = () => {
           <Whiteboard whiteboardData={whiteboardData} mrWhiteState={mrWhiteState} className="flex-1 w-full min-h-0" onAskAbout={(text) => handleSend(`Can you explain this in more detail: "${text}"?`)} />
         </div>
 
+        {/* Toggle button - desktop only */}
         <button
           onClick={() => setChatOpen((o) => !o)}
-          className="absolute right-0 top-1/2 -translate-y-1/2 z-20 bg-card border border-border rounded-l-lg p-2 shadow-md hover:bg-accent transition-colors"
+          className="hidden lg:block absolute right-0 top-1/2 -translate-y-1/2 z-20 bg-card border border-border rounded-l-lg p-2 shadow-md hover:bg-accent transition-colors"
           style={chatOpen ? { right: '24rem' } : { right: 0 }}
           aria-label={chatOpen ? "Hide chat" : "Show chat"}
         >
           {chatOpen ? <PanelRightClose className="w-4 h-4 text-foreground" /> : <MessageSquare className="w-4 h-4 text-foreground" />}
         </button>
 
-        <div
-          className={`flex-shrink-0 border-l border-border min-h-0 max-h-full transition-all duration-300 overflow-hidden ${
-            chatOpen ? "w-96 lg:w-80 xl:w-96" : "w-0 border-l-0"
-          }`}
+        {/* Chat - full width on mobile, collapsible sidebar on desktop */}
+        <div className="flex-1 lg:flex-none lg:flex-shrink-0 lg:border-l lg:border-border min-h-0 max-h-full lg:transition-all lg:duration-300 lg:overflow-hidden lg:w-96 xl:w-96"
+          style={chatOpen ? undefined : { width: 0 }}
         >
           <ChatPanel
             messages={messages}
@@ -270,7 +271,7 @@ const AskPage: React.FC = () => {
             sessionMinutes={sessionMinutes}
             errorMessage={errorMessage}
             onListeningChange={handleListeningChange}
-            className="h-full w-96 lg:w-80 xl:w-96"
+            className="h-full w-full lg:w-96 xl:w-96"
           />
         </div>
       </div>
