@@ -59,6 +59,7 @@ const AskPage: React.FC = () => {
   const [currentTopic, setCurrentTopic] = useState<string>("");
   
   const [chatOpen, setChatOpen] = useState(true);
+  const [subjectsOpen, setSubjectsOpen] = useState(true);
   const abortRef = useRef<AbortController | null>(null);
   const [searchParams, setSearchParams] = useSearchParams();
   const autoSentRef = useRef(false);
