@@ -13,6 +13,7 @@ import { useSavedConcepts } from "@/hooks/useSavedConcepts";
 import MasteryCelebration from "@/components/MasteryCelebration";
 import PricingModal from "@/components/PricingModal";
 import { hasReachedLimit, incrementDailyCount } from "@/hooks/useDailyQuestionLimit";
+import { useLessons } from "@/hooks/useLessons";
 
 const subjects = ["Math", "Science", "History", "Economics", "Coding", "English", "Other"];
 const defaultChips = ["Ask anything", "Explain simpler", "Go deeper", "Quiz me"];
@@ -51,6 +52,7 @@ const AskPage: React.FC = () => {
   const { trackTopic, trackSimplification, trackSession, getProfileSummary, markMastered } = useLearningProfile();
   const { saveConcept, concepts } = useSavedConcepts();
   const { speak, stop: stopTTS, isPlaying: isTTSPlaying, voiceEnabled, setVoiceEnabled } = useTextToSpeech();
+  const { saveLesson } = useLessons();
 
   // Track if we're at desktop (lg) breakpoint
   const [isDesktop, setIsDesktop] = useState(() => typeof window !== 'undefined' && window.innerWidth >= 1024);
@@ -180,15 +182,25 @@ const AskPage: React.FC = () => {
       setIsTyping(false);
       setMessages((prev) => [...prev, { role: "mr_white", content: aiResponse.message }]);
 
+      // Save lesson data
+      const wbData = aiResponse.whiteboard?.active && aiResponse.whiteboard.elements
+        ? { title: aiResponse.whiteboard.title || "", elements: aiResponse.whiteboard.elements }
+        : null;
+
+      saveLesson({
+        question: message,
+        message: aiResponse.message,
+        whiteboard: wbData,
+        audio_text: aiResponse.message,
+        subject: activeSubject,
+      });
+
       // Sequence: voice first → then whiteboard draws
       const startWhiteboard = () => {
-        if (aiResponse.whiteboard?.active && aiResponse.whiteboard.elements) {
-          setWhiteboardData({
-            title: aiResponse.whiteboard.title || "",
-            elements: aiResponse.whiteboard.elements,
-          });
+        if (wbData) {
+          setWhiteboardData(wbData);
           setMrWhiteState("drawing");
-          const drawDuration = (aiResponse.whiteboard.elements.length || 1) * 800;
+          const drawDuration = (wbData.elements.length || 1) * 800;
           setTimeout(() => {
             const finalState = aiResponse.mr_white_state || "idle";
             setMrWhiteState(finalState);
@@ -261,6 +273,37 @@ const AskPage: React.FC = () => {
   const handleListeningChange = useCallback((listening: boolean) => {
     setMrWhiteState(listening ? "listening" : "idle");
   }, []);
+
+  const handleReplay = useCallback((question: string, message: string) => {
+    // Find matching lesson from localStorage
+    const raw = localStorage.getItem("chalk_lesson_history");
+    if (!raw) return;
+    const lessons = JSON.parse(raw);
+    const lesson = [...lessons].reverse().find(
+      (l: any) => l.question === question && l.message === message
+    );
+    if (!lesson) return;
+
+    // Clear whiteboard, then replay
+    setWhiteboardData(null);
+    setTimeout(() => {
+      setMrWhiteState("talking");
+      speak(
+        lesson.audio_text,
+        () => setMrWhiteState("talking"),
+        () => {
+          if (lesson.whiteboard && lesson.whiteboard.elements?.length > 0) {
+            setWhiteboardData(lesson.whiteboard);
+            setMrWhiteState("drawing");
+            const dur = (lesson.whiteboard.elements.length || 1) * 800;
+            setTimeout(() => setMrWhiteState("idle"), dur);
+          } else {
+            setMrWhiteState("idle");
+          }
+        },
+      );
+    }, 100);
+  }, [speak]);
 
   // Auto-send question from query param
   useEffect(() => {
@@ -344,6 +387,7 @@ const AskPage: React.FC = () => {
               topic: currentTopic || undefined,
             }) : undefined}
             savedConceptQuestions={new Set(concepts.map((c) => c.question))}
+            onReplay={handleReplay}
             isTyping={isTyping}
             chalkedCount={chalkedCount}
             sessionMinutes={sessionMinutes}

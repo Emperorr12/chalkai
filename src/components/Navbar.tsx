@@ -31,6 +31,7 @@ const Navbar: React.FC = () => {
             )}
             <Link to="/exam-prep" className="hover:text-foreground transition-colors">Exam Prep</Link>
             {user && <Link to="/concepts" className="hover:text-foreground transition-colors">My Concepts</Link>}
+            {user && <Link to="/lessons" className="hover:text-foreground transition-colors">My Lessons</Link>}
             <Link to="/demo" className="hover:text-foreground transition-colors">Demo</Link>
             <button
               onClick={() => setShowPricing(true)}
