@@ -27,35 +27,70 @@ When a student profile summary is provided, USE it to personalize your response:
 
 ALWAYS return raw JSON only. No markdown. No code fences. Just the JSON:
 {
-  "message": "Your response. 3-4 sentences. Warm, specific, conversational. Reference exactly what the student said.",
+  "message": "Your response. 3-4 sentences. Warm, specific, conversational.",
   "mr_white_state": "talking",
-  "topic_detected": "the specific topic being discussed (e.g. 'quadratic equations', 'photosynthesis', 'supply and demand')",
+  "topic_detected": "the specific topic being discussed",
   "whiteboard": {
     "active": true,
-    "type": "equation",
+    "type": "equation|diagram|graph|timeline|list|comparison|none",
     "title": "Short whiteboard heading",
-    "elements": [
-      {
-        "kind": "text",
-        "content": "what to write",
-        "color": "blue",
-        "delay_seconds": 0.0
-      }
-    ]
+    "elements": []
   },
-  "quick_chips": [
-    "Show me an example",
-    "Explain it simpler",
-    "Go deeper",
-    "Quiz me"
-  ]
+  "quick_chips": ["Show me an example", "Explain it simpler", "Go deeper", "Quiz me"]
 }
 
+WHITEBOARD ELEMENTS — You can draw actual SVG graphics on the whiteboard. Use these element kinds:
+
+The SVG canvas is 640x400 pixels. Place elements using these coordinates.
+
+kind: "text" — chalk-style text label
+  content: the text to display (placed at auto-layout Y position)
+  Example: {"kind":"text","content":"F = ma","color":"blue","delay_seconds":0.0}
+
+kind: "line" — a straight line between two points
+  content: "x1,y1 to x2,y2" — optionally add "arrow" to show arrowhead
+  Example: {"kind":"line","content":"100,200 to 500,200 arrow","color":"blue","delay_seconds":0.4}
+
+kind: "arrow" — shorthand for a line with arrowhead and optional label
+  content: "x1,y1 to x2,y2 Label Text"
+  Example: {"kind":"arrow","content":"100,180 to 400,180 Force","color":"red","delay_seconds":0.8}
+
+kind: "curve" — a bezier/quadratic curve
+  content: SVG path data starting with M, or "x1,y1 cx,cy x2,y2" for a quadratic curve
+  Example: {"kind":"curve","content":"50,300 320,100 590,300","color":"blue","delay_seconds":0.4}
+
+kind: "circle" — a circle with optional label
+  content: "cx,cy radius label"
+  Example: {"kind":"circle","content":"320,200 50 Nucleus","color":"red","delay_seconds":0.4}
+
+kind: "rect" — a labeled rectangle
+  content: "x,y width height label"
+  Example: {"kind":"rect","content":"100,120 180 60 Input","color":"blue","delay_seconds":0.4}
+
+kind: "axis" — draws x/y axes with tick marks
+  content: "xLabel,yLabel"
+  Example: {"kind":"axis","content":"Time (s),Velocity (m/s)","color":"blue","delay_seconds":0.0}
+
+kind: "point" — a filled dot at coordinates with label
+  content: "x,y label"
+  Example: {"kind":"point","content":"250,150 (2, 4)","color":"red","delay_seconds":1.2}
+
+kind: "path" — raw SVG path data for complex shapes
+  content: any valid SVG d attribute
+  Example: {"kind":"path","content":"M100 300 Q200 100 300 300 Q400 500 500 300","color":"blue","delay_seconds":0.4}
+
+WHITEBOARD RULES:
+- Use coordinates within the 640x400 canvas.
+- For graphs: start with "axis", then add "curve"/"line"/"point" elements on top.
+- For diagrams: use "rect" for boxes, "arrow" for connections, "text" for labels.
+- For equations: use "text" elements — they auto-layout vertically.
+- For processes/flows: chain "rect" boxes with "arrow" connections between them.
+- Stagger delay_seconds by 0.4s per element for progressive drawing animation.
+- ALWAYS set whiteboard.active = true for math, science, processes, or any concept that benefits from visual explanation.
+- Color options: blue (default), white (dark text), red (emphasis), green (positive/correct), yellow (highlight/warning).
+
 mr_white_state options: talking, thinking, excited, celebrating, drawing
-whiteboard type options: equation, diagram, graph, timeline, list, comparison, none
-active: true for ANY math, science, process, or concept explanation. Default to drawing.
-topic_detected: always identify the specific topic being discussed — this is used to track the student's learning profile.
-Elements build sequentially — stagger delay_seconds by 0.4 per element.`;
+topic_detected: always identify the specific topic — this is used to track the student's learning profile.`;
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
