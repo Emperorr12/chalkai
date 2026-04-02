@@ -239,21 +239,26 @@ const MrWhite: React.FC<MrWhiteProps> = ({ state = "idle", size = 140, className
       {/* Celebrating confetti */}
       {state === "celebrating" && (
         <div className="absolute inset-0 pointer-events-none overflow-visible">
-          {[...Array(8)].map((_, i) => (
-            <div
-              key={i}
-              className="absolute animate-confetti"
-              style={{
-                left: `${20 + Math.random() * 60}%`,
-                top: `-10%`,
-                width: 6,
-                height: 6,
-                borderRadius: i % 2 === 0 ? "50%" : "1px",
-                backgroundColor: i % 3 === 0 ? "#3B6FCA" : i % 3 === 1 ? "#E05252" : "#F5DEB3",
-                animationDelay: `${i * 0.1}s`,
-              }}
-            />
-          ))}
+          {[...Array(12)].map((_, i) => {
+            const angle = (i / 12) * 360;
+            const dist = 30 + Math.random() * 30;
+            return (
+              <div
+                key={i}
+                className="absolute animate-confetti"
+                style={{
+                  left: `${50 + Math.cos(angle * Math.PI / 180) * dist}%`,
+                  top: `${40 + Math.sin(angle * Math.PI / 180) * dist}%`,
+                  width: i % 3 === 0 ? 8 : 5,
+                  height: i % 3 === 0 ? 3 : 5,
+                  borderRadius: i % 2 === 0 ? "50%" : "1px",
+                  backgroundColor: ["#3B6FCA", "#E05252", "#F5DEB3", "#4CAF50"][i % 4],
+                  animationDelay: `${i * 0.07}s`,
+                  transform: `rotate(${angle}deg)`,
+                }}
+              />
+            );
+          })}
         </div>
       )}
     </div>
