@@ -232,6 +232,25 @@
   100% { transform: scale(1); opacity: 1; }
 }
 
+/* Mr. White whiteboard floating animations */
+@keyframes mr-white-float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-4px); }
+}
+
+@keyframes mr-white-idle-bob {
+  0%, 100% { transform: translateY(0px) scale(1); }
+  50% { transform: translateY(-2px) scale(1.005); }
+}
+
+.mr-white-floating {
+  animation: mr-white-float 1.6s ease-in-out infinite;
+}
+
+.mr-white-idle-float {
+  animation: mr-white-idle-bob 3s ease-in-out infinite;
+}
+
 /* Prefers reduced motion */
 @media (prefers-reduced-motion: reduce) {
   .animate-breathe,
@@ -241,7 +260,9 @@
   .animate-excited,
   .animate-celebrate,
   .animate-lean,
-  .animate-mic-pulse {
+  .animate-mic-pulse,
+  .mr-white-floating,
+  .mr-white-idle-float {
     animation: none;
   }
   .chalk-animate {
