@@ -31,7 +31,7 @@ const ConfettiPiece: React.FC<{ index: number }> = ({ index }) => {
         backgroundColor: color,
         borderRadius: isCircle ? "50%" : "2px",
         transform: `rotate(${rotation}deg)`,
-        animation: `confetti-fall ${duration}s ${delay}s ease-out forwards`,
+        animation: `confetti-fall-screen ${duration}s ${delay}s ease-out forwards`,
         opacity: 0,
       }}
     />
