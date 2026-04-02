@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef, useCallback } from "react";
 import { type MrWhiteState } from "./MrWhite";
 import HighlightAskTooltip from "./HighlightAskTooltip";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 export interface WhiteboardElement {
   kind: "text" | "line" | "arrow" | "circle" | "rect" | "curve" | "path";
@@ -39,10 +40,16 @@ const Whiteboard: React.FC<WhiteboardProps> = ({
   onAskAbout,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
+  const isMobile = useIsMobile();
   const [phase, setPhase] = useState<"idle" | "fading-out" | "drawing">("idle");
   const [activeData, setActiveData] = useState<WhiteboardData | null>(null);
   const prevDataRef = useRef<WhiteboardData | null>(null);
   const [drawKey, setDrawKey] = useState(0);
+
+  // On mobile, use a smaller viewBox so content appears larger
+  const svgW = isMobile ? 380 : SVG_W;
+  const svgH = isMobile ? 280 : SVG_H;
+  const pad = isMobile ? 16 : PAD;
 
   useEffect(() => {
     if (whiteboardData === prevDataRef.current) return;
@@ -78,7 +85,7 @@ const Whiteboard: React.FC<WhiteboardProps> = ({
     }, 300);
   }, []);
 
-  const getY = (index: number) => 60 + index * 52;
+  const getY = (index: number) => (isMobile ? 44 : 60) + index * (isMobile ? 40 : 52);
 
   const renderElement = (el: WhiteboardElement, index: number) => {
     const color = CHALK_COLORS[el.color] || CHALK_COLORS.blue;
@@ -103,7 +110,7 @@ const Whiteboard: React.FC<WhiteboardProps> = ({
         return (
           <text
             key={index}
-            x={PAD}
+            x={pad}
             y={y}
             fill={color}
             fontSize={fontSize}
@@ -119,9 +126,9 @@ const Whiteboard: React.FC<WhiteboardProps> = ({
         return (
           <line
             key={index}
-            x1={PAD}
+            x1={pad}
             y1={y}
-            x2={SVG_W - PAD}
+            x2={svgW - pad}
             y2={y}
             stroke={color}
             strokeWidth={2.5 * scale}
@@ -132,13 +139,13 @@ const Whiteboard: React.FC<WhiteboardProps> = ({
         );
 
       case "arrow": {
-        const arrowLen = SVG_W * 0.55;
+        const arrowLen = svgW * 0.55;
         return (
           <g key={index}>
             <line
-              x1={PAD}
+              x1={pad}
               y1={y}
-              x2={PAD + arrowLen}
+              x2={pad + arrowLen}
               y2={y}
               stroke={color}
               strokeWidth={2.5 * scale}
@@ -147,7 +154,7 @@ const Whiteboard: React.FC<WhiteboardProps> = ({
               style={drawStyle}
             />
             <polygon
-              points={`${PAD + arrowLen},${y - 6} ${PAD + arrowLen + 14},${y} ${PAD + arrowLen},${y + 6}`}
+              points={`${pad + arrowLen},${y - 6} ${pad + arrowLen + 14},${y} ${pad + arrowLen},${y + 6}`}
               fill={color}
               style={{
                 opacity: 0,
@@ -156,7 +163,7 @@ const Whiteboard: React.FC<WhiteboardProps> = ({
             />
             {el.content && (
               <text
-                x={PAD + arrowLen + 22}
+                x={pad + arrowLen + 22}
                 y={y + 5}
                 fill={color}
                 fontSize={fontSize}
@@ -179,7 +186,7 @@ const Whiteboard: React.FC<WhiteboardProps> = ({
         return (
           <circle
             key={index}
-            cx={SVG_W / 2}
+            cx={svgW / 2}
             cy={y}
             r={r}
             stroke={color}
@@ -198,7 +205,7 @@ const Whiteboard: React.FC<WhiteboardProps> = ({
         return (
           <rect
             key={index}
-            x={PAD}
+            x={pad}
             y={y - rh / 2}
             width={rw}
             height={rh}
@@ -218,7 +225,7 @@ const Whiteboard: React.FC<WhiteboardProps> = ({
         const d =
           el.kind === "path" && el.content
             ? el.content
-            : `M${PAD} ${y} Q${SVG_W / 3} ${y - 40 * scale} ${SVG_W / 2} ${y} Q${(SVG_W * 2) / 3} ${y + 40 * scale} ${SVG_W - PAD} ${y}`;
+            : `M${pad} ${y} Q${svgW / 3} ${y - 40 * scale} ${svgW / 2} ${y} Q${(svgW * 2) / 3} ${y + 40 * scale} ${svgW - pad} ${y}`;
         return (
           <path
             key={index}
@@ -259,7 +266,7 @@ const Whiteboard: React.FC<WhiteboardProps> = ({
           backgroundColor: "#FFFEF5",
           border: "8px solid #8B6914",
           borderRadius: 6,
-          padding: PAD,
+          padding: pad,
           position: "relative",
           overflow: "hidden",
           boxShadow: "0 4px 20px -4px rgba(0, 0, 0, 0.15)",
@@ -300,7 +307,7 @@ const Whiteboard: React.FC<WhiteboardProps> = ({
         >
           <svg
             key={drawKey}
-            viewBox={`0 0 ${SVG_W} ${SVG_H}`}
+            viewBox={`0 0 ${svgW} ${svgH}`}
             width="100%"
             preserveAspectRatio="xMidYMid meet"
             style={{ display: "block" }}
@@ -320,7 +327,7 @@ const Whiteboard: React.FC<WhiteboardProps> = ({
                 onAsk={(text) => onAskAbout(text)}
               />
               <svg
-                viewBox={`0 0 ${SVG_W} ${SVG_H}`}
+                viewBox={`0 0 ${svgW} ${svgH}`}
                 width="100%"
                 preserveAspectRatio="xMidYMid meet"
                 style={{ display: "block", position: "absolute", top: 0, left: 0 }}
@@ -332,7 +339,7 @@ const Whiteboard: React.FC<WhiteboardProps> = ({
                   return (
                     <text
                       key={`sel-${i}`}
-                      x={PAD}
+                      x={pad}
                       y={y}
                       fontSize={fontSize}
                       fontFamily="'Caveat', cursive"
