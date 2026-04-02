@@ -387,6 +387,7 @@ const AskPage: React.FC = () => {
               topic: currentTopic || undefined,
             }) : undefined}
             savedConceptQuestions={new Set(concepts.map((c) => c.question))}
+            onReplay={handleReplay}
             isTyping={isTyping}
             chalkedCount={chalkedCount}
             sessionMinutes={sessionMinutes}
