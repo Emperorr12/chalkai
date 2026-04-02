@@ -137,7 +137,9 @@ const AskPage: React.FC = () => {
       console.error("Chat error:", err);
       setIsTyping(false);
       const errorMessage = err instanceof Error ? err.message : "Something went wrong";
-      toast.error(errorMessage);
+      const errMsg = err instanceof Error ? err.message : "Something went wrong";
+      setErrorMessage(errMsg);
+      toast.error(errMsg);
       setMessages((prev) => [
         ...prev,
         { role: "mr_white", content: "Oops, my chalk broke! Let me try that again — could you rephrase?" },
