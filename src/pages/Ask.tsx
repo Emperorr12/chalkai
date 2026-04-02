@@ -56,6 +56,7 @@ const AskPage: React.FC = () => {
     setMessages((prev) => [...prev, { role: "student", content: message, imagePreview: imageData }]);
     setMrWhiteState("thinking");
     setIsTyping(true);
+    setErrorMessage(null);
     
 
     // Build context: last 4 messages
