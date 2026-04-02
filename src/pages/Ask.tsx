@@ -63,6 +63,7 @@ const AskPage: React.FC = () => {
   const [startTime] = useState(Date.now());
   const [currentTopic, setCurrentTopic] = useState<string>("");
   const [showCelebration, setShowCelebration] = useState(false);
+  const [showPricing, setShowPricing] = useState(false);
   
   const [chatOpen, setChatOpen] = useState(true);
   const abortRef = useRef<AbortController | null>(null);
