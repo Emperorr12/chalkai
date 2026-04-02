@@ -408,7 +408,7 @@ const AskPage: React.FC = () => {
         />
 
         {/* Pricing modal */}
-        <PricingModal open={showPricing} onOpenChange={setShowPricing} />
+        <PricingModal open={showPricing} onOpenChange={setShowPricing} isPro={isPro} currentTier={tier} onStartCheckout={startCheckout} />
       </div>
     </div>
   );
