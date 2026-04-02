@@ -4,7 +4,9 @@ import MrWhite, { type MrWhiteState } from "./MrWhite";
 export interface ChatMessage {
   role: "mr_white" | "student";
   content: string;
-  imagePreview?: string; // data URL for attached image
+  imagePreview?: string;
+  fileName?: string;
+  fileType?: string;
 }
 
 interface ChatPanelProps {
