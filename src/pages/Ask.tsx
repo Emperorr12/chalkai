@@ -50,6 +50,7 @@ const AskPage: React.FC = () => {
   const { user } = useAuth();
   const { trackTopic, trackSimplification, trackSession, getProfileSummary, markMastered } = useLearningProfile();
   const { saveConcept, concepts } = useSavedConcepts();
+  const { speak, stop: stopTTS, isPlaying: isTTSPlaying, voiceEnabled, setVoiceEnabled } = useTextToSpeech();
 
   const [activeSubject, setActiveSubject] = useState("Math");
   const [messages, setMessages] = useState<ChatMessage[]>([
