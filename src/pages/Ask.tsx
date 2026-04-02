@@ -54,6 +54,7 @@ const AskPage: React.FC = () => {
   const { saveConcept, concepts } = useSavedConcepts();
   const { speak, stop: stopTTS, isPlaying: isTTSPlaying, voiceEnabled, setVoiceEnabled } = useTextToSpeech();
   const { saveLesson } = useLessons();
+  const { isPro, tier, startCheckout, refresh: refreshSubscription } = useSubscription();
 
   // Track if we're at desktop (lg) breakpoint
   const [isDesktop, setIsDesktop] = useState(() => typeof window !== 'undefined' && window.innerWidth >= 1024);
