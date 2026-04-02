@@ -250,9 +250,8 @@ const AskPage: React.FC = () => {
       setIsTyping(false);
       setErrorMessage("Something went wrong");
       setMrWhiteState("idle");
-    } finally {
-      setIsTyping(false);
     }
+    // Note: setIsTyping(false) is handled by onVoiceStart callback, not here
   }, [messages, activeSubject, user, currentTopic, trackTopic, trackSimplification, getProfileSummary]);
 
   const handleRetry = useCallback(() => {
