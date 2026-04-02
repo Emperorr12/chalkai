@@ -307,7 +307,7 @@ const Whiteboard: React.FC<WhiteboardProps> = ({
         >
           <svg
             key={drawKey}
-            viewBox={`0 0 ${SVG_W} ${SVG_H}`}
+            viewBox={`0 0 ${svgW} ${svgH}`}
             width="100%"
             preserveAspectRatio="xMidYMid meet"
             style={{ display: "block" }}
@@ -327,7 +327,7 @@ const Whiteboard: React.FC<WhiteboardProps> = ({
                 onAsk={(text) => onAskAbout(text)}
               />
               <svg
-                viewBox={`0 0 ${SVG_W} ${SVG_H}`}
+                viewBox={`0 0 ${svgW} ${svgH}`}
                 width="100%"
                 preserveAspectRatio="xMidYMid meet"
                 style={{ display: "block", position: "absolute", top: 0, left: 0 }}
@@ -339,7 +339,7 @@ const Whiteboard: React.FC<WhiteboardProps> = ({
                   return (
                     <text
                       key={`sel-${i}`}
-                      x={PAD}
+                      x={pad}
                       y={y}
                       fontSize={fontSize}
                       fontFamily="'Caveat', cursive"
