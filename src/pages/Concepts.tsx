@@ -132,13 +132,6 @@ const ConceptsPage: React.FC = () => {
 
   if (!user) return <Navigate to="/auth" replace />;
 
-  const filtered = useMemo(() => {
-    if (filter === "All") return concepts;
-    return concepts.filter((c) => c.subject === filter);
-  }, [concepts, filter]);
-
-  const reviewable = useMemo(() => filtered.filter((c) => !c.mastered), [filtered]);
-
   if (reviewMode) {
     const reviewList = reviewIndex !== null ? [filtered[reviewIndex]] : reviewable.length > 0 ? reviewable : filtered;
     return (
