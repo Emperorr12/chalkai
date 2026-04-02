@@ -17,6 +17,7 @@ interface ChatPanelProps {
   chalkedCount?: number;
   sessionMinutes?: number;
   className?: string;
+  errorMessage?: string | null;
 }
 
 const ChatPanel: React.FC<ChatPanelProps> = ({
