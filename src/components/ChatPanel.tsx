@@ -431,39 +431,60 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
               <polyline points="21 15 16 10 5 21" />
             </svg>
           </button>
-          <input
-            ref={inputRef}
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && handleSend()}
-            onPaste={(e) => {
-              const items = e.clipboardData?.items;
-              if (!items) return;
-              for (const item of Array.from(items)) {
-                if (item.type.startsWith("image/")) {
-                  e.preventDefault();
-                  const file = item.getAsFile();
-                  if (file) handleFileRead(file);
-                  return;
+          <div className="flex-1 relative">
+            <input
+              ref={inputRef}
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && handleSend()}
+              onPaste={(e) => {
+                const items = e.clipboardData?.items;
+                if (!items) return;
+                for (const item of Array.from(items)) {
+                  if (item.type.startsWith("image/")) {
+                    e.preventDefault();
+                    const file = item.getAsFile();
+                    if (file) handleFileRead(file);
+                    return;
+                  }
                 }
-              }
-            }}
-            placeholder={pendingFile ? (pendingFile.isImage ? "Ask about this image..." : "Ask about this file...") : "Chalk it up..."}
-            className={`flex-1 bg-transparent text-sm text-foreground placeholder:text-muted-foreground outline-none ${
-              !hasAnimatedPlaceholder ? "placeholder:animate-pulse-placeholder" : ""
-            }`}
-            aria-label="Ask Mr. White a question"
-          />
+              }}
+              placeholder={isRecording ? "Listening..." : pendingFile ? (pendingFile.isImage ? "Ask about this image..." : "Ask about this file...") : "Chalk it up..."}
+              className={`w-full bg-transparent text-sm outline-none ${
+                interimText ? "text-muted-foreground italic" : "text-foreground"
+              } placeholder:text-muted-foreground ${
+                !hasAnimatedPlaceholder ? "placeholder:animate-pulse-placeholder" : ""
+              }`}
+              aria-label="Ask Mr. White a question"
+              readOnly={isRecording}
+              style={interimText ? { color: "transparent" } : {}}
+            />
+            {interimText && (
+              <span className="absolute inset-0 flex items-center text-sm italic text-muted-foreground pointer-events-none truncate">
+                {interimText}
+              </span>
+            )}
+          </div>
+          {/* Microphone button */}
           <button
-            className="text-muted-foreground hover:text-foreground transition-colors p-1"
-            aria-label="Voice input"
+            onClick={toggleRecording}
+            className={`relative p-1 transition-colors ${
+              isRecording
+                ? "text-destructive"
+                : "text-muted-foreground hover:text-foreground"
+            }`}
+            aria-label={isRecording ? "Stop recording" : "Voice input"}
           >
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" />
-              <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
-              <line x1="12" y1="19" x2="12" y2="23" />
-              <line x1="8" y1="23" x2="16" y2="23" />
-            </svg>
+            {isProcessingSpeech ? (
+              <Loader2 size={18} className="animate-spin" />
+            ) : (
+              <>
+                <Mic size={18} />
+                {isRecording && (
+                  <span className="absolute inset-0 rounded-full border-2 border-destructive animate-mic-pulse" />
+                )}
+              </>
+            )}
           </button>
           <button
             onClick={handleSend}
@@ -477,6 +498,10 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
             </svg>
           </button>
         </div>
+        {/* Speech error */}
+        {speechError && (
+          <p className="text-xs text-muted-foreground mt-1 px-2">{speechError}</p>
+        )}
       </div>
     </div>
   );
