@@ -223,6 +223,11 @@ const AskPage: React.FC = () => {
 
   const handleChipClick = useCallback(
     (chip: string) => {
+      // Open pricing modal
+      if (chip.toLowerCase().includes("see chalk pro")) {
+        setShowPricing(true);
+        return;
+      }
       // "Chalk it up" marks current topic as mastered and triggers celebration
       if (chip.toLowerCase().includes("chalk") && currentTopic && user) {
         markMastered(currentTopic, activeSubject);
