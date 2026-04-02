@@ -40,7 +40,7 @@ const Index: React.FC = () => {
             <input
               value={heroQuery}
               onChange={(e) => setHeroQuery(e.target.value)}
-              placeholder='Stuck on something? Type it here…'
+              placeholder='Chalk it up…'
               className="flex-1 bg-transparent text-sm text-foreground placeholder:text-muted-foreground outline-none"
               autoFocus
             />
