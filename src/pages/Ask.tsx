@@ -422,6 +422,8 @@ const AskPage: React.FC = () => {
             sessionMinutes={sessionMinutes}
             errorMessage={errorMessage}
             onListeningChange={handleListeningChange}
+            activeSubject={activeSubject}
+            onRetry={handleRetry}
             className="h-full w-full"
           />
         </div>
