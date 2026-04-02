@@ -12,6 +12,7 @@ import ExamPrepPage from "./pages/ExamPrep";
 import AuthPage from "./pages/Auth";
 import NotFound from "./pages/NotFound";
 import ConceptsPage from "./pages/Concepts";
+import LessonsPage from "./pages/Lessons";
 
 const queryClient = new QueryClient();
 
