@@ -324,6 +324,9 @@ const AskPage: React.FC = () => {
           visible={showCelebration}
           onClose={() => setShowCelebration(false)}
         />
+
+        {/* Pricing modal */}
+        <PricingModal open={showPricing} onOpenChange={setShowPricing} />
       </div>
     </div>
   );
