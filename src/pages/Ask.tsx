@@ -178,42 +178,36 @@ const AskPage: React.FC = () => {
       const aiResponse: AIResponse = JSON.parse(rawText);
 
       setIsTyping(false);
-      setMrWhiteState("talking");
       setMessages((prev) => [...prev, { role: "mr_white", content: aiResponse.message }]);
 
-      // Auto-play TTS for the response
+      // Sequence: voice first → then whiteboard draws
+      const startWhiteboard = () => {
+        if (aiResponse.whiteboard?.active && aiResponse.whiteboard.elements) {
+          setWhiteboardData({
+            title: aiResponse.whiteboard.title || "",
+            elements: aiResponse.whiteboard.elements,
+          });
+          setMrWhiteState("drawing");
+          const drawDuration = (aiResponse.whiteboard.elements.length || 1) * 800;
+          setTimeout(() => {
+            const finalState = aiResponse.mr_white_state || "idle";
+            setMrWhiteState(finalState);
+            if (finalState !== "idle") {
+              setTimeout(() => setMrWhiteState("idle"), 3000);
+            }
+          }, drawDuration);
+        } else {
+          setMrWhiteState("idle");
+        }
+      };
+
+      // Play TTS — when it ends, start whiteboard drawing
+      setMrWhiteState("talking");
       speak(
         aiResponse.message,
         () => setMrWhiteState("talking"),
-        () => setMrWhiteState("idle"),
+        () => startWhiteboard(),
       );
-
-      // Track the topic if detected
-      if (aiResponse.topic_detected && user) {
-        setCurrentTopic(aiResponse.topic_detected);
-        trackTopic(aiResponse.topic_detected, activeSubject);
-      }
-
-      // Update whiteboard
-      if (aiResponse.whiteboard?.active && aiResponse.whiteboard.elements) {
-        setWhiteboardData({
-          title: aiResponse.whiteboard.title || "",
-          elements: aiResponse.whiteboard.elements,
-        });
-        setMrWhiteState("drawing");
-        const drawDuration = (aiResponse.whiteboard.elements.length || 1) * 800;
-        setTimeout(() => {
-          const finalState = aiResponse.mr_white_state || "idle";
-          setMrWhiteState(finalState);
-          if (finalState !== "idle") {
-            setTimeout(() => setMrWhiteState("idle"), 3000);
-          }
-        }, drawDuration);
-      } else {
-        const finalState = aiResponse.mr_white_state || "talking";
-        setMrWhiteState(finalState);
-        setTimeout(() => setMrWhiteState("idle"), 3000);
-      }
 
       if (aiResponse.quick_chips && aiResponse.quick_chips.length > 0) {
         setQuickChips(aiResponse.quick_chips);
