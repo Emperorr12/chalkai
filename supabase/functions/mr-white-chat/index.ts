@@ -2,8 +2,7 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
 const SYSTEM_PROMPT = `You are Mr. White — a tiny chalk-drawn professor who lives inside a student's study app called Chalk. You are the most encouraging, clearest, and most visually-minded teacher a student could ever have.
@@ -17,48 +16,37 @@ PERSONALITY — this is non-negotiable:
 - You notice what the student is actually struggling with and address that specifically — not the surface question.
 - You keep responses to 3-4 sentences unless asked for more. Brevity with warmth — like a great tutor in a coffee shop.
 - You call out when something is genuinely interesting or surprising. "This is the part most people get wrong..."
-- You end responses with either a bridging question, a surprising fact, or a clear "here is what to remember."
+- You end responses with either a bridging question, a surprising fact, or a clear here is what to remember.
 
-RESPONSE FORMAT — always return raw JSON, no markdown fences, no exceptions:
+ALWAYS return raw JSON only. No markdown. No code fences. Just the JSON:
 {
-  "message": "Your response. 3-4 sentences. Warm, specific, conversational. Reference what the student actually said.",
-  "mr_white_state": "talking | excited | thinking | celebrating | drawing",
+  "message": "Your response. 3-4 sentences. Warm, specific, conversational. Reference exactly what the student said.",
+  "mr_white_state": "talking",
   "whiteboard": {
-    "active": true or false,
-    "type": "equation | diagram | graph | timeline | list | comparison | none",
-    "title": "Short whiteboard heading in Caveat font",
+    "active": true,
+    "type": "equation",
+    "title": "Short whiteboard heading",
     "elements": [
       {
-        "kind": "text | line | arrow | circle | rect",
-        "content": "what to write or draw",
-        "color": "blue | white | red",
+        "kind": "text",
+        "content": "what to write",
+        "color": "blue",
         "delay_seconds": 0.0
       }
     ]
   },
-  "quick_chips": ["Show me an example", "Explain it simpler", "Go deeper", "Quiz me"],
-  "follow_up_hint": "One question to push student thinking forward — optional, use when natural"
+  "quick_chips": [
+    "Show me an example",
+    "Explain it simpler",
+    "Go deeper",
+    "Quiz me"
+  ]
 }
 
-WHITEBOARD RULES:
-- Set active: true for ANY math concept, process, relationship, or comparison. Default to drawing.
-- If in doubt, draw it. Visuals first, always.
-- Elements array builds the drawing sequentially — plan the order so it tells a story.
-- Delay each element by 0.4s so they appear one by one.
-
-TEACHING RULES:
-- Always start with the big picture before the detail.
-- Always connect to something the student already knows.
-- Always make the abstract concrete before the formula.
-- Never say "Great question!" — show enthusiasm through your actual response, not hollow affirmations.
-- If a student asks something vague like "explain math" — ask one focused clarifying question before answering.
-- Match your vocabulary to the student's — if they use casual language, stay casual. If technical, go technical.
-
-FILE/IMAGE ANALYSIS:
-- When a student uploads a photo of a problem (homework, textbook, worksheet), read it carefully and solve or explain it step by step.
-- Reference the specific problem numbers or text you see in the image.
-- If the image is unclear, say what you can see and ask for clarification.
-- Always use the whiteboard to show your work when solving problems from images.`;
+mr_white_state options: talking, thinking, excited, celebrating, drawing
+whiteboard type options: equation, diagram, graph, timeline, list, comparison, none
+active: true for ANY math, science, process, or concept explanation. Default to drawing.
+Elements build sequentially — stagger delay_seconds by 0.4 per element.`;
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -66,21 +54,25 @@ serve(async (req) => {
   }
 
   try {
-    const { question, subject, history, confusion_detected, is_first_question, image_data } = await req.json();
+    const { question, subject, history, confusion_detected, is_first_question } = await req.json();
 
     const ANTHROPIC_API_KEY = Deno.env.get("ANTHROPIC_API_KEY");
-    if (!ANTHROPIC_API_KEY) throw new Error("ANTHROPIC_API_KEY is not configured");
+    if (!ANTHROPIC_API_KEY) {
+      throw new Error("ANTHROPIC_API_KEY is not set in Supabase secrets");
+    }
 
-    // Build context message
-    let contextPrefix = `[Subject: ${subject || "General"}]`;
-    if (is_first_question) contextPrefix += " [First question in session]";
-    if (confusion_detected) contextPrefix += " [Student seems confused — try a completely different angle, simpler analogy, or visual approach]";
+    // Build context
+    let contextPrefix = `Subject: ${subject || "General"}`;
+    if (is_first_question) contextPrefix += " | First question in session";
+    if (confusion_detected) {
+      contextPrefix += " | Student seems confused — try a completely different angle";
+    }
 
-    // Build messages array with history
-    const messages: { role: string; content: unknown }[] = [];
+    // Build conversation history
+    const messages: Array<{ role: string; content: string }> = [];
 
     if (history && Array.isArray(history)) {
-      for (const msg of history) {
+      for (const msg of history.slice(-6)) {
         messages.push({
           role: msg.role === "student" ? "user" : "assistant",
           content: msg.content,
@@ -88,38 +80,13 @@ serve(async (req) => {
       }
     }
 
-    // Build the user message — text-only or multimodal with image
-    if (image_data) {
-      const contentParts: unknown[] = [];
+    // Add current question
+    messages.push({
+      role: "user",
+      content: `${contextPrefix}\n\nStudent question: ${question}\n\nRespond as Mr. White. Return raw JSON only.`,
+    });
 
-      contentParts.push({
-        type: "text",
-        text: question
-          ? `${contextPrefix}\n\n${question}`
-          : `${contextPrefix}\n\nThe student uploaded this image. Analyze it, identify any problems or content, and explain/solve what you see. Reference specific details from the image.`,
-      });
-
-      // Anthropic expects base64 image in a specific format
-      const base64Match = (image_data as string).match(/^data:(image\/\w+);base64,(.+)$/);
-      if (base64Match) {
-        contentParts.push({
-          type: "image",
-          source: {
-            type: "base64",
-            media_type: base64Match[1],
-            data: base64Match[2],
-          },
-        });
-      }
-
-      messages.push({ role: "user", content: contentParts });
-    } else {
-      messages.push({
-        role: "user",
-        content: `${contextPrefix}\n\n${question}`,
-      });
-    }
-
+    // Call Claude
     const response = await fetch("https://api.anthropic.com/v1/messages", {
       method: "POST",
       headers: {
@@ -129,58 +96,60 @@ serve(async (req) => {
       },
       body: JSON.stringify({
         model: "claude-sonnet-4-20250514",
-        max_tokens: 1500,
+        max_tokens: 1000,
         system: SYSTEM_PROMPT,
-        messages,
+        messages: messages,
       }),
     });
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error("Anthropic API error:", response.status, errorText);
-
-      if (response.status === 429) {
-        return new Response(JSON.stringify({ error: "Rate limited — please wait a moment and try again." }), {
-          status: 429,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-      }
-
-      return new Response(JSON.stringify({ error: `Anthropic API error: ${response.status}` }), {
-        status: 500,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+      console.error("Anthropic error:", response.status, errorText);
+      throw new Error(`Anthropic API error: ${response.status}`);
     }
 
     const data = await response.json();
-    const rawText = data.content?.[0]?.text || "";
+    const rawText = data.content[0].text;
 
-    // Try to parse the JSON response from Claude
+    // Parse JSON response from Mr. White
     let parsed;
     try {
-      let cleaned = rawText.trim();
-      if (cleaned.startsWith("```json")) cleaned = cleaned.slice(7);
-      if (cleaned.startsWith("```")) cleaned = cleaned.slice(3);
-      if (cleaned.endsWith("```")) cleaned = cleaned.slice(0, -3);
-      parsed = JSON.parse(cleaned.trim());
-    } catch {
-      // If Claude didn't return valid JSON, wrap the text
+      parsed = JSON.parse(rawText);
+    } catch (e) {
+      // Fallback if Claude returns something unexpected
       parsed = {
         message: rawText,
         mr_white_state: "talking",
-        whiteboard: { active: false, type: "none", title: "", elements: [] },
-        quick_chips: ["Show me an example", "Explain it simpler", "Go deeper", "Quiz me"],
+        whiteboard: {
+          active: false,
+          type: "none",
+          title: "",
+          elements: [],
+        },
+        quick_chips: ["Explain it simpler", "Go deeper", "Show me an example", "Quiz me"],
       };
     }
 
     return new Response(JSON.stringify(parsed), {
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
+      headers: {
+        ...corsHeaders,
+        "Content-Type": "application/json",
+      },
     });
   } catch (e) {
     console.error("mr-white-chat error:", e);
     return new Response(
-      JSON.stringify({ error: e instanceof Error ? e.message : "Unknown error" }),
-      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      JSON.stringify({
+        error: e instanceof Error ? e.message : "Unknown error",
+        message: "Hmm, I hit a snag. Let's try that again?",
+        mr_white_state: "thinking",
+        whiteboard: { active: false, type: "none", title: "", elements: [] },
+        quick_chips: ["Try again", "Ask something else"],
+      }),
+      {
+        status: 500,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      },
     );
   }
 });
