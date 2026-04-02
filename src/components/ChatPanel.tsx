@@ -366,7 +366,7 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
                 </div>
               </div>
               {canSave && (
-                <div className="ml-9 mt-1 mb-1">
+                <div className="ml-9 mt-1 mb-1 flex items-center gap-2">
                   <button
                     onClick={() => onSaveConcept(prevStudentMsg!.content, msg.content)}
                     disabled={!!isSaved}
@@ -379,6 +379,16 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
                     <Bookmark className="w-3 h-3" />
                     {isSaved ? "Saved" : "Save concept"}
                   </button>
+                  {onReplay && prevStudentMsg && (
+                    <button
+                      onClick={() => onReplay(prevStudentMsg!.content, msg.content)}
+                      className="text-[11px] px-2.5 py-1 rounded-full border border-border text-muted-foreground hover:border-primary hover:text-primary transition-colors inline-flex items-center gap-1"
+                      title="Replay this lesson"
+                    >
+                      <RotateCcw className="w-3 h-3" />
+                      Replay
+                    </button>
+                  )}
                 </div>
               )}
             </div>
