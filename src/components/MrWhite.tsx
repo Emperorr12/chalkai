@@ -229,6 +229,8 @@ const MrWhite: React.FC<MrWhiteProps> = ({ state = "idle", size = 140, className
             <>
               <polygon points="100,30 102,35 107,35 103,38 105,43 100,40 95,43 97,38 93,35 98,35" fill="#3B6FCA" opacity="0.7" style={{ animation: "star-burst 0.6s ease-out forwards" }} />
               <polygon points="42,32 43,35 46,35 44,37 45,40 42,38 39,40 40,37 38,35 41,35" fill="#3B6FCA" opacity="0.5" style={{ animation: "star-burst 0.6s 0.15s ease-out forwards" }} />
+              <polygon points="55,18 56,21 59,21 57,23 58,26 55,24 52,26 53,23 51,21 54,21" fill="#3B6FCA" opacity="0.6" style={{ animation: "star-burst 0.6s 0.08s ease-out forwards" }} />
+              <polygon points="85,15 86,18 89,18 87,20 88,23 85,21 82,23 83,20 81,18 84,18" fill="#3B6FCA" opacity="0.4" style={{ animation: "star-burst 0.6s 0.22s ease-out forwards" }} />
             </>
           )}
         </svg>
