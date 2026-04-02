@@ -19,7 +19,7 @@ const Navbar: React.FC = () => {
           </span>
         </Link>
 
-        <div className="hidden md:flex items-center gap-8 text-sm text-muted-foreground">
+        <div className="hidden sm:flex items-center gap-8 text-sm text-muted-foreground">
           {isHome && (
             <>
               <a href="#how-it-works" className="hover:text-foreground transition-colors">How it works</a>
