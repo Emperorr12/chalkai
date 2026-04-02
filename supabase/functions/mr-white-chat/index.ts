@@ -76,6 +76,9 @@ serve(async (req) => {
     if (confusion_detected) {
       contextPrefix += " | Student seems confused — try a completely different angle";
     }
+    if (student_profile) {
+      contextPrefix += ` | ${student_profile}`;
+    }
 
     // Build conversation history
     const messages: Array<{ role: string; content: any }> = [];
