@@ -66,7 +66,7 @@ const Index: React.FC = () => {
       </section>
 
       {/* Subject Chips */}
-      <section id="subjects" className="max-w-3xl mx-auto px-6 pb-12">
+      <section id="subjects" className="max-w-3xl mx-auto px-6 pt-6 pb-12">
         <p className="text-center text-[11px] text-muted-foreground tracking-[0.2em] uppercase mb-4">
           Works for any subject
         </p>
