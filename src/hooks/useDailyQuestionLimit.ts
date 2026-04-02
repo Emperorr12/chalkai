@@ -1,5 +1,14 @@
 const STORAGE_KEY = "chalk_daily_questions";
+const DEV_MODE_KEY = "chalk_dev_mode";
 const FREE_LIMIT = 5;
+
+function isDevMode(): boolean {
+  try {
+    return localStorage.getItem(DEV_MODE_KEY) === "true";
+  } catch {
+    return false;
+  }
+}
 
 interface DailyData {
   count: number;
@@ -41,6 +50,7 @@ export function incrementDailyCount(): number {
 }
 
 export function hasReachedLimit(): boolean {
+  if (isDevMode()) return false;
   return getData().count >= FREE_LIMIT;
 }
 
