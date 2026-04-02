@@ -1,10 +1,12 @@
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
 import MrWhite from "./MrWhite";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Navbar: React.FC = () => {
   const location = useLocation();
   const isHome = location.pathname === "/";
+  const { user, signOut } = useAuth();
 
   return (
     <nav className="w-full border-b border-border/50 bg-background/95 backdrop-blur-sm sticky top-0 z-50">
@@ -29,12 +31,37 @@ const Navbar: React.FC = () => {
         </div>
 
         <div className="flex items-center gap-3">
-          <Link
-            to="/ask"
-            className="text-sm px-4 py-1.5 rounded-full border border-primary text-primary hover:bg-primary hover:text-primary-foreground transition-colors"
-          >
-            Start learning
-          </Link>
+          {user ? (
+            <>
+              <Link
+                to="/ask"
+                className="text-sm px-4 py-1.5 rounded-full border border-primary text-primary hover:bg-primary hover:text-primary-foreground transition-colors"
+              >
+                Start learning
+              </Link>
+              <button
+                onClick={signOut}
+                className="text-xs text-muted-foreground hover:text-foreground transition-colors"
+              >
+                Sign out
+              </button>
+            </>
+          ) : (
+            <>
+              <Link
+                to="/ask"
+                className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+              >
+                Try it free
+              </Link>
+              <Link
+                to="/auth"
+                className="text-sm px-4 py-1.5 rounded-full border border-primary text-primary hover:bg-primary hover:text-primary-foreground transition-colors"
+              >
+                Sign in
+              </Link>
+            </>
+          )}
         </div>
       </div>
     </nav>
