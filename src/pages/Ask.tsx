@@ -5,7 +5,8 @@ import { type MrWhiteState } from "../components/MrWhite";
 import Whiteboard, { type WhiteboardElement } from "../components/Whiteboard";
 import ChatPanel, { type ChatMessage } from "../components/ChatPanel";
 import { toast } from "sonner";
-import { MessageSquare, PanelRightClose } from "lucide-react";
+import { MessageSquare, PanelRightClose, Volume2, VolumeX } from "lucide-react";
+import { useTextToSpeech } from "@/hooks/useTextToSpeech";
 import { useAuth } from "@/contexts/AuthContext";
 import { useLearningProfile } from "@/hooks/useLearningProfile";
 import { useSavedConcepts } from "@/hooks/useSavedConcepts";
@@ -49,6 +50,7 @@ const AskPage: React.FC = () => {
   const { user } = useAuth();
   const { trackTopic, trackSimplification, trackSession, getProfileSummary, markMastered } = useLearningProfile();
   const { saveConcept, concepts } = useSavedConcepts();
+  const { speak, stop: stopTTS, isPlaying: isTTSPlaying, voiceEnabled, setVoiceEnabled } = useTextToSpeech();
 
   const [activeSubject, setActiveSubject] = useState("Math");
   const [messages, setMessages] = useState<ChatMessage[]>([
@@ -170,6 +172,13 @@ const AskPage: React.FC = () => {
       setMrWhiteState("talking");
       setMessages((prev) => [...prev, { role: "mr_white", content: aiResponse.message }]);
 
+      // Auto-play TTS for the response
+      speak(
+        aiResponse.message,
+        () => setMrWhiteState("talking"),
+        () => setMrWhiteState("idle"),
+      );
+
       // Track the topic if detected
       if (aiResponse.topic_detected && user) {
         setCurrentTopic(aiResponse.topic_detected);
@@ -262,20 +271,38 @@ const AskPage: React.FC = () => {
       <div className="flex-1 flex flex-col lg:flex-row min-h-0 relative overflow-hidden">
         {/* Whiteboard */}
         <div className="flex flex-col items-center p-2 lg:p-4 flex-shrink-0 lg:flex-1 lg:min-h-0">
-          <div className="flex flex-wrap gap-1.5 lg:gap-2 mb-2 lg:mb-4 flex-shrink-0">
-            {subjects.map((s) => (
-              <button
-                key={s}
-                onClick={() => setActiveSubject(s)}
-                className={`text-xs px-2.5 py-1 lg:px-3 lg:py-1.5 rounded-full border transition-colors ${
-                  activeSubject === s
-                    ? "border-primary bg-primary text-primary-foreground"
-                    : "border-border text-muted-foreground hover:border-primary hover:text-primary"
-                }`}
-              >
-                {s}
-              </button>
-            ))}
+          <div className="flex items-center gap-2 mb-2 lg:mb-4 flex-shrink-0">
+            <div className="flex flex-wrap gap-1.5 lg:gap-2">
+              {subjects.map((s) => (
+                <button
+                  key={s}
+                  onClick={() => setActiveSubject(s)}
+                  className={`text-xs px-2.5 py-1 lg:px-3 lg:py-1.5 rounded-full border transition-colors ${
+                    activeSubject === s
+                      ? "border-primary bg-primary text-primary-foreground"
+                      : "border-border text-muted-foreground hover:border-primary hover:text-primary"
+                  }`}
+                >
+                  {s}
+                </button>
+              ))}
+            </div>
+            <button
+              onClick={() => { setVoiceEnabled((v) => !v); if (isTTSPlaying) stopTTS(); }}
+              className={`flex-shrink-0 p-1.5 rounded-full border transition-colors ${
+                voiceEnabled
+                  ? "border-primary text-primary bg-primary/10"
+                  : "border-border text-muted-foreground hover:border-primary"
+              }`}
+              aria-label={voiceEnabled ? "Disable voice" : "Enable voice"}
+              title={voiceEnabled ? "Voice on" : "Voice off"}
+            >
+              {voiceEnabled ? (
+                <Volume2 className={`w-4 h-4 ${isTTSPlaying ? "animate-pulse" : ""}`} />
+              ) : (
+                <VolumeX className="w-4 h-4" />
+              )}
+            </button>
           </div>
           <Whiteboard whiteboardData={whiteboardData} mrWhiteState={mrWhiteState} className="w-full min-h-[200px] lg:flex-1 lg:min-h-[0px] lg:h-full" onAskAbout={(text) => handleSend(`Can you explain this in more detail: "${text}"?`)} />
         </div>
