@@ -227,7 +227,7 @@ const AskPage: React.FC = () => {
       <Navbar />
       <div className="flex-1 flex flex-col lg:flex-row min-h-0 relative overflow-hidden">
         {/* Whiteboard */}
-        <div className="flex flex-col items-center p-2 lg:p-4 flex-shrink-0 lg:flex-1 lg:overflow-y-auto lg:min-h-0">
+        <div className="flex flex-col items-center p-2 lg:p-4 flex-1 min-h-0 lg:overflow-y-auto">
           <div className="flex flex-wrap gap-1.5 lg:gap-2 mb-2 lg:mb-4 flex-shrink-0">
             {subjects.map((s) => (
               <button
@@ -243,7 +243,7 @@ const AskPage: React.FC = () => {
               </button>
             ))}
           </div>
-          <Whiteboard whiteboardData={whiteboardData} mrWhiteState={mrWhiteState} className="w-full min-h-[200px] lg:flex-1 lg:min-h-0" onAskAbout={(text) => handleSend(`Can you explain this in more detail: "${text}"?`)} />
+          <Whiteboard whiteboardData={whiteboardData} mrWhiteState={mrWhiteState} className="w-full flex-1 min-h-0 lg:min-h-0" onAskAbout={(text) => handleSend(`Can you explain this in more detail: "${text}"?`)} />
         </div>
 
         {/* Toggle button - desktop only */}
@@ -257,7 +257,7 @@ const AskPage: React.FC = () => {
         </button>
 
         {/* Chat - static scrollable on mobile, collapsible sidebar on desktop */}
-        <div className="flex-1 min-h-0 lg:flex-none lg:h-auto lg:border-l lg:border-border lg:transition-all lg:duration-300 lg:overflow-hidden lg:w-96 xl:w-96"
+        <div className="h-[35vh] flex-shrink-0 lg:h-auto lg:flex-none lg:border-l lg:border-border lg:transition-all lg:duration-300 lg:overflow-hidden lg:w-96 xl:w-96"
           style={chatOpen ? undefined : { width: 0 }}
         >
           <ChatPanel
