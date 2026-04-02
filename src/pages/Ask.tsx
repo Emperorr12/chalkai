@@ -52,6 +52,7 @@ const AskPage: React.FC = () => {
   const { trackTopic, trackSimplification, trackSession, getProfileSummary, markMastered } = useLearningProfile();
   const { saveConcept, concepts } = useSavedConcepts();
   const { speak, stop: stopTTS, isPlaying: isTTSPlaying, voiceEnabled, setVoiceEnabled } = useTextToSpeech();
+  const { saveLesson } = useLessons();
 
   // Track if we're at desktop (lg) breakpoint
   const [isDesktop, setIsDesktop] = useState(() => typeof window !== 'undefined' && window.innerWidth >= 1024);
