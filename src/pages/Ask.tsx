@@ -91,12 +91,16 @@ const AskPage: React.FC = () => {
         signal: controller.signal,
       });
 
+      const rawText = await resp.text();
+      console.log("[mr-white-chat] Raw response:", rawText);
+
       if (!resp.ok) {
-        const errData = await resp.json().catch(() => ({ error: "Request failed" }));
-        throw new Error(errData.error || `Error ${resp.status}`);
+        let errMsg = `Error ${resp.status}`;
+        try { errMsg = JSON.parse(rawText).error || errMsg; } catch {}
+        throw new Error(errMsg);
       }
 
-      const aiResponse: AIResponse = await resp.json();
+      const aiResponse: AIResponse = JSON.parse(rawText);
 
       setIsTyping(false);
 
