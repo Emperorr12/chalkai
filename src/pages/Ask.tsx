@@ -98,14 +98,21 @@ const AskPage: React.FC = () => {
     };
   }, [startTime, user, trackSession]);
 
+  // Save subject to localStorage
+  useEffect(() => {
+    localStorage.setItem("chalk_last_subject", activeSubject);
+  }, [activeSubject]);
+
   const handleSend = useCallback(async (message: string, fileData?: { data: string; type: string; name: string }) => {
     const isImage = fileData?.type.startsWith("image/");
+    setLastQuestion({ text: message, fileData });
     setMessages((prev) => [...prev, { 
       role: "student", 
       content: message, 
       imagePreview: isImage ? fileData?.data : undefined,
       fileName: fileData?.name,
       fileType: fileData?.type,
+      timestamp: Date.now(),
     }]);
 
     // Check daily free limit (skip for Pro users)
