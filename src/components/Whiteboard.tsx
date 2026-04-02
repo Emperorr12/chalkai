@@ -110,7 +110,7 @@ const Whiteboard: React.FC<WhiteboardProps> = ({
         return (
           <text
             key={index}
-            x={PAD}
+            x={pad}
             y={y}
             fill={color}
             fontSize={fontSize}
@@ -126,9 +126,9 @@ const Whiteboard: React.FC<WhiteboardProps> = ({
         return (
           <line
             key={index}
-            x1={PAD}
+            x1={pad}
             y1={y}
-            x2={SVG_W - PAD}
+            x2={svgW - pad}
             y2={y}
             stroke={color}
             strokeWidth={2.5 * scale}
@@ -139,13 +139,13 @@ const Whiteboard: React.FC<WhiteboardProps> = ({
         );
 
       case "arrow": {
-        const arrowLen = SVG_W * 0.55;
+        const arrowLen = svgW * 0.55;
         return (
           <g key={index}>
             <line
-              x1={PAD}
+              x1={pad}
               y1={y}
-              x2={PAD + arrowLen}
+              x2={pad + arrowLen}
               y2={y}
               stroke={color}
               strokeWidth={2.5 * scale}
@@ -154,7 +154,7 @@ const Whiteboard: React.FC<WhiteboardProps> = ({
               style={drawStyle}
             />
             <polygon
-              points={`${PAD + arrowLen},${y - 6} ${PAD + arrowLen + 14},${y} ${PAD + arrowLen},${y + 6}`}
+              points={`${pad + arrowLen},${y - 6} ${pad + arrowLen + 14},${y} ${pad + arrowLen},${y + 6}`}
               fill={color}
               style={{
                 opacity: 0,
@@ -163,7 +163,7 @@ const Whiteboard: React.FC<WhiteboardProps> = ({
             />
             {el.content && (
               <text
-                x={PAD + arrowLen + 22}
+                x={pad + arrowLen + 22}
                 y={y + 5}
                 fill={color}
                 fontSize={fontSize}
@@ -186,7 +186,7 @@ const Whiteboard: React.FC<WhiteboardProps> = ({
         return (
           <circle
             key={index}
-            cx={SVG_W / 2}
+            cx={svgW / 2}
             cy={y}
             r={r}
             stroke={color}
@@ -205,7 +205,7 @@ const Whiteboard: React.FC<WhiteboardProps> = ({
         return (
           <rect
             key={index}
-            x={PAD}
+            x={pad}
             y={y - rh / 2}
             width={rw}
             height={rh}
@@ -225,7 +225,7 @@ const Whiteboard: React.FC<WhiteboardProps> = ({
         const d =
           el.kind === "path" && el.content
             ? el.content
-            : `M${PAD} ${y} Q${SVG_W / 3} ${y - 40 * scale} ${SVG_W / 2} ${y} Q${(SVG_W * 2) / 3} ${y + 40 * scale} ${SVG_W - PAD} ${y}`;
+            : `M${pad} ${y} Q${svgW / 3} ${y - 40 * scale} ${svgW / 2} ${y} Q${(svgW * 2) / 3} ${y + 40 * scale} ${svgW - pad} ${y}`;
         return (
           <path
             key={index}
