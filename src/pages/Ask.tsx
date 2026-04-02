@@ -242,6 +242,7 @@ const AskPage: React.FC = () => {
             chalkedCount={chalkedCount}
             sessionMinutes={sessionMinutes}
             errorMessage={errorMessage}
+            onListeningChange={handleListeningChange}
             className="h-full w-96 lg:w-80 xl:w-96"
           />
         </div>
