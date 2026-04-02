@@ -257,15 +257,15 @@ const AskPage: React.FC = () => {
         <button
           onClick={() => setChatOpen((o) => !o)}
           className="hidden lg:block absolute right-0 top-1/2 -translate-y-1/2 z-20 bg-card border border-border rounded-l-lg p-2 shadow-md hover:bg-accent transition-colors"
-          style={chatOpen ? { right: '24rem' } : { right: 0 }}
+          style={chatOpen ? { right: '38%' } : { right: 0 }}
           aria-label={chatOpen ? "Hide chat" : "Show chat"}
         >
           {chatOpen ? <PanelRightClose className="w-4 h-4 text-foreground" /> : <MessageSquare className="w-4 h-4 text-foreground" />}
         </button>
 
         {/* Chat - static scrollable on mobile, collapsible sidebar on desktop */}
-        <div className="flex-1 min-h-0 lg:flex-none lg:h-auto lg:border-l lg:border-border lg:transition-all lg:duration-300 lg:overflow-hidden lg:w-96 xl:w-96"
-          style={chatOpen ? undefined : { width: 0 }}
+        <div className="flex-1 min-h-0 lg:flex-none lg:h-auto lg:border-l lg:border-border lg:transition-all lg:duration-300 lg:overflow-hidden"
+          style={chatOpen ? { width: '38%' } : { width: 0 }}
         >
           <ChatPanel
             messages={messages}
@@ -286,7 +286,7 @@ const AskPage: React.FC = () => {
             sessionMinutes={sessionMinutes}
             errorMessage={errorMessage}
             onListeningChange={handleListeningChange}
-            className="h-full w-full lg:w-96 xl:w-96"
+            className="h-full w-full"
           />
         </div>
 

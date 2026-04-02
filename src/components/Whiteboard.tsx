@@ -89,20 +89,22 @@ const Whiteboard: React.FC<WhiteboardProps> = ({
 
   const renderElement = (el: WhiteboardElement, index: number) => {
     const color = CHALK_COLORS[el.color] || CHALK_COLORS.blue;
-    const delay = `${el.delay_seconds}s`;
     const y = getY(index);
     const scale = el.size === "large" ? 1.3 : el.size === "small" ? 0.7 : 1;
     const fontSize = el.size === "large" ? 36 : el.size === "small" ? 22 : 24;
 
+    // Enforce 0.4s stagger between elements for progressive drawing
+    const staggerDelay = `${index * 0.4}s`;
+
     const drawStyle: React.CSSProperties = {
       strokeDasharray: 1,
       strokeDashoffset: 1,
-      animation: `chalk-draw 1.2s ease-out ${delay} forwards`,
+      animation: `chalk-draw 1.2s ease-out ${staggerDelay} forwards`,
     };
 
     const fadeStyle: React.CSSProperties = {
       opacity: 0,
-      animation: `chalk-fade 0.5s ease-out ${delay} forwards`,
+      animation: `chalk-fade 0.5s ease-out ${staggerDelay} forwards`,
     };
 
     switch (el.kind) {
@@ -158,7 +160,7 @@ const Whiteboard: React.FC<WhiteboardProps> = ({
               fill={color}
               style={{
                 opacity: 0,
-                animation: `chalk-fade 0.3s ease-out calc(${el.delay_seconds}s + 1s) forwards`,
+                animation: `chalk-fade 0.3s ease-out calc(${staggerDelay} + 1s) forwards`,
               }}
             />
             {el.content && (
@@ -171,7 +173,7 @@ const Whiteboard: React.FC<WhiteboardProps> = ({
                 fontWeight={700}
                 style={{
                   opacity: 0,
-                  animation: `chalk-fade 0.5s ease-out calc(${el.delay_seconds}s + 0.8s) forwards`,
+                  animation: `chalk-fade 0.5s ease-out calc(${staggerDelay} + 0.8s) forwards`,
                 }}
               >
                 {el.content}
