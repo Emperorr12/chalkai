@@ -83,6 +83,45 @@ export type Database = {
         }
         Relationships: []
       }
+      saved_concepts: {
+        Row: {
+          created_at: string
+          explanation: string
+          id: string
+          mastered: boolean
+          question: string
+          subject: string
+          topic: string | null
+          updated_at: string
+          user_id: string
+          whiteboard_data: Json | null
+        }
+        Insert: {
+          created_at?: string
+          explanation: string
+          id?: string
+          mastered?: boolean
+          question: string
+          subject?: string
+          topic?: string | null
+          updated_at?: string
+          user_id: string
+          whiteboard_data?: Json | null
+        }
+        Update: {
+          created_at?: string
+          explanation?: string
+          id?: string
+          mastered?: boolean
+          question?: string
+          subject?: string
+          topic?: string | null
+          updated_at?: string
+          user_id?: string
+          whiteboard_data?: Json | null
+        }
+        Relationships: []
+      }
       study_sessions: {
         Row: {
           created_at: string
