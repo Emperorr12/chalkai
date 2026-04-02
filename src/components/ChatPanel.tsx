@@ -13,7 +13,7 @@ interface ChatPanelProps {
   messages: ChatMessage[];
   mrWhiteState: MrWhiteState;
   quickChips: string[];
-  onSend: (message: string, imageData?: string) => void;
+  onSend: (message: string, fileData?: { data: string; type: string; name: string }) => void;
   onChipClick: (chip: string) => void;
   isTyping?: boolean;
   chalkedCount?: number;
