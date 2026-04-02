@@ -1,6 +1,13 @@
 import React from "react";
 
-export type MrWhiteState = "idle" | "talking" | "thinking" | "excited" | "celebrating" | "drawing" | "listening";
+export type MrWhiteState =
+  | "idle"
+  | "talking"
+  | "thinking"
+  | "excited"
+  | "celebrating"
+  | "drawing"
+  | "listening";
 
 interface MrWhiteProps {
   state?: MrWhiteState;
@@ -9,7 +16,7 @@ interface MrWhiteProps {
 }
 
 const MrWhite: React.FC<MrWhiteProps> = ({ state = "idle", size = 140, className = "" }) => {
-  const getAnimationClass = () => {
+  const animClass = (() => {
     switch (state) {
       case "idle": return "animate-breathe";
       case "talking": return "animate-bounce-talk";
@@ -20,11 +27,11 @@ const MrWhite: React.FC<MrWhiteProps> = ({ state = "idle", size = 140, className
       case "listening": return "animate-lean";
       default: return "animate-breathe";
     }
-  };
+  })();
 
   return (
     <div className={`relative inline-block ${className}`} style={{ width: size, height: size }}>
-      <div className={getAnimationClass()} style={{ width: "100%", height: "100%" }}>
+      <div className={animClass} style={{ width: "100%", height: "100%", transformOrigin: "center bottom" }}>
         <svg
           viewBox="0 0 140 140"
           width={size}
@@ -32,45 +39,25 @@ const MrWhite: React.FC<MrWhiteProps> = ({ state = "idle", size = 140, className
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
           aria-label="Mr. White, your chalk professor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
         >
-          {/* Body / Jacket */}
+          {/* ── Body / Academic Jacket ── */}
           <path
-            d="M45 95 C45 78, 55 72, 70 72 C85 72, 95 78, 95 95 L95 125 L45 125 Z"
+            d="M46 94 C46 79, 56 73, 70 73 C84 73, 94 79, 94 94 L96 126 L44 126 Z"
             fill="#2C2C2C"
             stroke="#1A1A1A"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
+            strokeWidth="2.2"
           />
-          {/* Jacket lapels */}
-          <path
-            d="M60 72 L65 88 L70 78"
-            stroke="#444"
-            strokeWidth="1.5"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            fill="none"
-          />
-          <path
-            d="M80 72 L75 88 L70 78"
-            stroke="#444"
-            strokeWidth="1.5"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            fill="none"
-          />
+          {/* Lapel lines */}
+          <path d="M60 73 L66 89 L70 79" stroke="#444" strokeWidth="1.5" fill="none" />
+          <path d="M80 73 L74 89 L70 79" stroke="#444" strokeWidth="1.5" fill="none" />
 
-          {/* Bowtie */}
-          <path
-            d="M63 74 L70 78 L77 74 L70 72 Z"
-            fill="#3B6FCA"
-            stroke="#2E5BA8"
-            strokeWidth="1.5"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
+          {/* ── Bowtie (two triangles) ── */}
+          <path d="M63 75 L70 79 L70 73 Z" fill="#3B6FCA" stroke="#2E5BA8" strokeWidth="1.2" />
+          <path d="M77 75 L70 79 L70 73 Z" fill="#3B6FCA" stroke="#2E5BA8" strokeWidth="1.2" />
 
-          {/* Head */}
+          {/* ── Head ── */}
           <ellipse
             cx="70"
             cy="50"
@@ -78,182 +65,151 @@ const MrWhite: React.FC<MrWhiteProps> = ({ state = "idle", size = 140, className
             ry="24"
             fill="#F5DEB3"
             stroke="#D4B896"
-            strokeWidth="2"
-            strokeLinecap="round"
+            strokeWidth="2.2"
           />
 
-          {/* Hair */}
+          {/* ── Hair (light gray-white) ── */}
           <path
-            d="M48 42 C48 28, 58 22, 70 22 C82 22, 92 28, 92 42"
+            d="M48 42 C48 27, 58 20, 70 20 C82 20, 92 27, 92 42"
             fill="#E8E8E8"
             stroke="#D0D0D0"
             strokeWidth="2"
-            strokeLinecap="round"
           />
-          {/* Hair tufts */}
-          <path
-            d="M50 38 C48 30, 55 24, 60 26"
-            stroke="#D0D0D0"
-            strokeWidth="2"
-            fill="none"
-            strokeLinecap="round"
-          />
-          <path
-            d="M85 32 C88 26, 82 22, 78 24"
-            stroke="#D0D0D0"
-            strokeWidth="2"
-            fill="none"
-            strokeLinecap="round"
-          />
+          {/* Hair tufts — slightly imperfect chalk strokes */}
+          <path d="M50 38 C47 30, 55 23, 61 26" stroke="#D0D0D0" strokeWidth="2.3" fill="none" />
+          <path d="M86 33 C89 26, 82 21, 77 24" stroke="#D0D0D0" strokeWidth="2" fill="none" />
+          <path d="M70 20 C72 16, 76 17, 78 20" stroke="#DADADA" strokeWidth="1.8" fill="none" />
 
-          {/* Glasses - left */}
-          <circle cx="61" cy="48" r="8" stroke="#1A1A1A" strokeWidth="2" fill="none" />
-          {/* Glasses - right */}
-          <circle cx="79" cy="48" r="8" stroke="#1A1A1A" strokeWidth="2" fill="none" />
-          {/* Glasses bridge */}
-          <path d="M69 48 L71 48" stroke="#1A1A1A" strokeWidth="1.5" strokeLinecap="round" />
-          {/* Glasses arms */}
-          <path d="M53 46 L48 44" stroke="#1A1A1A" strokeWidth="1.5" strokeLinecap="round" />
-          <path d="M87 46 L92 44" stroke="#1A1A1A" strokeWidth="1.5" strokeLinecap="round" />
+          {/* ── Glasses (wireframe, no fill) ── */}
+          <circle cx="61" cy="48" r="8.5" stroke="#1A1A1A" strokeWidth="2" fill="none" />
+          <circle cx="79" cy="48" r="8.5" stroke="#1A1A1A" strokeWidth="2" fill="none" />
+          {/* Bridge */}
+          <path d="M69.5 48 L70.5 48" stroke="#1A1A1A" strokeWidth="2" />
+          {/* Arms of glasses */}
+          <path d="M52.5 46 L47 43" stroke="#1A1A1A" strokeWidth="1.8" />
+          <path d="M87.5 46 L93 43" stroke="#1A1A1A" strokeWidth="1.8" />
 
-          {/* Eyes */}
+          {/* ── Eyes ── */}
           <circle cx="61" cy="47" r="2.5" fill="#1A1A1A" />
           <circle cx="79" cy="47" r="2.5" fill="#1A1A1A" />
           {/* Eye shine */}
-          <circle cx="62" cy="46" r="0.8" fill="white" />
-          <circle cx="80" cy="46" r="0.8" fill="white" />
+          <circle cx="62.2" cy="45.8" r="0.9" fill="#FFFFFF" />
+          <circle cx="80.2" cy="45.8" r="0.9" fill="#FFFFFF" />
 
-          {/* Blink overlay */}
-          <rect
-            x="53"
-            y="44"
-            width="17"
-            height="6"
-            rx="3"
-            fill="#F5DEB3"
-            className="animate-blink"
-          />
-          <rect
-            x="71"
-            y="44"
-            width="17"
-            height="6"
-            rx="3"
-            fill="#F5DEB3"
-            className="animate-blink"
-          />
+          {/* ── Blink overlays ── */}
+          <rect x="52.5" y="43.5" width="17" height="7" rx="3" fill="#F5DEB3" className="animate-blink" />
+          <rect x="70.5" y="43.5" width="17" height="7" rx="3" fill="#F5DEB3" className="animate-blink" />
 
-          {/* Nose */}
-          <path
-            d="M70 52 C68 54, 69 56, 71 55"
-            stroke="#C4A882"
-            strokeWidth="1.5"
-            fill="none"
-            strokeLinecap="round"
-          />
+          {/* ── Nose ── */}
+          <path d="M70 53 C68 55, 69 57, 71.5 56" stroke="#C4A882" strokeWidth="1.5" fill="none" />
 
-          {/* Mouth */}
+          {/* ── Mouth ── */}
           {state === "talking" ? (
-            <ellipse cx="70" cy="60" rx="4" ry="3" fill="#1A1A1A" opacity="0.7" />
+            <ellipse cx="70" cy="61" rx="4" ry="3" fill="#1A1A1A" opacity="0.7">
+              <animate attributeName="ry" values="3;1.5;3" dur="0.45s" repeatCount="indefinite" />
+            </ellipse>
           ) : (
-            <path
-              d="M65 59 C67 62, 73 62, 75 59"
-              stroke="#1A1A1A"
-              strokeWidth="1.5"
-              fill="none"
-              strokeLinecap="round"
-            />
+            <path d="M64 60 C66 63, 74 63, 76 60" stroke="#1A1A1A" strokeWidth="1.8" fill="none" />
           )}
 
-          {/* Left arm */}
+          {/* ── Left arm ── */}
           <path
-            d="M48 90 C40 85, 38 95, 42 100"
+            d="M48 92 C39 87, 37 96, 41 102"
             stroke="#2C2C2C"
             strokeWidth="4"
             fill="none"
-            strokeLinecap="round"
           />
 
-          {/* Right arm - extends toward whiteboard when drawing */}
+          {/* ── Right arm ── */}
           {state === "drawing" ? (
             <path
-              d="M92 88 C100 80, 108 75, 112 72"
+              d="M92 89 C101 80, 110 74, 115 70"
               stroke="#2C2C2C"
               strokeWidth="4"
               fill="none"
-              strokeLinecap="round"
-            />
+            >
+              <animateTransform
+                attributeName="transform"
+                type="rotate"
+                values="0 92 89;-4 92 89;0 92 89;4 92 89;0 92 89"
+                dur="2s"
+                repeatCount="indefinite"
+              />
+            </path>
           ) : (
             <path
-              d="M92 90 C100 85, 102 90, 100 96"
+              d="M92 91 C101 86, 103 91, 101 97"
               stroke="#2C2C2C"
               strokeWidth="4"
               fill="none"
-              strokeLinecap="round"
             />
           )}
 
-          {/* Chalk piece in right hand */}
+          {/* ── Chalk piece in right hand ── */}
           <rect
-            x={state === "drawing" ? 110 : 97}
-            y={state === "drawing" ? 69 : 93}
-            width="8"
+            x={state === "drawing" ? 112 : 98}
+            y={state === "drawing" ? 67 : 94}
+            width="9"
             height="4"
             rx="2"
-            fill="white"
+            fill="#F5F5F0"
             stroke="#DDD"
             strokeWidth="1"
-            transform={state === "drawing" ? "rotate(-30, 114, 71)" : "rotate(15, 101, 95)"}
+            transform={state === "drawing" ? "rotate(-35, 116, 69)" : "rotate(15, 102, 96)"}
           />
 
-          {/* Thinking dots + text */}
+          {/* ── State overlays ── */}
+
+          {/* Thinking: dots above head */}
           {state === "thinking" && (
             <>
-              <circle cx="88" cy="28" r="2.5" fill="#3B6FCA" opacity="0.6" style={{ animation: "dots-pulse 1.2s 0s infinite" }} />
-              <circle cx="95" cy="22" r="2.5" fill="#3B6FCA" opacity="0.6" style={{ animation: "dots-pulse 1.2s 0.2s infinite" }} />
-              <circle cx="102" cy="28" r="2.5" fill="#3B6FCA" opacity="0.6" style={{ animation: "dots-pulse 1.2s 0.4s infinite" }} />
-              <text x="95" y="16" textAnchor="middle" fontSize="10" fill="#3B6FCA" opacity="0.5" fontFamily="Caveat, cursive" style={{ animation: "dots-pulse 1.5s infinite" }}>...</text>
+              <circle cx="88" cy="26" r="2.5" fill="#3B6FCA" opacity="0.6" style={{ animation: "dots-pulse 1.2s 0s infinite" }} />
+              <circle cx="95" cy="20" r="2.5" fill="#3B6FCA" opacity="0.6" style={{ animation: "dots-pulse 1.2s 0.2s infinite" }} />
+              <circle cx="102" cy="26" r="2.5" fill="#3B6FCA" opacity="0.6" style={{ animation: "dots-pulse 1.2s 0.4s infinite" }} />
+              <text x="95" y="14" textAnchor="middle" fontSize="11" fill="#3B6FCA" opacity="0.5" fontFamily="'Caveat', cursive" style={{ animation: "dots-pulse 1.5s infinite" }}>...</text>
             </>
           )}
 
-          {/* Listening sound waves */}
+          {/* Listening: sound wave rings near ear */}
           {state === "listening" && (
             <>
-              <circle cx="46" cy="48" r="6" stroke="#3B6FCA" strokeWidth="1.5" fill="none" opacity="0.5" style={{ animation: "sound-wave 1.5s 0s infinite" }} />
-              <circle cx="46" cy="48" r="10" stroke="#3B6FCA" strokeWidth="1" fill="none" opacity="0.3" style={{ animation: "sound-wave 1.5s 0.3s infinite" }} />
+              <circle cx="45" cy="48" r="6" stroke="#3B6FCA" strokeWidth="1.5" fill="none" opacity="0.5" style={{ animation: "sound-wave 1.5s 0s infinite" }} />
+              <circle cx="45" cy="48" r="11" stroke="#3B6FCA" strokeWidth="1" fill="none" opacity="0.3" style={{ animation: "sound-wave 1.5s 0.3s infinite" }} />
+              <circle cx="45" cy="48" r="16" stroke="#3B6FCA" strokeWidth="0.8" fill="none" opacity="0.2" style={{ animation: "sound-wave 1.5s 0.6s infinite" }} />
             </>
           )}
 
-          {/* Excited stars */}
+          {/* Excited: 4 star bursts */}
           {state === "excited" && (
             <>
-              <polygon points="100,30 102,35 107,35 103,38 105,43 100,40 95,43 97,38 93,35 98,35" fill="#3B6FCA" opacity="0.7" style={{ animation: "star-burst 0.6s ease-out forwards" }} />
-              <polygon points="42,32 43,35 46,35 44,37 45,40 42,38 39,40 40,37 38,35 41,35" fill="#3B6FCA" opacity="0.5" style={{ animation: "star-burst 0.6s 0.15s ease-out forwards" }} />
-              <polygon points="55,18 56,21 59,21 57,23 58,26 55,24 52,26 53,23 51,21 54,21" fill="#3B6FCA" opacity="0.6" style={{ animation: "star-burst 0.6s 0.08s ease-out forwards" }} />
-              <polygon points="85,15 86,18 89,18 87,20 88,23 85,21 82,23 83,20 81,18 84,18" fill="#3B6FCA" opacity="0.4" style={{ animation: "star-burst 0.6s 0.22s ease-out forwards" }} />
+              <polygon points="100,28 102,33 107,33 103,36 105,41 100,38 95,41 97,36 93,33 98,33" fill="#3B6FCA" opacity="0.7" style={{ animation: "star-burst 0.6s ease-out forwards" }} />
+              <polygon points="42,30 43,33 46,33 44,35 45,38 42,36 39,38 40,35 38,33 41,33" fill="#3B6FCA" opacity="0.5" style={{ animation: "star-burst 0.6s 0.15s ease-out forwards" }} />
+              <polygon points="54,16 55,19 58,19 56,21 57,24 54,22 51,24 52,21 50,19 53,19" fill="#E05252" opacity="0.6" style={{ animation: "star-burst 0.6s 0.08s ease-out forwards" }} />
+              <polygon points="86,14 87,17 90,17 88,19 89,22 86,20 83,22 84,19 82,17 85,17" fill="#3B6FCA" opacity="0.4" style={{ animation: "star-burst 0.6s 0.22s ease-out forwards" }} />
             </>
           )}
         </svg>
       </div>
 
-      {/* Celebrating confetti */}
+      {/* Celebrating confetti — 6 chalk stroke shapes */}
       {state === "celebrating" && (
         <div className="absolute inset-0 pointer-events-none overflow-visible">
-          {[...Array(12)].map((_, i) => {
-            const angle = (i / 12) * 360;
-            const dist = 30 + Math.random() * 30;
+          {[...Array(6)].map((_, i) => {
+            const angle = (i / 6) * 360;
+            const dist = 35 + Math.random() * 25;
+            const colors = ["#3B6FCA", "#E05252", "#F5DEB3", "#4CAF50", "#3B6FCA", "#E05252"];
             return (
               <div
                 key={i}
                 className="absolute animate-confetti"
                 style={{
-                  left: `${50 + Math.cos(angle * Math.PI / 180) * dist}%`,
-                  top: `${40 + Math.sin(angle * Math.PI / 180) * dist}%`,
-                  width: i % 3 === 0 ? 8 : 5,
-                  height: i % 3 === 0 ? 3 : 5,
-                  borderRadius: i % 2 === 0 ? "50%" : "1px",
-                  backgroundColor: ["#3B6FCA", "#E05252", "#F5DEB3", "#4CAF50"][i % 4],
-                  animationDelay: `${i * 0.07}s`,
+                  left: `${50 + Math.cos((angle * Math.PI) / 180) * dist}%`,
+                  top: `${40 + Math.sin((angle * Math.PI) / 180) * dist}%`,
+                  width: i % 2 === 0 ? 8 : 5,
+                  height: i % 2 === 0 ? 3 : 5,
+                  borderRadius: i % 2 === 0 ? "1px" : "50%",
+                  backgroundColor: colors[i],
+                  animationDelay: `${i * 0.08}s`,
                   transform: `rotate(${angle}deg)`,
                 }}
               />
