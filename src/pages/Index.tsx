@@ -26,12 +26,12 @@ const Index: React.FC = () => {
       {/* Hero */}
       <section className="max-w-3xl mx-auto px-6 pt-10 sm:pt-16 pb-8 sm:pb-10 text-center">
         <h1 className="text-[40px] sm:text-[42px] md:text-[52px] leading-[1.08] font-semibold text-foreground mb-4 tracking-tight">
-          Understand anything in seconds
+          Exam tomorrow?
           <br />
-          <span className="text-primary">— explained visually</span>
+          <span className="text-primary">Make it finally click.</span>
         </h1>
         <p className="text-muted-foreground max-w-[480px] mx-auto text-[15px] sm:text-base leading-relaxed mb-8">
-          Ask any question and watch Mr.&nbsp;White draw the answer step-by-step on a whiteboard.
+          Stop re-reading notes that don't make sense. Ask Mr.&nbsp;White and watch him draw the answer until you get it.
         </p>
 
         {/* Hero Input */}
@@ -40,7 +40,7 @@ const Index: React.FC = () => {
             <input
               value={heroQuery}
               onChange={(e) => setHeroQuery(e.target.value)}
-              placeholder='Ask anything… (e.g., What is supply and demand?)'
+              placeholder='Stuck on something? Type it here…'
               className="flex-1 bg-transparent text-sm text-foreground placeholder:text-muted-foreground outline-none"
               autoFocus
             />
@@ -57,7 +57,7 @@ const Index: React.FC = () => {
             </button>
           </div>
           <p className="text-xs text-muted-foreground mt-3">
-            No sign-up needed — just ask and watch Mr. White explain it visually.
+            No sign-up needed. Understand it faster — in seconds, not hours.
           </p>
         </form>
 
@@ -68,7 +68,7 @@ const Index: React.FC = () => {
       {/* Subject Chips */}
       <section id="subjects" className="max-w-3xl mx-auto px-6 pt-6 pb-12">
         <p className="text-center text-[11px] text-muted-foreground tracking-[0.2em] uppercase mb-4">
-          Works for any subject
+          Whatever you're stuck on
         </p>
         <div className="flex flex-wrap justify-center gap-2">
           {subjects.map((s) => (
@@ -92,15 +92,15 @@ const Index: React.FC = () => {
                 <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
             </div>
-            <h3 className="text-lg font-medium text-foreground mb-2">Ask Mr. White</h3>
+            <h3 className="text-lg font-medium text-foreground mb-2">Stuck on homework?</h3>
             <p className="text-sm text-muted-foreground mb-6 leading-relaxed">
-              Type any question. Mr.&nbsp;White draws the answer on his whiteboard in real time.
+              Type what's confusing you. Mr.&nbsp;White draws it out until it clicks.
             </p>
             <Link
               to="/ask"
               className="inline-flex items-center justify-center w-full px-5 py-2.5 text-sm rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
             >
-              Ask a question
+              Stop being confused
             </Link>
           </div>
 
@@ -112,9 +112,9 @@ const Index: React.FC = () => {
                 <line x1="12" y1="17" x2="12" y2="21" strokeLinecap="round" />
               </svg>
             </div>
-            <h3 className="text-lg font-medium text-foreground mb-2">Import my slides</h3>
+            <h3 className="text-lg font-medium text-foreground mb-2">Confused by your notes?</h3>
             <p className="text-sm text-muted-foreground mb-6 leading-relaxed">
-              Upload class slides and Mr.&nbsp;White walks you through every concept.
+              Upload your class slides. Mr.&nbsp;White breaks them down so they actually make sense.
             </p>
             <Link
               to="/slides"
@@ -128,12 +128,12 @@ const Index: React.FC = () => {
 
       {/* How It Works */}
       <section id="how-it-works" className="max-w-3xl mx-auto px-6 pb-20">
-        <h2 className="text-2xl font-light text-foreground text-center mb-12">How it works</h2>
+        <h2 className="text-2xl font-light text-foreground text-center mb-12">Three steps to getting it</h2>
         <div className="grid md:grid-cols-3 gap-8 text-center">
           {[
-            { step: "1", title: "Ask anything", desc: "Type or speak your question" },
-            { step: "2", title: "Watch it drawn", desc: "Mr. White draws the answer on his whiteboard" },
-            { step: "3", title: "Go deeper", desc: "Ask follow-ups, get quizzed, master the topic" },
+            { step: "1", title: "Type what's confusing", desc: "Any topic, any subject, any class" },
+            { step: "2", title: "Watch it make sense", desc: "Mr. White draws it out step by step" },
+            { step: "3", title: "Actually remember it", desc: "Quiz yourself, save it, come back before the exam" },
           ].map((item) => (
             <div key={item.step}>
               <div className="w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center text-sm font-medium mx-auto mb-3">
@@ -149,13 +149,13 @@ const Index: React.FC = () => {
       {/* Social Proof */}
       <section className="max-w-3xl mx-auto px-6 pb-16">
         <p className="text-center text-xs text-muted-foreground mb-8 uppercase tracking-wider">
-          Trusted by students at 100+ schools
+          Real students, real results
         </p>
         <div className="grid md:grid-cols-3 gap-5">
           {[
-            { quote: "Finally a study tool that actually explains things instead of just giving answers.", name: "Priya, UC Berkeley" },
-            { quote: "Mr. White helped me understand thermodynamics better than my actual professor.", name: "Marcus, Georgia Tech" },
-            { quote: "I use Chalk before every exam. The whiteboard drawings make everything click.", name: "Sana, NYU" },
+            { quote: "I had an exam in 12 hours and nothing made sense. Chalk saved me.", name: "Priya, UC Berkeley" },
+            { quote: "My professor lost me in week 2. Mr. White caught me up in one night.", name: "Marcus, Georgia Tech" },
+            { quote: "I stopped re-reading my notes and just ask Chalk now. Way faster.", name: "Sana, NYU" },
           ].map((t) => (
             <div key={t.name} className="bg-card rounded-lg p-5 border border-border/60">
               <p className="text-sm text-foreground mb-3 leading-relaxed">"{t.quote}"</p>
@@ -170,7 +170,7 @@ const Index: React.FC = () => {
         <div className="max-w-3xl mx-auto px-6 flex items-center justify-between">
           <span className="text-sm font-medium text-muted-foreground">Chalk</span>
           <p className="text-xs text-muted-foreground">
-            Every student deserves a great teacher.
+            Stop being confused. Start understanding.
           </p>
         </div>
       </footer>
