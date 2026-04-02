@@ -9,6 +9,7 @@ import { MessageSquare, PanelRightClose } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useLearningProfile } from "@/hooks/useLearningProfile";
 import { useSavedConcepts } from "@/hooks/useSavedConcepts";
+import MasteryCelebration from "@/components/MasteryCelebration";
 
 const subjects = ["Math", "Science", "History", "Economics", "Coding", "English", "Other"];
 const defaultChips = ["Ask anything", "Explain simpler", "Go deeper", "Quiz me"];
@@ -59,6 +60,7 @@ const AskPage: React.FC = () => {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [startTime] = useState(Date.now());
   const [currentTopic, setCurrentTopic] = useState<string>("");
+  const [showCelebration, setShowCelebration] = useState(false);
   
   const [chatOpen, setChatOpen] = useState(true);
   const abortRef = useRef<AbortController | null>(null);
@@ -199,9 +201,12 @@ const AskPage: React.FC = () => {
 
   const handleChipClick = useCallback(
     (chip: string) => {
-      // "Chalk it up" marks current topic as mastered
+      // "Chalk it up" marks current topic as mastered and triggers celebration
       if (chip.toLowerCase().includes("chalk") && currentTopic && user) {
         markMastered(currentTopic, activeSubject);
+        setMrWhiteState("celebrating");
+        setShowCelebration(true);
+        setTimeout(() => setMrWhiteState("idle"), 2000);
       }
       handleSend(chip);
     },
@@ -284,6 +289,14 @@ const AskPage: React.FC = () => {
             className="h-full w-full lg:w-96 xl:w-96"
           />
         </div>
+
+        {/* Mastery celebration overlay */}
+        <MasteryCelebration
+          topic={currentTopic}
+          subject={activeSubject}
+          visible={showCelebration}
+          onClose={() => setShowCelebration(false)}
+        />
       </div>
     </div>
   );
