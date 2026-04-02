@@ -52,6 +52,15 @@ const AskPage: React.FC = () => {
   const { saveConcept, concepts } = useSavedConcepts();
   const { speak, stop: stopTTS, isPlaying: isTTSPlaying, voiceEnabled, setVoiceEnabled } = useTextToSpeech();
 
+  // Track if we're at desktop (lg) breakpoint
+  const [isDesktop, setIsDesktop] = useState(() => typeof window !== 'undefined' && window.innerWidth >= 1024);
+  useEffect(() => {
+    const mql = window.matchMedia('(min-width: 1024px)');
+    const onChange = () => setIsDesktop(mql.matches);
+    mql.addEventListener('change', onChange);
+    return () => mql.removeEventListener('change', onChange);
+  }, []);
+
   const [activeSubject, setActiveSubject] = useState("Math");
   const [messages, setMessages] = useState<ChatMessage[]>([
     { role: "mr_white", content: "What should we tackle today? I'm warmed up and my chalk is ready! 🎓" },
