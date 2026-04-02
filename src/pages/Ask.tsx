@@ -10,6 +10,8 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useLearningProfile } from "@/hooks/useLearningProfile";
 import { useSavedConcepts } from "@/hooks/useSavedConcepts";
 import MasteryCelebration from "@/components/MasteryCelebration";
+import PricingModal from "@/components/PricingModal";
+import { hasReachedLimit, incrementDailyCount } from "@/hooks/useDailyQuestionLimit";
 
 const subjects = ["Math", "Science", "History", "Economics", "Coding", "English", "Other"];
 const defaultChips = ["Ask anything", "Explain simpler", "Go deeper", "Quiz me"];
@@ -61,6 +63,7 @@ const AskPage: React.FC = () => {
   const [startTime] = useState(Date.now());
   const [currentTopic, setCurrentTopic] = useState<string>("");
   const [showCelebration, setShowCelebration] = useState(false);
+  const [showPricing, setShowPricing] = useState(false);
   
   const [chatOpen, setChatOpen] = useState(true);
   const abortRef = useRef<AbortController | null>(null);
@@ -86,6 +89,25 @@ const AskPage: React.FC = () => {
       fileName: fileData?.name,
       fileType: fileData?.type,
     }]);
+
+    // Check daily free limit
+    if (hasReachedLimit()) {
+      setMrWhiteState("excited");
+      setMessages((prev) => [
+        ...prev,
+        {
+          role: "mr_white",
+          content:
+            "You've been on a roll today — 5 concepts already! Upgrade to Pro for unlimited sessions. I'll be here waiting. 🎓",
+        },
+      ]);
+      setQuickChips(["See Chalk Pro", "Ask anything"]);
+      setTimeout(() => setMrWhiteState("idle"), 3000);
+      return;
+    }
+
+    incrementDailyCount();
+
     setMrWhiteState("thinking");
     setIsTyping(true);
     setErrorMessage(null);
@@ -201,6 +223,11 @@ const AskPage: React.FC = () => {
 
   const handleChipClick = useCallback(
     (chip: string) => {
+      // Open pricing modal
+      if (chip.toLowerCase().includes("see chalk pro")) {
+        setShowPricing(true);
+        return;
+      }
       // "Chalk it up" marks current topic as mastered and triggers celebration
       if (chip.toLowerCase().includes("chalk") && currentTopic && user) {
         markMastered(currentTopic, activeSubject);
@@ -297,6 +324,9 @@ const AskPage: React.FC = () => {
           visible={showCelebration}
           onClose={() => setShowCelebration(false)}
         />
+
+        {/* Pricing modal */}
+        <PricingModal open={showPricing} onOpenChange={setShowPricing} />
       </div>
     </div>
   );
