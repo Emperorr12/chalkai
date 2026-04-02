@@ -289,6 +289,14 @@ const AskPage: React.FC = () => {
             className="h-full w-full lg:w-96 xl:w-96"
           />
         </div>
+
+        {/* Mastery celebration overlay */}
+        <MasteryCelebration
+          topic={currentTopic}
+          subject={activeSubject}
+          visible={showCelebration}
+          onClose={() => setShowCelebration(false)}
+        />
       </div>
     </div>
   );
