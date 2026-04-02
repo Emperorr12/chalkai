@@ -51,9 +51,16 @@ const AskPage: React.FC = () => {
   const autoSentRef = useRef(false);
 
 
-  const handleSend = useCallback(async (message: string, imageData?: string) => {
+  const handleSend = useCallback(async (message: string, fileData?: { data: string; type: string; name: string }) => {
     // Add student message exactly as typed
-    setMessages((prev) => [...prev, { role: "student", content: message, imagePreview: imageData }]);
+    const isImage = fileData?.type.startsWith("image/");
+    setMessages((prev) => [...prev, { 
+      role: "student", 
+      content: message, 
+      imagePreview: isImage ? fileData?.data : undefined,
+      fileName: fileData?.name,
+      fileType: fileData?.type,
+    }]);
     setMrWhiteState("thinking");
     setIsTyping(true);
     setErrorMessage(null);
@@ -86,7 +93,9 @@ const AskPage: React.FC = () => {
           history: recentMessages,
           confusion_detected: confusionDetected,
           is_first_question: isFirstQuestion,
-          image_data: imageData || undefined,
+          file_data: fileData?.data || undefined,
+          file_type: fileData?.type || undefined,
+          file_name: fileData?.name || undefined,
         }),
         signal: controller.signal,
       });

@@ -4,14 +4,16 @@ import MrWhite, { type MrWhiteState } from "./MrWhite";
 export interface ChatMessage {
   role: "mr_white" | "student";
   content: string;
-  imagePreview?: string; // data URL for attached image
+  imagePreview?: string;
+  fileName?: string;
+  fileType?: string;
 }
 
 interface ChatPanelProps {
   messages: ChatMessage[];
   mrWhiteState: MrWhiteState;
   quickChips: string[];
-  onSend: (message: string, imageData?: string) => void;
+  onSend: (message: string, fileData?: { data: string; type: string; name: string }) => void;
   onChipClick: (chip: string) => void;
   isTyping?: boolean;
   chalkedCount?: number;
@@ -34,8 +36,7 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
 }) => {
   const [input, setInput] = useState("");
   const [hasAnimatedPlaceholder, setHasAnimatedPlaceholder] = useState(false);
-  const [pendingImage, setPendingImage] = useState<string | null>(null);
-  const [pendingImageName, setPendingImageName] = useState<string>("");
+  const [pendingFile, setPendingFile] = useState<{ data: string; name: string; type: string; isImage: boolean } | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -55,29 +56,43 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
     return () => clearTimeout(timer);
   }, []);
 
+  const SUPPORTED_IMAGE_TYPES = ["image/jpeg", "image/png", "image/gif", "image/webp"];
+  const SUPPORTED_DOC_TYPES = ["application/pdf", "text/plain", "text/csv", "text/markdown", "application/json"];
+  const ALL_SUPPORTED = [...SUPPORTED_IMAGE_TYPES, ...SUPPORTED_DOC_TYPES];
+
   const handleFileRead = useCallback((file: File) => {
-    if (!file.type.startsWith("image/")) {
-      return; // Only images for now
+    const isImage = SUPPORTED_IMAGE_TYPES.includes(file.type);
+    const isDoc = SUPPORTED_DOC_TYPES.includes(file.type);
+    
+    if (!isImage && !isDoc) {
+      // Try by extension
+      const ext = file.name.split('.').pop()?.toLowerCase();
+      const extMap: Record<string, boolean> = { pdf: true, txt: true, csv: true, md: true, json: true };
+      if (!ext || !extMap[ext]) return;
     }
-    if (file.size > 10 * 1024 * 1024) {
-      return; // 10MB limit
-    }
+    
+    if (file.size > 20 * 1024 * 1024) return; // 20MB limit
+
     const reader = new FileReader();
     reader.onload = (e) => {
       const dataUrl = e.target?.result as string;
-      setPendingImage(dataUrl);
-      setPendingImageName(file.name);
+      setPendingFile({
+        data: dataUrl,
+        name: file.name,
+        type: file.type || `application/${file.name.split('.').pop()}`,
+        isImage: SUPPORTED_IMAGE_TYPES.includes(file.type),
+      });
     };
     reader.readAsDataURL(file);
   }, []);
 
   const handleSend = () => {
     const trimmed = input.trim();
-    if (!trimmed && !pendingImage) return;
-    onSend(trimmed || "Solve this problem", pendingImage || undefined);
+    if (!trimmed && !pendingFile) return;
+    const defaultMsg = pendingFile?.isImage ? "What's in this image?" : "Analyze this file";
+    onSend(trimmed || defaultMsg, pendingFile ? { data: pendingFile.data, type: pendingFile.type, name: pendingFile.name } : undefined);
     setInput("");
-    setPendingImage(null);
-    setPendingImageName("");
+    setPendingFile(null);
   };
 
   const handleScroll = () => {
@@ -143,8 +158,8 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
               <polyline points="17 8 12 3 7 8" />
               <line x1="12" y1="3" x2="12" y2="15" />
             </svg>
-            <p className="text-sm font-medium text-primary">Drop image here</p>
-            <p className="text-xs text-muted-foreground">Photos of problems, worksheets, textbooks</p>
+            <p className="text-sm font-medium text-primary">Drop file here</p>
+            <p className="text-xs text-muted-foreground">Images, PDFs, text files, CSVs</p>
           </div>
         </div>
       )}
@@ -201,6 +216,12 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
                   className="max-w-full max-h-48 rounded-md mb-2 border border-border"
                 />
               )}
+              {msg.fileName && !msg.imagePreview && (
+                <div className="flex items-center gap-2 mb-2 px-2 py-1.5 bg-background/30 rounded border border-border/50 text-xs">
+                  <span className="font-medium">{msg.fileName.split('.').pop()?.toUpperCase()}</span>
+                  <span className="truncate opacity-70">{msg.fileName}</span>
+                </div>
+              )}
               {msg.content}
             </div>
           </div>
@@ -218,13 +239,19 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
         )}
       </div>
 
-      {/* Pending image preview */}
-      {pendingImage && (
+      {/* Pending file preview */}
+      {pendingFile && (
         <div className="px-4 py-2 border-t border-border flex items-center gap-2 bg-muted/30">
-          <img src={pendingImage} alt="Pending upload" className="h-12 w-12 object-cover rounded border border-border" />
-          <span className="text-xs text-muted-foreground flex-1 truncate">{pendingImageName}</span>
+          {pendingFile.isImage ? (
+            <img src={pendingFile.data} alt="Pending upload" className="h-12 w-12 object-cover rounded border border-border" />
+          ) : (
+            <div className="h-12 w-12 rounded border border-border bg-muted flex items-center justify-center text-xs text-muted-foreground font-medium">
+              {pendingFile.name.split('.').pop()?.toUpperCase()}
+            </div>
+          )}
+          <span className="text-xs text-muted-foreground flex-1 truncate">{pendingFile.name}</span>
           <button
-            onClick={() => { setPendingImage(null); setPendingImageName(""); }}
+            onClick={() => setPendingFile(null)}
             className="text-muted-foreground hover:text-foreground p-1"
             aria-label="Remove attachment"
           >
@@ -264,7 +291,7 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
           <input
             ref={fileInputRef}
             type="file"
-            accept="image/*"
+            accept="image/*,.pdf,.txt,.csv,.md,.json"
             onChange={handleFileSelect}
             className="hidden"
           />
@@ -296,7 +323,7 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
                 }
               }
             }}
-            placeholder={pendingImage ? "Ask about this image..." : "Chalk it up..."}
+            placeholder={pendingFile ? (pendingFile.isImage ? "Ask about this image..." : "Ask about this file...") : "Chalk it up..."}
             className={`flex-1 bg-transparent text-sm text-foreground placeholder:text-muted-foreground outline-none ${
               !hasAnimatedPlaceholder ? "placeholder:animate-pulse-placeholder" : ""
             }`}
@@ -315,7 +342,7 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
           </button>
           <button
             onClick={handleSend}
-            disabled={!input.trim() && !pendingImage}
+            disabled={!input.trim() && !pendingFile}
             className="bg-primary text-primary-foreground rounded-full p-1.5 disabled:opacity-30 transition-opacity"
             aria-label="Send message"
           >
