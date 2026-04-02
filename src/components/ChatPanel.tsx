@@ -339,7 +339,6 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
                 {msg.role === "mr_white" && (
                   <span className="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center mr-2 mt-0.5 flex-shrink-0 text-[10px] text-primary font-bold">W</span>
                 )}
-                )}
                 <div
                   {...(msg.role === "mr_white" ? { "data-mr-white-msg": true } : {})}
                   className={`max-w-[80%] text-sm leading-relaxed ${
