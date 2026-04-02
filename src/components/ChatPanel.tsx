@@ -35,6 +35,7 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
   onSend,
   onChipClick,
   onSaveConcept,
+  onReplay,
   isTyping = false,
   chalkedCount = 0,
   sessionMinutes = 0,
