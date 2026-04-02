@@ -225,15 +225,15 @@ const AskPage: React.FC = () => {
   return (
     <div className="h-screen bg-background flex flex-col overflow-hidden">
       <Navbar />
-      <div className="flex-1 flex flex-col lg:flex-row min-h-0 relative overflow-y-auto lg:overflow-hidden">
+      <div className="flex-1 flex flex-col lg:flex-row min-h-0 relative overflow-hidden">
         {/* Whiteboard */}
-        <div className="flex flex-col items-center p-4 flex-shrink-0 lg:flex-1 lg:overflow-y-auto lg:min-h-0">
-          <div className="flex flex-wrap gap-2 mb-4 flex-shrink-0">
+        <div className="flex flex-col items-center p-2 lg:p-4 flex-shrink-0 lg:flex-1 lg:overflow-y-auto lg:min-h-0">
+          <div className="flex flex-wrap gap-1.5 lg:gap-2 mb-2 lg:mb-4 flex-shrink-0">
             {subjects.map((s) => (
               <button
                 key={s}
                 onClick={() => setActiveSubject(s)}
-                className={`text-xs px-3 py-1.5 rounded-full border transition-colors ${
+                className={`text-xs px-2.5 py-1 lg:px-3 lg:py-1.5 rounded-full border transition-colors ${
                   activeSubject === s
                     ? "border-primary bg-primary text-primary-foreground"
                     : "border-border text-muted-foreground hover:border-primary hover:text-primary"
@@ -243,7 +243,7 @@ const AskPage: React.FC = () => {
               </button>
             ))}
           </div>
-          <Whiteboard whiteboardData={whiteboardData} mrWhiteState={mrWhiteState} className="w-full min-h-[280px] lg:flex-1 lg:min-h-0" onAskAbout={(text) => handleSend(`Can you explain this in more detail: "${text}"?`)} />
+          <Whiteboard whiteboardData={whiteboardData} mrWhiteState={mrWhiteState} className="w-full min-h-[200px] lg:flex-1 lg:min-h-0" onAskAbout={(text) => handleSend(`Can you explain this in more detail: "${text}"?`)} />
         </div>
 
         {/* Toggle button - desktop only */}
