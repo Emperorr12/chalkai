@@ -256,6 +256,13 @@ const AskPage: React.FC = () => {
     }
   }, [messages, activeSubject, user, currentTopic, trackTopic, trackSimplification, getProfileSummary]);
 
+  const handleRetry = useCallback(() => {
+    if (lastQuestion) {
+      setErrorMessage(null);
+      handleSend(lastQuestion.text, lastQuestion.fileData);
+    }
+  }, [lastQuestion, handleSend]);
+
   const handleChipClick = useCallback(
     (chip: string) => {
       // Open pricing modal
