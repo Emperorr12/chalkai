@@ -3,11 +3,14 @@ import { Link, useLocation } from "react-router-dom";
 import MrWhite from "./MrWhite";
 import { useAuth } from "@/contexts/AuthContext";
 import PricingModal from "./PricingModal";
+import { useSubscription } from "@/hooks/useSubscription";
+import { Crown } from "lucide-react";
 
 const Navbar: React.FC = () => {
   const location = useLocation();
   const isHome = location.pathname === "/";
   const { user, signOut } = useAuth();
+  const { isPro, tier, startCheckout } = useSubscription();
   const [showPricing, setShowPricing] = useState(false);
 
   return (
@@ -20,6 +23,12 @@ const Navbar: React.FC = () => {
               Chalk
               <span className="absolute -bottom-0.5 left-0 right-0 h-[2px] bg-primary/40 rounded-full" />
             </span>
+            {isPro && (
+              <span className="flex items-center gap-0.5 text-[10px] font-semibold text-primary bg-primary/10 px-1.5 py-0.5 rounded-full">
+                <Crown className="w-3 h-3" />
+                PRO
+              </span>
+            )}
           </Link>
 
           <div className="hidden sm:flex items-center gap-8 text-sm text-muted-foreground">
@@ -33,12 +42,14 @@ const Navbar: React.FC = () => {
             {user && <Link to="/concepts" className="hover:text-foreground transition-colors">My Concepts</Link>}
             {user && <Link to="/lessons" className="hover:text-foreground transition-colors">My Lessons</Link>}
             <Link to="/demo" className="hover:text-foreground transition-colors">Demo</Link>
-            <button
-              onClick={() => setShowPricing(true)}
-              className="hover:text-foreground transition-colors text-primary font-medium"
-            >
-              Upgrade
-            </button>
+            {!isPro && (
+              <button
+                onClick={() => setShowPricing(true)}
+                className="hover:text-foreground transition-colors text-primary font-medium"
+              >
+                Upgrade
+              </button>
+            )}
           </div>
 
           <div className="flex items-center gap-3">
@@ -77,7 +88,13 @@ const Navbar: React.FC = () => {
         </div>
       </nav>
 
-      <PricingModal open={showPricing} onOpenChange={setShowPricing} />
+      <PricingModal
+        open={showPricing}
+        onOpenChange={setShowPricing}
+        isPro={isPro}
+        currentTier={tier}
+        onStartCheckout={startCheckout}
+      />
     </>
   );
 };

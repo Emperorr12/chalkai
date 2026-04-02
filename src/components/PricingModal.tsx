@@ -8,13 +8,18 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Check, Sparkles, GraduationCap, Crown } from "lucide-react";
+import { Check, Sparkles, GraduationCap, Crown, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { useAuth } from "@/contexts/AuthContext";
+import { STRIPE_TIERS } from "@/hooks/useSubscription";
 
 interface PricingModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  isPro?: boolean;
+  currentTier?: string;
+  onStartCheckout?: (priceId: string) => Promise<void>;
 }
 
 const tiers = [
@@ -29,8 +34,7 @@ const tiers = [
       "Basic whiteboard visualizations",
       "Core subjects",
     ],
-    cta: "Current plan",
-    disabled: true,
+    tierKey: "free" as const,
     highlight: false,
   },
   {
@@ -41,12 +45,12 @@ const tiers = [
     description: "For serious learners",
     features: [
       "Unlimited questions",
-      "Session memory across topics",
-      "Exam prep & study plans",
-      "Slide import & analysis",
+      "Full whiteboard graphics",
+      "Lesson history and replay",
+      "Exam prep mode",
+      "Session memory",
     ],
-    cta: "Coming soon",
-    disabled: true,
+    tierKey: "pro" as const,
     highlight: true,
   },
   {
@@ -57,37 +61,52 @@ const tiers = [
     description: "The full experience",
     features: [
       "Everything in Student Pro",
+      "Unlimited slide imports",
       "Learning analytics dashboard",
-      "Study card export",
-      "Priority AI responses",
+      "Study card PDF export",
+      "Priority Mr. White responses",
     ],
-    cta: "Coming soon",
-    disabled: true,
+    tierKey: "scholar" as const,
     highlight: false,
   },
 ];
 
-const PricingModal: React.FC<PricingModalProps> = ({ open, onOpenChange }) => {
+const PricingModal: React.FC<PricingModalProps> = ({ open, onOpenChange, isPro, currentTier = "free", onStartCheckout }) => {
+  const { user } = useAuth();
   const [email, setEmail] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [checkoutLoading, setCheckoutLoading] = useState<string | null>(null);
+
+  const handleCheckout = async (tierKey: string) => {
+    if (!user) {
+      toast.error("Please sign in first to upgrade.");
+      return;
+    }
+    const priceId = tierKey === "pro" ? STRIPE_TIERS.pro.price_id : STRIPE_TIERS.scholar.price_id;
+    setCheckoutLoading(tierKey);
+    try {
+      if (onStartCheckout) {
+        await onStartCheckout(priceId);
+      }
+    } catch {
+      toast.error("Could not start checkout. Please try again.");
+    } finally {
+      setCheckoutLoading(null);
+    }
+  };
 
   const handleEmailSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email.trim()) return;
-
     setSubmitting(true);
     try {
       const { error } = await supabase
         .from("email_captures")
         .insert({ email: email.trim(), source: "pricing_modal" });
-
       if (error) {
-        if (error.code === "23505") {
-          toast.info("You're already on the list!");
-        } else {
-          throw error;
-        }
+        if (error.code === "23505") toast.info("You're already on the list!");
+        else throw error;
       } else {
         toast.success("You're on the list! We'll be in touch.");
       }
@@ -99,13 +118,21 @@ const PricingModal: React.FC<PricingModalProps> = ({ open, onOpenChange }) => {
     }
   };
 
+  const getCtaLabel = (tierKey: string) => {
+    if (tierKey === "free") return currentTier === "free" ? "Current plan" : "Current plan";
+    if (tierKey === currentTier) return "Current plan";
+    return tierKey === "pro" ? "Start Pro" : "Start Scholar";
+  };
+
+  const isDisabled = (tierKey: string) => {
+    return tierKey === "free" || tierKey === currentTier;
+  };
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="text-xl font-semibold text-center">
-            Chalk Pro
-          </DialogTitle>
+          <DialogTitle className="text-xl font-semibold text-center">Chalk Pro</DialogTitle>
           <DialogDescription className="text-center text-muted-foreground">
             Unlock your full learning potential with Mr. White
           </DialogDescription>
@@ -114,6 +141,7 @@ const PricingModal: React.FC<PricingModalProps> = ({ open, onOpenChange }) => {
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 py-4">
           {tiers.map((tier) => {
             const Icon = tier.icon;
+            const isCurrent = tier.tierKey === currentTier;
             return (
               <div
                 key={tier.name}
@@ -121,8 +149,11 @@ const PricingModal: React.FC<PricingModalProps> = ({ open, onOpenChange }) => {
                   tier.highlight
                     ? "border-primary bg-primary/5 ring-1 ring-primary/20"
                     : "border-border"
-                }`}
+                } ${isCurrent ? "ring-2 ring-primary" : ""}`}
               >
+                {isCurrent && (
+                  <span className="text-[10px] font-semibold text-primary uppercase tracking-wider">Your Plan</span>
+                )}
                 <div className="flex items-center gap-2">
                   <Icon className="w-4 h-4 text-primary" />
                   <span className="font-medium text-sm text-foreground">{tier.name}</span>
@@ -143,43 +174,49 @@ const PricingModal: React.FC<PricingModalProps> = ({ open, onOpenChange }) => {
                 <Button
                   size="sm"
                   variant={tier.highlight ? "default" : "outline"}
-                  disabled={tier.disabled}
+                  disabled={isDisabled(tier.tierKey) || checkoutLoading === tier.tierKey}
                   className="w-full text-xs"
+                  onClick={() => handleCheckout(tier.tierKey)}
                 >
-                  {tier.cta}
+                  {checkoutLoading === tier.tierKey ? (
+                    <Loader2 className="w-3 h-3 animate-spin" />
+                  ) : (
+                    getCtaLabel(tier.tierKey)
+                  )}
                 </Button>
               </div>
             );
           })}
         </div>
 
-        {/* Email capture */}
-        <div className="border-t border-border pt-4">
-          {submitted ? (
-            <p className="text-sm text-center text-primary font-medium">
-              🎉 You're on the list — we'll give you 2 weeks free when Pro launches!
-            </p>
-          ) : (
-            <form onSubmit={handleEmailSubmit} className="space-y-2">
-              <p className="text-sm text-center text-muted-foreground">
-                Get notified when Pro launches — we'll give you 2 weeks free.
+        {!isPro && (
+          <div className="border-t border-border pt-4">
+            {submitted ? (
+              <p className="text-sm text-center text-primary font-medium">
+                🎉 You're on the list — we'll give you 2 weeks free when Pro launches!
               </p>
-              <div className="flex gap-2">
-                <Input
-                  type="email"
-                  placeholder="you@email.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                  className="text-sm"
-                />
-                <Button type="submit" size="sm" disabled={submitting}>
-                  {submitting ? "..." : "Notify me"}
-                </Button>
-              </div>
-            </form>
-          )}
-        </div>
+            ) : (
+              <form onSubmit={handleEmailSubmit} className="space-y-2">
+                <p className="text-sm text-center text-muted-foreground">
+                  Get notified about new features — we'll give you 2 weeks free.
+                </p>
+                <div className="flex gap-2">
+                  <Input
+                    type="email"
+                    placeholder="you@email.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                    className="text-sm"
+                  />
+                  <Button type="submit" size="sm" disabled={submitting}>
+                    {submitting ? "..." : "Notify me"}
+                  </Button>
+                </div>
+              </form>
+            )}
+          </div>
+        )}
       </DialogContent>
     </Dialog>
   );
