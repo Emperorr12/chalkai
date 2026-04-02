@@ -8,7 +8,7 @@ import { toast } from "sonner";
 import { MessageSquare, PanelRightClose } from "lucide-react";
 
 const subjects = ["Math", "Science", "History", "Economics", "Coding", "English", "Other"];
-const defaultChips = ["Show me an example", "Explain it simpler", "Go deeper", "Quiz me on this"];
+const defaultChips = ["Ask anything", "Explain simpler", "Go deeper", "Quiz me"];
 
 const CONFUSION_WORDS = ["don't understand", "dont understand", "confused", "lost", "help", "don't get it", "dont get it", "what do you mean", "huh", "i'm lost", "im lost"];
 
