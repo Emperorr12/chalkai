@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect, useCallback } from "react";
 import { Mic, Loader2 } from "lucide-react";
 import MrWhite, { type MrWhiteState } from "./MrWhite";
+import HighlightAskTooltip from "./HighlightAskTooltip";
 
 export interface ChatMessage {
   role: "mr_white" | "student";
@@ -315,8 +316,12 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
       <div
         ref={scrollRef}
         onScroll={handleScroll}
-        className="flex-1 overflow-y-auto px-4 py-4 space-y-4"
+        className="flex-1 overflow-y-auto px-4 py-4 space-y-4 relative"
       >
+        <HighlightAskTooltip
+          containerRef={scrollRef as React.RefObject<HTMLElement>}
+          onAsk={(text) => onSend(`Can you explain this in more detail: "${text}"?`)}
+        />
         {messages.map((msg, i) => (
           <div
             key={i}
@@ -328,6 +333,7 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
               <MrWhite state="idle" size={28} className="mr-2 mt-1 flex-shrink-0" />
             )}
             <div
+              {...(msg.role === "mr_white" ? { "data-mr-white-msg": true } : {})}
               className={`max-w-[80%] text-sm leading-relaxed ${
                 msg.role === "student"
                   ? "student-bubble"
