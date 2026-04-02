@@ -6,10 +6,13 @@ import Whiteboard, { type WhiteboardElement } from "../components/Whiteboard";
 import ChatPanel, { type ChatMessage } from "../components/ChatPanel";
 import { toast } from "sonner";
 import { MessageSquare, PanelRightClose } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
+import { useLearningProfile } from "@/hooks/useLearningProfile";
 
 const subjects = ["Math", "Science", "History", "Economics", "Coding", "English", "Other"];
 const defaultChips = ["Ask anything", "Explain simpler", "Go deeper", "Quiz me"];
 
+const SIMPLIFICATION_PHRASES = ["explain simpler", "explain it simpler", "simplify", "too complicated", "make it simpler", "eli5", "in simple terms", "dumb it down"];
 const CONFUSION_WORDS = ["don't understand", "dont understand", "confused", "lost", "help", "don't get it", "dont get it", "what do you mean", "huh", "i'm lost", "im lost"];
 
 const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/mr-white-chat`;
@@ -17,6 +20,11 @@ const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/mr-white-cha
 function detectConfusion(text: string): boolean {
   const lower = text.toLowerCase();
   return CONFUSION_WORDS.some((w) => lower.includes(w));
+}
+
+function detectSimplification(text: string): boolean {
+  const lower = text.toLowerCase();
+  return SIMPLIFICATION_PHRASES.some((w) => lower.includes(w));
 }
 
 interface AIResponse {
@@ -30,9 +38,13 @@ interface AIResponse {
   };
   quick_chips?: string[];
   follow_up_hint?: string;
+  topic_detected?: string;
 }
 
 const AskPage: React.FC = () => {
+  const { user } = useAuth();
+  const { trackTopic, trackSimplification, trackSession, getProfileSummary, markMastered } = useLearningProfile();
+
   const [activeSubject, setActiveSubject] = useState("Math");
   const [messages, setMessages] = useState<ChatMessage[]>([
     { role: "mr_white", content: "What should we tackle today? I'm warmed up and my chalk is ready! 🎓" },
@@ -44,15 +56,24 @@ const AskPage: React.FC = () => {
   const [chalkedCount, setChalkedCount] = useState(0);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [startTime] = useState(Date.now());
+  const [currentTopic, setCurrentTopic] = useState<string>("");
   
   const [chatOpen, setChatOpen] = useState(true);
   const abortRef = useRef<AbortController | null>(null);
   const [searchParams, setSearchParams] = useSearchParams();
   const autoSentRef = useRef(false);
 
+  // Track session duration on unmount
+  useEffect(() => {
+    return () => {
+      const mins = Math.floor((Date.now() - startTime) / 60000);
+      if (mins >= 1 && user) {
+        trackSession(mins);
+      }
+    };
+  }, [startTime, user, trackSession]);
 
   const handleSend = useCallback(async (message: string, fileData?: { data: string; type: string; name: string }) => {
-    // Add student message exactly as typed
     const isImage = fileData?.type.startsWith("image/");
     setMessages((prev) => [...prev, { 
       role: "student", 
@@ -64,9 +85,14 @@ const AskPage: React.FC = () => {
     setMrWhiteState("thinking");
     setIsTyping(true);
     setErrorMessage(null);
-    
 
-    // Build context: last 4 messages
+    // Detect simplification requests and track them
+    const isSimplification = detectSimplification(message);
+    if (isSimplification && currentTopic && user) {
+      trackSimplification(currentTopic, activeSubject);
+    }
+
+    // Build context
     const recentMessages = messages.slice(-4).map((m) => ({
       role: m.role,
       content: m.content,
@@ -75,7 +101,9 @@ const AskPage: React.FC = () => {
     const isFirstQuestion = messages.filter((m) => m.role === "student").length === 0;
     const confusionDetected = detectConfusion(message);
 
-    // Abort previous stream if any
+    // Get learning profile summary
+    const profileSummary = user ? getProfileSummary() : "";
+
     abortRef.current?.abort();
     const controller = new AbortController();
     abortRef.current = controller;
@@ -96,6 +124,7 @@ const AskPage: React.FC = () => {
           file_data: fileData?.data || undefined,
           file_type: fileData?.type || undefined,
           file_name: fileData?.name || undefined,
+          student_profile: profileSummary || undefined,
         }),
         signal: controller.signal,
       });
@@ -113,9 +142,13 @@ const AskPage: React.FC = () => {
 
       setIsTyping(false);
       setMrWhiteState("talking");
-
-      // Add Mr. White's message
       setMessages((prev) => [...prev, { role: "mr_white", content: aiResponse.message }]);
+
+      // Track the topic if detected
+      if (aiResponse.topic_detected && user) {
+        setCurrentTopic(aiResponse.topic_detected);
+        trackTopic(aiResponse.topic_detected, activeSubject);
+      }
 
       // Update whiteboard
       if (aiResponse.whiteboard?.active && aiResponse.whiteboard.elements) {
@@ -126,7 +159,6 @@ const AskPage: React.FC = () => {
         setMrWhiteState("drawing");
         const drawDuration = (aiResponse.whiteboard.elements.length || 1) * 800;
         setTimeout(() => {
-          // After drawing, apply the API's state or fall back to idle
           const finalState = aiResponse.mr_white_state || "idle";
           setMrWhiteState(finalState);
           if (finalState !== "idle") {
@@ -134,13 +166,11 @@ const AskPage: React.FC = () => {
           }
         }, drawDuration);
       } else {
-        // No whiteboard — use API state then return to idle after 3s
         const finalState = aiResponse.mr_white_state || "talking";
         setMrWhiteState(finalState);
         setTimeout(() => setMrWhiteState("idle"), 3000);
       }
 
-      // Update chips
       if (aiResponse.quick_chips && aiResponse.quick_chips.length > 0) {
         setQuickChips(aiResponse.quick_chips);
       } else {
@@ -163,20 +193,24 @@ const AskPage: React.FC = () => {
     } finally {
       setIsTyping(false);
     }
-  }, [messages, activeSubject]);
+  }, [messages, activeSubject, user, currentTopic, trackTopic, trackSimplification, getProfileSummary]);
 
   const handleChipClick = useCallback(
     (chip: string) => {
+      // "Chalk it up" marks current topic as mastered
+      if (chip.toLowerCase().includes("chalk") && currentTopic && user) {
+        markMastered(currentTopic, activeSubject);
+      }
       handleSend(chip);
     },
-    [handleSend]
+    [handleSend, currentTopic, activeSubject, user, markMastered]
   );
 
   const handleListeningChange = useCallback((listening: boolean) => {
     setMrWhiteState(listening ? "listening" : "idle");
   }, []);
 
-  // Auto-send question from query param (homepage input)
+  // Auto-send question from query param
   useEffect(() => {
     const q = searchParams.get("q");
     if (q && !autoSentRef.current) {
@@ -186,16 +220,13 @@ const AskPage: React.FC = () => {
     }
   }, [searchParams, setSearchParams, handleSend]);
 
-
   const sessionMinutes = Math.floor((Date.now() - startTime) / 60000);
 
   return (
     <div className="h-screen bg-background flex flex-col overflow-hidden">
       <Navbar />
       <div className="flex-1 flex flex-col lg:flex-row min-h-0 relative">
-        {/* Left - Whiteboard Area (dominant) */}
         <div className="flex-1 flex flex-col items-center p-4 overflow-y-auto min-h-0">
-          {/* Subject pills */}
           <div className="flex flex-wrap gap-2 mb-4 flex-shrink-0">
             {subjects.map((s) => (
               <button
@@ -211,12 +242,9 @@ const AskPage: React.FC = () => {
               </button>
             ))}
           </div>
-
-          {/* Whiteboard */}
           <Whiteboard whiteboardData={whiteboardData} mrWhiteState={mrWhiteState} className="flex-1 w-full min-h-0" onAskAbout={(text) => handleSend(`Can you explain this in more detail: "${text}"?`)} />
         </div>
 
-        {/* Toggle button */}
         <button
           onClick={() => setChatOpen((o) => !o)}
           className="absolute right-0 top-1/2 -translate-y-1/2 z-20 bg-card border border-border rounded-l-lg p-2 shadow-md hover:bg-accent transition-colors"
@@ -226,7 +254,6 @@ const AskPage: React.FC = () => {
           {chatOpen ? <PanelRightClose className="w-4 h-4 text-foreground" /> : <MessageSquare className="w-4 h-4 text-foreground" />}
         </button>
 
-        {/* Right - Chat Panel (narrow, collapsible) */}
         <div
           className={`flex-shrink-0 border-l border-border min-h-0 max-h-full transition-all duration-300 overflow-hidden ${
             chatOpen ? "w-96 lg:w-80 xl:w-96" : "w-0 border-l-0"
