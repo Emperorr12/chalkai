@@ -485,10 +485,13 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
         {isTyping && (
           <div className="flex justify-start animate-fade-in-up">
             <span className="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center mr-2 mt-0.5 flex-shrink-0 text-[10px] text-primary font-bold">W</span>
-            <div className="chalk-bubble flex gap-1.5 items-center">
-              <span className="w-2 h-2 rounded-full bg-primary" style={{ animation: "dots-pulse 1.2s 0s infinite" }} />
-              <span className="w-2 h-2 rounded-full bg-primary" style={{ animation: "dots-pulse 1.2s 0.2s infinite" }} />
-              <span className="w-2 h-2 rounded-full bg-primary" style={{ animation: "dots-pulse 1.2s 0.4s infinite" }} />
+            <div className="chalk-bubble flex gap-2 items-center">
+              <span className="text-xs text-muted-foreground italic">Mr. White is thinking</span>
+              <span className="flex gap-1 items-center">
+                <span className="w-1.5 h-1.5 rounded-full bg-primary" style={{ animation: "dots-pulse 1.2s 0s infinite" }} />
+                <span className="w-1.5 h-1.5 rounded-full bg-primary" style={{ animation: "dots-pulse 1.2s 0.2s infinite" }} />
+                <span className="w-1.5 h-1.5 rounded-full bg-primary" style={{ animation: "dots-pulse 1.2s 0.4s infinite" }} />
+              </span>
             </div>
           </div>
         )}
