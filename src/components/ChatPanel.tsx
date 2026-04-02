@@ -252,7 +252,7 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
 
       {/* Error message */}
       {errorMessage && (
-        <div className="px-4 py-2 text-xs text-red-600 bg-red-50 border-t border-red-200">
+        <div className="px-4 py-2 text-xs text-destructive bg-destructive/10 border-t border-destructive/20">
           ⚠️ {errorMessage}
         </div>
       )}
