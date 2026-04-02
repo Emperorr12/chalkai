@@ -209,6 +209,12 @@ const AskPage: React.FC = () => {
         () => startWhiteboard(),
       );
 
+      // Track the topic if detected
+      if (aiResponse.topic_detected && user) {
+        setCurrentTopic(aiResponse.topic_detected);
+        trackTopic(aiResponse.topic_detected, activeSubject);
+      }
+
       if (aiResponse.quick_chips && aiResponse.quick_chips.length > 0) {
         setQuickChips(aiResponse.quick_chips);
       } else {
