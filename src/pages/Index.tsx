@@ -120,7 +120,7 @@ const Index: React.FC = () => {
               to="/slides"
               className="inline-flex items-center justify-center w-full px-5 py-2.5 text-sm rounded-lg border border-primary text-primary hover:bg-primary/5 transition-colors"
             >
-              Upload slides
+              Upload Slides
             </Link>
           </div>
         </div>
