@@ -18,6 +18,7 @@ interface ChatPanelProps {
   onSend: (message: string, fileData?: { data: string; type: string; name: string }) => void;
   onChipClick: (chip: string) => void;
   onSaveConcept?: (question: string, explanation: string) => void;
+  onReplay?: (question: string, message: string) => void;
   isTyping?: boolean;
   chalkedCount?: number;
   sessionMinutes?: number;
