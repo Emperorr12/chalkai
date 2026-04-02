@@ -30,7 +30,7 @@ const Index: React.FC = () => {
           <br />
           <span className="text-primary">— explained visually</span>
         </h1>
-        <p className="text-muted-foreground max-w-[480px] mx-auto text-base leading-relaxed mb-8">
+        <p className="text-muted-foreground max-w-[480px] mx-auto text-sm sm:text-base leading-relaxed mb-6 sm:mb-8">
           Ask any question and watch Mr.&nbsp;White draw the answer step-by-step on a whiteboard.
         </p>
 
