@@ -389,89 +389,108 @@ const Whiteboard: React.FC<WhiteboardProps> = ({ whiteboardData, mrWhiteState = 
             {/* Mr. White character with pointer stick */}
             <g
               transform="translate(510, 220) scale(1.4)"
-              style={{
-                transition: "transform 0.3s ease",
-              }}
             >
-              {/* Body */}
-              <path
-                d="M-12 15 C-12 5, -6 2, 0 2 C6 2, 12 5, 12 15 L12 32 L-12 32 Z"
-                fill="#2C2C2C"
-                stroke="#1A1A1A"
-                strokeWidth="1.5"
-                strokeLinecap="round"
-              />
-              {/* Bowtie */}
-              <path
-                d="M-3 3 L0 5 L3 3 L0 2 Z"
-                fill="#3B6FCA"
-                stroke="#2E5BA8"
-                strokeWidth="0.8"
-              />
-              {/* Head */}
-              <ellipse cx="0" cy="-8" rx="10" ry="11" fill="#F5DEB3" stroke="#D4B896" strokeWidth="1.5" />
-              {/* Hair */}
-              <path
-                d="M-10 -12 C-10 -19, -5 -22, 0 -22 C5 -22, 10 -19, 10 -12"
-                fill="#E8E8E8"
-                stroke="#D0D0D0"
-                strokeWidth="1.5"
-              />
-              {/* Glasses */}
-              <circle cx="-4" cy="-9" r="4" stroke="#1A1A1A" strokeWidth="1.2" fill="none" />
-              <circle cx="4" cy="-9" r="4" stroke="#1A1A1A" strokeWidth="1.2" fill="none" />
-              <path d="M0 -9 L0.5 -9" stroke="#1A1A1A" strokeWidth="1" />
-              {/* Eyes */}
-              <circle cx="-4" cy="-9.5" r="1.2" fill="#1A1A1A" />
-              <circle cx="4" cy="-9.5" r="1.2" fill="#1A1A1A" />
-              {/* Mouth */}
-              {mrWhiteState === "talking" ? (
-                <ellipse cx="0" cy="-3" rx="2" ry="1.5" fill="#1A1A1A" opacity="0.7" />
-              ) : (
-                <path d="M-2.5 -3.5 C-1.5 -2, 1.5 -2, 2.5 -3.5" stroke="#1A1A1A" strokeWidth="1" fill="none" strokeLinecap="round" />
-              )}
-              {/* Left arm */}
-              <path
-                d="M-10 12 C-14 10, -15 14, -13 17"
-                stroke="#2C2C2C"
-                strokeWidth="2.5"
-                fill="none"
-                strokeLinecap="round"
-              />
-              {/* Right arm holding pointer stick */}
-              <path
-                d="M10 10 C14 6, 16 2, 18 -2"
-                stroke="#2C2C2C"
-                strokeWidth="2.5"
-                fill="none"
-                strokeLinecap="round"
-              />
-              {/* Pointer stick */}
-              <line
-                x1="17"
-                y1="-1"
-                x2={mrWhiteState === "drawing" ? "-60" : "-30"}
-                y2={mrWhiteState === "drawing" ? "-50" : "-35"}
-                stroke="#8B6914"
-                strokeWidth="2"
-                strokeLinecap="round"
-                style={{ transition: "x2 0.5s ease, y2 0.5s ease" }}
-              />
-              {/* Pointer tip */}
-              <circle
-                cx={mrWhiteState === "drawing" ? "-60" : "-30"}
-                cy={mrWhiteState === "drawing" ? "-50" : "-35"}
-                r="2"
-                fill="#C41E1E"
-                style={{ transition: "cx 0.5s ease, cy 0.5s ease" }}
-              />
+              {/* Animated wrapper for state-based animations */}
+              <g className={
+                mrWhiteState === "idle" ? "animate-breathe" :
+                mrWhiteState === "talking" ? "animate-bounce-talk" :
+                mrWhiteState === "thinking" ? "animate-think" :
+                mrWhiteState === "excited" ? "animate-excited" :
+                mrWhiteState === "celebrating" ? "animate-celebrate" :
+                ""
+              } style={{ transformOrigin: "0px 0px" }}>
+                {/* Body */}
+                <path
+                  d="M-12 15 C-12 5, -6 2, 0 2 C6 2, 12 5, 12 15 L12 32 L-12 32 Z"
+                  fill="#2C2C2C"
+                  stroke="#1A1A1A"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                />
+                {/* Bowtie */}
+                <path
+                  d="M-3 3 L0 5 L3 3 L0 2 Z"
+                  fill="#3B6FCA"
+                  stroke="#2E5BA8"
+                  strokeWidth="0.8"
+                />
+                {/* Head */}
+                <ellipse cx="0" cy="-8" rx="10" ry="11" fill="#F5DEB3" stroke="#D4B896" strokeWidth="1.5" />
+                {/* Hair */}
+                <path
+                  d="M-10 -12 C-10 -19, -5 -22, 0 -22 C5 -22, 10 -19, 10 -12"
+                  fill="#E8E8E8"
+                  stroke="#D0D0D0"
+                  strokeWidth="1.5"
+                />
+                {/* Glasses */}
+                <circle cx="-4" cy="-9" r="4" stroke="#1A1A1A" strokeWidth="1.2" fill="none" />
+                <circle cx="4" cy="-9" r="4" stroke="#1A1A1A" strokeWidth="1.2" fill="none" />
+                <path d="M0 -9 L0.5 -9" stroke="#1A1A1A" strokeWidth="1" />
+                {/* Eyes */}
+                <circle cx="-4" cy="-9.5" r="1.2" fill="#1A1A1A" />
+                <circle cx="4" cy="-9.5" r="1.2" fill="#1A1A1A" />
+                {/* Blink overlays */}
+                <rect x="-8" y="-12" width="8" height="4" rx="2" fill="#F5DEB3" className="animate-blink" />
+                <rect x="0" y="-12" width="8" height="4" rx="2" fill="#F5DEB3" className="animate-blink" />
+                {/* Mouth */}
+                {mrWhiteState === "talking" ? (
+                  <ellipse cx="0" cy="-3" rx="2" ry="1.5" fill="#1A1A1A" opacity="0.7" />
+                ) : (
+                  <path d="M-2.5 -3.5 C-1.5 -2, 1.5 -2, 2.5 -3.5" stroke="#1A1A1A" strokeWidth="1" fill="none" strokeLinecap="round" />
+                )}
+                {/* Left arm */}
+                <path
+                  d="M-10 12 C-14 10, -15 14, -13 17"
+                  stroke="#2C2C2C"
+                  strokeWidth="2.5"
+                  fill="none"
+                  strokeLinecap="round"
+                />
+                {/* Right arm holding pointer stick */}
+                <path
+                  d="M10 10 C14 6, 16 2, 18 -2"
+                  stroke="#2C2C2C"
+                  strokeWidth="2.5"
+                  fill="none"
+                  strokeLinecap="round"
+                />
+                {/* Pointer stick */}
+                <line
+                  x1="17"
+                  y1="-1"
+                  x2={mrWhiteState === "drawing" ? "-60" : "-30"}
+                  y2={mrWhiteState === "drawing" ? "-50" : "-35"}
+                  stroke="#8B6914"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  style={{ transition: "x2 0.5s ease, y2 0.5s ease" }}
+                />
+                {/* Pointer tip */}
+                <circle
+                  cx={mrWhiteState === "drawing" ? "-60" : "-30"}
+                  cy={mrWhiteState === "drawing" ? "-50" : "-35"}
+                  r="2"
+                  fill="#C41E1E"
+                  style={{ transition: "cx 0.5s ease, cy 0.5s ease" }}
+                />
+              </g>
 
-              {/* Thinking dots */}
+              {/* Thinking dots + text */}
               {mrWhiteState === "thinking" && (
                 <>
                   <circle cx="8" cy="-22" r="1.5" fill="#3B6FCA" opacity="0.6" style={{ animation: "dots-pulse 1.2s 0s infinite" }} />
                   <circle cx="12" cy="-25" r="1.5" fill="#3B6FCA" opacity="0.6" style={{ animation: "dots-pulse 1.2s 0.2s infinite" }} />
                   <circle cx="16" cy="-22" r="1.5" fill="#3B6FCA" opacity="0.6" style={{ animation: "dots-pulse 1.2s 0.4s infinite" }} />
+                  <text x="12" y="-30" textAnchor="middle" fontSize="8" fill="#3B6FCA" opacity="0.5" fontFamily="Caveat, cursive" style={{ animation: "dots-pulse 1.5s infinite" }}>...</text>
+                </>
+              )}
+
+              {/* Excited stars */}
+              {mrWhiteState === "excited" && (
+                <>
+                  <polygon points="18,-18 19,-15 22,-15 20,-13 21,-10 18,-12 15,-10 16,-13 14,-15 17,-15" fill="#3B6FCA" opacity="0.7" style={{ animation: "star-burst 0.6s ease-out forwards" }} />
+                  <polygon points="-14,-20 -13,-17 -10,-17 -12,-15 -11,-12 -14,-14 -17,-12 -16,-15 -18,-17 -15,-17" fill="#3B6FCA" opacity="0.5" style={{ animation: "star-burst 0.6s 0.15s ease-out forwards" }} />
                 </>
               )}
             </g>
