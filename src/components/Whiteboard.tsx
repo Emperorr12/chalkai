@@ -14,7 +14,10 @@ export interface WhiteboardElement {
 
 export interface WhiteboardData {
   title?: string;
-  elements: WhiteboardElement[];
+  elements?: WhiteboardElement[];
+  layout?: string;
+  labels?: string[];
+  colors?: string[];
 }
 
 interface WhiteboardProps {
