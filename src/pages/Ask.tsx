@@ -245,7 +245,7 @@ const AskPage: React.FC = () => {
         setQuickChips(defaultChips);
       }
 
-      setChalkedCount((c) => c + 1);
+      
     } catch (err: unknown) {
       if (err instanceof Error && err.name === "AbortError") return;
       console.error("Chat error:", err);
@@ -273,6 +273,7 @@ const AskPage: React.FC = () => {
       // "Chalk it up" marks current topic as mastered and triggers celebration
       if (chip.toLowerCase().includes("chalk") && currentTopic && user) {
         markMastered(currentTopic, activeSubject);
+        setChalkedCount((c) => c + 1);
         setMrWhiteState("celebrating");
         setShowCelebration(true);
         setTimeout(() => setMrWhiteState("idle"), 2000);
