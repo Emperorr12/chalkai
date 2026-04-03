@@ -19,6 +19,8 @@ export interface WhiteboardData {
 interface WhiteboardProps {
   whiteboardData: WhiteboardData | null;
   mrWhiteState?: MrWhiteState;
+  videoUrl?: string | null;
+  videoLoading?: boolean;
   className?: string;
   onAskAbout?: (text: string) => void;
 }
