@@ -10,6 +10,7 @@ const TTS_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/elevenlabs-tt
 export function useTextToSpeech() {
   const [isPlaying, setIsPlaying] = useState(false);
   const [voiceEnabled, setVoiceEnabled] = useState(true);
+  const [volume, setVolumeState] = useState(0.8);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const unlockedRef = useRef(false);
   const pendingRef = useRef<{ url: string; onStart?: () => void; onEnd?: () => void } | null>(null);
@@ -31,7 +32,7 @@ export function useTextToSpeech() {
         p.then(() => {
           unlockedRef.current = true;
           audio.pause();
-          audio.volume = 1;
+          audio.volume = volume;
           audio.src = "";
         }).catch(() => {});
       }
@@ -157,5 +158,11 @@ export function useTextToSpeech() {
     }
   }, [voiceEnabled, stop, speakFallback, playBlob]);
 
-  return { speak, stop, isPlaying, voiceEnabled, setVoiceEnabled };
+  const setVolume = useCallback((v: number) => {
+    const clamped = Math.max(0, Math.min(1, v));
+    setVolumeState(clamped);
+    if (audioRef.current) audioRef.current.volume = clamped;
+  }, []);
+
+  return { speak, stop, isPlaying, voiceEnabled, setVoiceEnabled, volume, setVolume };
 }

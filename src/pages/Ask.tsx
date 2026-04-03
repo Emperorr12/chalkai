@@ -5,7 +5,7 @@ import { type MrWhiteState } from "../components/MrWhite";
 import Whiteboard, { type WhiteboardElement } from "../components/Whiteboard";
 import ChatPanel, { type ChatMessage } from "../components/ChatPanel";
 import { toast } from "sonner";
-import { MessageSquare, PanelRightClose, Volume2, VolumeX } from "lucide-react";
+import { MessageSquare, PanelRightClose, Volume2, VolumeX, Volume1 } from "lucide-react";
 import { useTextToSpeech } from "@/hooks/useTextToSpeech";
 import { useAuth } from "@/contexts/AuthContext";
 import { useLearningProfile } from "@/hooks/useLearningProfile";
@@ -52,7 +52,7 @@ const AskPage: React.FC = () => {
   const { user } = useAuth();
   const { trackTopic, trackSimplification, trackSession, getProfileSummary, markMastered } = useLearningProfile();
   const { saveConcept, concepts } = useSavedConcepts();
-  const { speak, stop: stopTTS, isPlaying: isTTSPlaying, voiceEnabled, setVoiceEnabled } = useTextToSpeech();
+  const { speak, stop: stopTTS, isPlaying: isTTSPlaying, voiceEnabled, setVoiceEnabled, volume, setVolume } = useTextToSpeech();
   const { saveLesson } = useLessons();
   const { isPro, tier, startCheckout, refresh: refreshSubscription } = useSubscription();
 
@@ -366,22 +366,40 @@ const AskPage: React.FC = () => {
                 </button>
               ))}
             </div>
-            <button
-              onClick={() => { setVoiceEnabled((v) => !v); if (isTTSPlaying) stopTTS(); }}
-              className={`flex-shrink-0 p-1.5 rounded-full border transition-colors ${
-                voiceEnabled
-                  ? "border-primary text-primary bg-primary/10"
-                  : "border-border text-muted-foreground hover:border-primary"
-              }`}
-              aria-label={voiceEnabled ? "Disable voice" : "Enable voice"}
-              title={voiceEnabled ? "Voice on" : "Voice off"}
-            >
-              {voiceEnabled ? (
-                <Volume2 className={`w-4 h-4 ${isTTSPlaying ? "animate-pulse" : ""}`} />
-              ) : (
-                <VolumeX className="w-4 h-4" />
-              )}
-            </button>
+            <div className="relative flex-shrink-0 group/vol">
+              <button
+                onClick={() => { setVoiceEnabled((v) => !v); if (isTTSPlaying) stopTTS(); }}
+                className={`p-1.5 rounded-full border transition-colors ${
+                  voiceEnabled
+                    ? "border-primary text-primary bg-primary/10"
+                    : "border-border text-muted-foreground hover:border-primary"
+                }`}
+                aria-label={voiceEnabled ? "Disable voice" : "Enable voice"}
+                title={voiceEnabled ? "Voice on" : "Voice off"}
+              >
+                {voiceEnabled ? (
+                  volume > 0.5 ? <Volume2 className={`w-4 h-4 ${isTTSPlaying ? "animate-pulse" : ""}`} /> : <Volume1 className={`w-4 h-4 ${isTTSPlaying ? "animate-pulse" : ""}`} />
+                ) : (
+                  <VolumeX className="w-4 h-4" />
+                )}
+              </button>
+              {/* Volume slider popup on hover */}
+              <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 opacity-0 pointer-events-none group-hover/vol:opacity-100 group-hover/vol:pointer-events-auto transition-opacity duration-200 z-50">
+                <div className="bg-background border border-border rounded-lg shadow-lg px-3 py-4 flex flex-col items-center gap-2" style={{ width: 40, height: 120 }}>
+                  <input
+                    type="range"
+                    min={0}
+                    max={100}
+                    value={Math.round(volume * 100)}
+                    onChange={(e) => setVolume(Number(e.target.value) / 100)}
+                    className="w-20 accent-primary cursor-pointer"
+                    style={{ writingMode: "vertical-lr", direction: "rtl", height: 80 }}
+                    aria-label="Volume"
+                  />
+                  <span className="text-[10px] text-muted-foreground">{Math.round(volume * 100)}%</span>
+                </div>
+              </div>
+            </div>
           </div>
           <Whiteboard whiteboardData={whiteboardData} mrWhiteState={mrWhiteState} className="w-full min-h-[200px] lg:flex-1 lg:min-h-[0px] lg:h-full" onAskAbout={(text) => handleSend(`Can you explain this in more detail: "${text}"?`)} />
         </div>
