@@ -83,7 +83,7 @@
   }
 
   .whiteboard-surface {
-    background-color: #1C2E28;
+    background-color: #1E2D3A;
     border: 8px solid hsl(var(--chalk-wood));
     border-radius: 6px;
     box-shadow: 0 4px 20px -4px rgba(0, 0, 0, 0.15);
