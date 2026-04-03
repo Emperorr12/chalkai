@@ -216,7 +216,6 @@ const AskPage: React.FC = () => {
 
       // Voice + whiteboard draw simultaneously, then settle when voice ends
       const onVoiceStart = () => {
-        // Reveal message text + start whiteboard drawing at the same time as voice
         setIsTyping(false);
         setMessages((prev) => [...prev, { role: "mr_white", content: aiResponse.message, timestamp: Date.now() }]);
         setMrWhiteState("talking");
@@ -234,14 +233,19 @@ const AskPage: React.FC = () => {
         }
       };
 
-      // Speak — keeps "thinking" until audio is ready, then reveals text + draws + plays voice together
-      speak(
-        aiResponse.message,
-        onVoiceStart,
-        onVoiceEnd,
-      );
+      // Handle video URL
+      if (aiResponse.video_url) {
+        setVideoUrl(aiResponse.video_url);
+        setVideoLoading(false);
+      } else {
+        setVideoLoading(false);
+        if (aiResponse.video_error) {
+          console.warn("Video generation failed:", aiResponse.video_error);
+        }
+      }
 
-      // Track the topic if detected
+      speak(aiResponse.message, onVoiceStart, onVoiceEnd);
+
       if (aiResponse.topic_detected && user) {
         setCurrentTopic(aiResponse.topic_detected);
         trackTopic(aiResponse.topic_detected, activeSubject);
