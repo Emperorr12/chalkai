@@ -23,6 +23,7 @@ interface WhiteboardProps {
   videoLoading?: boolean;
   className?: string;
   onAskAbout?: (text: string) => void;
+  onVideoEnded?: () => void;
 }
 
 const CHALK_COLORS: Record<string, string> = {
