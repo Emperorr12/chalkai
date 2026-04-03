@@ -36,6 +36,7 @@ function detectSimplification(text: string): boolean {
 
 interface AIResponse {
   message: string;
+  narration_script?: string;
   mr_white_state?: MrWhiteState;
   whiteboard?: {
     active: boolean;
@@ -46,6 +47,8 @@ interface AIResponse {
   quick_chips?: string[];
   follow_up_hint?: string;
   topic_detected?: string;
+  video_url?: string | null;
+  video_error?: string;
 }
 
 const AskPage: React.FC = () => {
