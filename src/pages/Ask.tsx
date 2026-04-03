@@ -5,7 +5,7 @@ import { type MrWhiteState } from "../components/MrWhite";
 import Whiteboard, { type WhiteboardElement } from "../components/Whiteboard";
 import ChatPanel, { type ChatMessage } from "../components/ChatPanel";
 import { toast } from "sonner";
-import { MessageSquare, PanelRightClose, Volume2, VolumeX } from "lucide-react";
+import { MessageSquare, PanelRightClose, Volume2, VolumeX, Volume1 } from "lucide-react";
 import { useTextToSpeech } from "@/hooks/useTextToSpeech";
 import { useAuth } from "@/contexts/AuthContext";
 import { useLearningProfile } from "@/hooks/useLearningProfile";
