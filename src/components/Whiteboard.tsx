@@ -525,7 +525,7 @@ const Whiteboard: React.FC<WhiteboardProps> = ({
 
       <div
         style={{
-          backgroundColor: "#1C2E28",
+          backgroundColor: "#1E2D3A",
           border: "8px solid #8B6914",
           borderRadius: 6,
           padding: pad,

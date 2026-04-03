@@ -137,7 +137,7 @@ const HeroWhiteboardDemo: React.FC = () => {
       </div>
 
       {/* Chalkboard */}
-      <div className="relative overflow-hidden" style={{ backgroundColor: "#1C2E28", border: "8px solid #8B6914", borderRadius: 6, boxShadow: "0 4px 20px -4px rgba(0, 0, 0, 0.15)", minHeight: 260 }}>
+      <div className="relative overflow-hidden" style={{ backgroundColor: "#1E2D3A", border: "8px solid #8B6914", borderRadius: 6, boxShadow: "0 4px 20px -4px rgba(0, 0, 0, 0.15)", minHeight: 260 }}>
         <svg viewBox="0 0 310 150" className="w-full h-auto" style={{ minHeight: 208 }}>
           {/* Axes */}
           <path
