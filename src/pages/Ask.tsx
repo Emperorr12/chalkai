@@ -384,7 +384,7 @@ const AskPage: React.FC = () => {
               )}
             </button>
           </div>
-          <Whiteboard whiteboardData={whiteboardData} mrWhiteState={mrWhiteState} className="w-full min-h-[200px] lg:flex-1 lg:min-h-[0px] lg:h-full" onAskAbout={(text) => handleSend(`Can you explain this in more detail: "${text}"?`)} />
+          <AnimatedWhiteboard mrWhiteState={mrWhiteState} className="w-full min-h-[200px] lg:flex-1 lg:min-h-[0px] lg:h-full" />
         </div>
 
         {/* Toggle button - desktop only */}
