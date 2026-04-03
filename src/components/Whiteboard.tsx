@@ -162,7 +162,7 @@ const Whiteboard: React.FC<WhiteboardProps> = ({
 
   // Compute Mr. White's position as CSS percentages within the container
   const mrWhitePosition = useMemo(() => {
-    const dynamicH = isMobile ? svgH : Math.max(SVG_H, (activeData?.elements.length || 0) * 50 + 80);
+    const dynamicH = isMobile ? svgH : Math.max(200, (activeData?.elements.length || 0) * 58 + 100);
     // Default: bottom-right
     if (activeElementIndex < 0 || !activeData || activeElementIndex >= activeData.elements.length) {
       return { bottom: isMobile ? 4 : 8, right: isMobile ? 8 : 16, top: "auto" as const, left: "auto" as const };
