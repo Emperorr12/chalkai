@@ -117,6 +117,82 @@ const Whiteboard: React.FC<WhiteboardProps> = ({
       return;
     }
 
+    if (whiteboardData && (whiteboardData as any).template) {
+      const template = (whiteboardData as any).template;
+      const labels = (whiteboardData as any).labels || [];
+
+      let elements: WhiteboardElement[] = [];
+
+      if (template === 'graph') {
+        elements = [
+          { kind: 'axis', content: `${labels[2] || 'x'},${labels[3] || 'y'}`, color: 'white', delay_seconds: 0.0 },
+          { kind: 'curve', content: 'M80,320 C200,280 350,160 580,80', color: 'blue', delay_seconds: 0.8 },
+          { kind: 'point', content: '320,195 •', color: 'red', delay_seconds: 1.8 },
+          { kind: 'line', content: '200,255 to 440,135 arrow', color: 'yellow', delay_seconds: 2.2 },
+          { kind: 'text', content: labels[0] || 'f(x)', color: 'blue', delay_seconds: 2.8 },
+          { kind: 'text', content: labels[1] || 'slope', color: 'yellow', delay_seconds: 3.2 },
+        ];
+      } else if (template === 'force_diagram') {
+        elements = [
+          { kind: 'rect', content: '220,160 200 80 ' + (labels[0] || 'Object'), color: 'white', delay_seconds: 0.0 },
+          { kind: 'arrow', content: '320,160 to 320,60 ' + (labels[1] || 'Normal'), color: 'blue', delay_seconds: 0.5 },
+          { kind: 'arrow', content: '320,240 to 320,340 ' + (labels[2] || 'Gravity'), color: 'red', delay_seconds: 1.0 },
+          { kind: 'arrow', content: '420,200 to 540,200 ' + (labels[3] || 'Force'), color: 'yellow', delay_seconds: 1.5 },
+          { kind: 'text', content: 'F = ma', color: 'white', delay_seconds: 2.0 },
+        ];
+      } else if (template === 'molecule') {
+        const count = Math.max(labels.length, 2);
+        const spacing = 480 / (count + 1);
+        labels.forEach((label: string, i: number) => {
+          const cx = 80 + spacing * (i + 1);
+          elements.push({ kind: 'circle', content: `${cx},200 40 ${label}`, color: i === 0 ? 'blue' : i === labels.length - 1 ? 'red' : 'white', delay_seconds: i * 0.5 });
+          if (i < labels.length - 1) {
+            const nextCx = 80 + spacing * (i + 2);
+            elements.push({ kind: 'line', content: `${cx + 40},200 to ${nextCx - 40},200`, color: 'white', delay_seconds: i * 0.5 + 0.3 });
+          }
+        });
+      } else if (template === 'process_flow') {
+        const count = Math.max(labels.length, 2);
+        const spacing = 560 / (count + 1);
+        labels.forEach((label: string, i: number) => {
+          const x = 40 + spacing * (i + 1) - 65;
+          elements.push({ kind: 'rect', content: `${x},165 130 70 ${label}`, color: 'blue', delay_seconds: i * 0.6 });
+          if (i < labels.length - 1) {
+            const nextX = 40 + spacing * (i + 2) - 65;
+            elements.push({ kind: 'arrow', content: `${x + 130},200 to ${nextX},200`, color: 'white', delay_seconds: i * 0.6 + 0.4 });
+          }
+        });
+      } else if (template === 'comparison') {
+        elements = [
+          { kind: 'line', content: '320,40 to 320,380', color: 'white', delay_seconds: 0.0 },
+          { kind: 'line', content: '40,80 to 600,80', color: 'white', delay_seconds: 0.2 },
+          { kind: 'text', content: labels[0] || 'Option A', color: 'blue', delay_seconds: 0.5 },
+          { kind: 'text', content: labels[1] || 'Option B', color: 'red', delay_seconds: 0.7 },
+        ];
+        for (let i = 2; i < labels.length; i += 2) {
+          const y = 120 + Math.floor((i - 2) / 2) * 55;
+          elements.push({ kind: 'text', content: labels[i], color: 'blue', delay_seconds: 0.8 + i * 0.2 });
+          if (labels[i + 1]) {
+            elements.push({ kind: 'text', content: labels[i + 1], color: 'red', delay_seconds: 0.9 + i * 0.2 });
+          }
+        }
+      } else if (template === 'equation_build') {
+        const total = labels.length * 70;
+        const startX = Math.max(40, (640 - total) / 2);
+        labels.forEach((term: string, i: number) => {
+          elements.push({ kind: 'text', content: term, color: i % 2 === 0 ? 'blue' : 'white', delay_seconds: i * 0.35 });
+        });
+        elements.push({ kind: 'rect', content: `${startX - 10},155 ${total + 20} 60`, color: 'yellow', delay_seconds: labels.length * 0.35 + 0.2 });
+      }
+
+      if (elements.length > 0) {
+        setActiveData({ title: whiteboardData.title || '', elements });
+        setDrawKey(k => k + 1);
+        setPhase('drawing');
+        return;
+      }
+    }
+
     // Resolve layout-based data into elements, or use elements directly
     let resolvedElements: WhiteboardElement[] = [];
     if (whiteboardData.layout) {
