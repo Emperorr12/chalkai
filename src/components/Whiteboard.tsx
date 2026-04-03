@@ -92,6 +92,7 @@ const Whiteboard: React.FC<WhiteboardProps> = ({
   videoLoading = false,
   className = "",
   onAskAbout,
+  onVideoEnded,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const svgContainerRef = useRef<HTMLDivElement>(null);
