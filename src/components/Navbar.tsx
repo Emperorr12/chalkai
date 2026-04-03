@@ -18,7 +18,6 @@ const Navbar: React.FC = () => {
       <nav className="w-full border-b border-border/50 bg-background/95 backdrop-blur-sm sticky top-0 z-50">
         <div className="max-w-6xl mx-auto px-6 h-14 flex items-center justify-between">
           <Link to="/" className="flex items-center gap-2">
-            <MrWhite state="idle" size={34} />
             <span className="text-lg font-medium text-foreground relative">
               Chalk
               <span className="absolute -bottom-0.5 left-0 right-0 h-[2px] bg-primary/40 rounded-full" />
