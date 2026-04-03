@@ -100,7 +100,7 @@ const Whiteboard: React.FC<WhiteboardProps> = ({
   const svgW = isMobile ? 380 : SVG_W;
   const svgH = isMobile ? 300 : SVG_H;
   const pad = isMobile ? 16 : PAD;
-  const mrWhiteSize = isMobile ? 64 : 100;
+  const mrWhiteSize = isMobile ? 80 : 128;
 
   useEffect(() => {
     if (whiteboardData === prevDataRef.current) return;
