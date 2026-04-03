@@ -164,8 +164,8 @@ const MrWhite: React.FC<MrWhiteProps> = ({ state = "idle", size = 140, className
             width="9"
             height="4"
             rx="2"
-            fill="#F5F5F0"
-            stroke="#DDD"
+            fill="#F5F0E8"
+            stroke="#D8D0C0"
             strokeWidth="1"
             transform={state === "drawing" ? "rotate(-35, 116, 69)" : "rotate(15, 102, 96)"}
           />

@@ -540,7 +540,7 @@ const Whiteboard: React.FC<WhiteboardProps> = ({
         <button
           onClick={handleErase}
           disabled={!hasContent}
-          className="absolute top-2 right-2 z-10 text-xs px-2.5 py-1 rounded bg-[#8B6914]/20 text-[#8B6914] hover:bg-[#8B6914]/30 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+          className="absolute top-2 right-2 z-10 text-xs px-2.5 py-1 rounded bg-[#F5F0E8]/15 text-[#F5F0E8] hover:bg-[#F5F0E8]/25 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
           aria-label="Erase whiteboard"
         >
           🧽 Erase
