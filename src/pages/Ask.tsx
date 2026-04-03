@@ -1,9 +1,8 @@
-import React, { useState, useCallback, useRef, useEffect, useMemo } from "react"; // refresh
+import React, { useState, useCallback, useRef, useEffect, useMemo } from "react";
 import { useSearchParams } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import { type MrWhiteState } from "../components/MrWhite";
-import { type WhiteboardElement } from "../components/Whiteboard";
-import AnimatedWhiteboard from "../components/AnimatedWhiteboard";
+import Whiteboard, { type WhiteboardElement } from "../components/Whiteboard";
 import ChatPanel, { type ChatMessage } from "../components/ChatPanel";
 import { toast } from "sonner";
 import { MessageSquare, PanelRightClose, Volume2, VolumeX } from "lucide-react";
@@ -384,7 +383,7 @@ const AskPage: React.FC = () => {
               )}
             </button>
           </div>
-          <AnimatedWhiteboard mrWhiteState={mrWhiteState} className="w-full min-h-[200px] lg:flex-1 lg:min-h-[0px] lg:h-full" />
+          <Whiteboard whiteboardData={whiteboardData} mrWhiteState={mrWhiteState} className="w-full min-h-[200px] lg:flex-1 lg:min-h-[0px] lg:h-full" onAskAbout={(text) => handleSend(`Can you explain this in more detail: "${text}"?`)} />
         </div>
 
         {/* Toggle button - desktop only */}
