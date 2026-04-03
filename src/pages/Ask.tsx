@@ -166,6 +166,15 @@ const AskPage: React.FC = () => {
     abortRef.current?.abort();
     cancelTimelineRef.current?.();
     cancelTimelineRef.current = null;
+
+    // For follow-up questions, erase the current board before calling the API.
+    // This makes Mr. White feel like he's wiping the chalkboard before the new lesson.
+    if (!isFirstQuestion && whiteboardData) {
+      setWhiteboardData(null);
+      setTriggeredElements(new Set());
+      await new Promise<void>((resolve) => setTimeout(resolve, 400));
+    }
+
     const controller = new AbortController();
     abortRef.current = controller;
 
