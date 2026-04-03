@@ -179,7 +179,7 @@ const Whiteboard: React.FC<WhiteboardProps> = ({
   }, [activeElementIndex, activeData, svgW, svgH, pad, isMobile]);
 
   // Auto-layout: compute Y positions for elements that don't specify coordinates
-  const getAutoY = (index: number) => (isMobile ? 44 : 56) + index * (isMobile ? 42 : 50);
+  const getAutoY = (index: number) => (isMobile ? 44 : 60) + index * (isMobile ? 48 : 58);
 
   const renderElement = (el: WhiteboardElement, index: number) => {
     const color = CHALK_COLORS[el.color] || CHALK_COLORS.blue;
