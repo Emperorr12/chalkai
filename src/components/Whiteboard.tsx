@@ -551,7 +551,7 @@ const Whiteboard: React.FC<WhiteboardProps> = ({
             className="mb-1"
             style={{
               fontFamily: "'Caveat', cursive",
-              fontSize: 16,
+              fontSize: 24,
               color: "#F5F0E8",
               opacity: phase === "fading-out" ? 0 : 1,
               transition: "opacity 0.3s ease",
