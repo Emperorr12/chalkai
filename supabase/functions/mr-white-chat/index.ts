@@ -90,14 +90,59 @@ Minimum elements required per topic:
 
 Never return only text elements for math or science topics. Always draw something.
 
-WHITEBOARD RULES:
-- Use coordinates within the 640x400 canvas.
-- CANVAS LAYOUT: Spread elements across the FULL 640x400 canvas. Use the top half (y: 0-200) for the main diagram, graph, or concept. Use the bottom half (y: 200-400) for additional labels, worked examples, key formulas, or supporting details. Never leave more than 30% of the board empty — fill space with annotations, labels, extra examples, or related formulas.
-- For graphs: start with "axis", then add "curve"/"line"/"point" elements on top. Place axis labels and key values in the bottom region.
-- For diagrams: use "rect" for boxes, "arrow" for connections, "text" for labels. Spread boxes across the full width (x: 40-600).
-- For equations: use "text" elements — they auto-layout vertically. Add a worked example or variable definitions in the bottom half.
-- For processes/flows: chain "rect" boxes with "arrow" connections between them. Use full canvas width.
-- Stagger delay_seconds by 0.4s per element for progressive drawing animation.
+WHITEBOARD RULES — READ CAREFULLY:
+
+The SVG canvas is 640x400. Axes origin is at x=80, y=320. This is fixed — always use these exact coordinates for graph-based diagrams.
+
+TEMPLATE SYSTEM: Choose the right template and populate it. Do not invent coordinates from scratch.
+
+TEMPLATE 1 — STANDARD GRAPH (for any function/curve):
+Always use these exact elements in this order:
+1. axis: content 'x,y' delay 0.0
+2. curve: content 'M80,320 C200,280 350,180 560,80' (adjust control points only slightly for different curves) delay 0.8
+3. point: content '320,195 (x,f(x))' delay 1.8
+4. line: from the point along the slope — for upward slope use '220,255 to 420,135 arrow' delay 2.2
+5. text: equation label at '90,370' delay 2.8
+6. text: slope label near tangent line delay 3.2
+
+TEMPLATE 2 — FORCE DIAGRAM (physics):
+1. rect: '220,140 200 100 Object' delay 0.0
+2. arrow: '320,140 to 320,60 Normal Force' color blue delay 0.5
+3. arrow: '320,240 to 320,320 Gravity (mg)' color red delay 1.0
+4. arrow: '420,190 to 520,190 Applied Force' color yellow delay 1.5
+5. text: 'ΣF = ma' at auto-layout delay 2.0
+
+TEMPLATE 3 — PROCESS FLOW (steps/reactions):
+1. rect: '40,160 140 80 Step 1' delay 0.0
+2. arrow: '180,200 to 240,200' delay 0.5
+3. rect: '240,160 140 80 Step 2' delay 0.8
+4. arrow: '380,200 to 440,200' delay 1.2
+5. rect: '440,160 140 80 Step 3' delay 1.5
+6. text: description labels below each rect delay 2.0
+
+TEMPLATE 4 — COMPARISON TABLE:
+1. line: '320,40 to 320,380' color white delay 0.0
+2. line: '40,80 to 600,80' color white delay 0.3
+3. text: left header at top-left delay 0.6
+4. text: right header at top-right delay 0.8
+5. text: left items stacked down delay 1.0+
+6. text: right items stacked down delay 1.4+
+
+TEMPLATE 5 — ATOM/MOLECULE:
+1. circle: '200,200 40 C' color blue delay 0.0
+2. circle: '340,200 40 H' color white delay 0.5
+3. line: '240,200 to 300,200' color white delay 1.0
+4. circle: '480,200 40 O' color red delay 1.5
+5. line: '380,200 to 440,200' color white delay 2.0
+6. text: molecule name below delay 2.5
+
+CRITICAL RULES:
+- ALWAYS pick a template for math and science
+- NEVER place a curve that does not start at the axes origin (80,320) for graph templates
+- NEVER place a tangent line that does not intersect the curve at the labeled point
+- Text labels for graphs go BELOW y=340 so they never overlap the diagram
+- Fill the full canvas — use y values from 60 to 380 and x values from 80 to 600
+- Stagger all delay_seconds by 0.4s minimum
 - ALWAYS set whiteboard.active = true for math, science, processes, or any concept that benefits from visual explanation.
 - Color options: blue (default), white (dark text), red (emphasis), green (positive/correct), yellow (highlight/warning).
 
