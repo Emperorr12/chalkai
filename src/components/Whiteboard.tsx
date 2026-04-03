@@ -501,8 +501,14 @@ const Whiteboard: React.FC<WhiteboardProps> = ({
     }
   };
 
-  const hasContent = activeData && activeData.elements.length > 0;
-  const dynamicSvgH = isMobile ? svgH : Math.max(SVG_H, (activeData?.elements.length || 0) * 50 + 80);
+  const contentBottomY = activeData ? Math.max(
+    ...activeData.elements.map((el, i) => {
+      if (el.kind === "text") return getAutoY(i) + 20;
+      return getAutoY(i) + 30;
+    }),
+    120
+  ) : SVG_H;
+  const dynamicSvgH = isMobile ? svgH : Math.min(Math.max(contentBottomY + 40, 200), SVG_H);
 
   return (
     <div className={`relative ${className}`} style={{ width: "100%", height: isMobile ? undefined : "100%" }}>
