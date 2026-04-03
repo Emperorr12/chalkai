@@ -1,4 +1,5 @@
 import React, { useState, useCallback, useRef } from "react";
+import { resolveWhiteboardData } from "@/lib/resolveWhiteboardLayout";
 import Navbar from "../components/Navbar";
 import MrWhite, { type MrWhiteState } from "../components/MrWhite";
 import Whiteboard, { type WhiteboardElement } from "../components/Whiteboard";

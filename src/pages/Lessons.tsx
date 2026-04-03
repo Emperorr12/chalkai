@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { resolveWhiteboardData } from "@/lib/resolveWhiteboardLayout";
 import { useNavigate } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Whiteboard, { type WhiteboardData } from "@/components/Whiteboard";
