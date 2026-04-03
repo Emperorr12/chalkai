@@ -158,5 +158,11 @@ export function useTextToSpeech() {
     }
   }, [voiceEnabled, stop, speakFallback, playBlob]);
 
-  return { speak, stop, isPlaying, voiceEnabled, setVoiceEnabled };
+  const setVolume = useCallback((v: number) => {
+    const clamped = Math.max(0, Math.min(1, v));
+    setVolumeState(clamped);
+    if (audioRef.current) audioRef.current.volume = clamped;
+  }, []);
+
+  return { speak, stop, isPlaying, voiceEnabled, setVoiceEnabled, volume, setVolume };
 }
