@@ -32,7 +32,7 @@ export function useTextToSpeech() {
         p.then(() => {
           unlockedRef.current = true;
           audio.pause();
-          audio.volume = 1;
+          audio.volume = volume;
           audio.src = "";
         }).catch(() => {});
       }
