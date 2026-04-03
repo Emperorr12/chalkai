@@ -32,9 +32,10 @@ ALWAYS return raw JSON only. No markdown. No code fences. Just the JSON:
   "topic_detected": "the specific topic being discussed",
   "whiteboard": {
     "active": true,
-    "type": "equation|diagram|graph|timeline|list|comparison|none",
+    "layout": "graph_single_curve",
     "title": "Short whiteboard heading",
-    "elements": []
+    "labels": ["label1", "label2"],
+    "colors": ["blue", "white"]
   },
   "quick_chips": ["Show me an example", "Explain it simpler", "Go deeper", "Quiz me"]
 }
