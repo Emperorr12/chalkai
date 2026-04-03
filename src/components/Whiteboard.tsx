@@ -24,11 +24,11 @@ interface WhiteboardProps {
 }
 
 const CHALK_COLORS: Record<string, string> = {
-  blue: "#3B6FCA",
-  white: "#5A5A50",
-  red: "#E05252",
-  green: "#4CAF50",
-  yellow: "#D4A017",
+  blue: "#F5F0E8",
+  white: "#F5F0E8",
+  red: "#E8C84A",
+  green: "#F5F0E8",
+  yellow: "#E8C84A",
 };
 
 const SVG_W = 640;
@@ -525,7 +525,7 @@ const Whiteboard: React.FC<WhiteboardProps> = ({
 
       <div
         style={{
-          backgroundColor: "#FFFEF5",
+          backgroundColor: "#1C2E28",
           border: "8px solid #8B6914",
           borderRadius: 6,
           padding: pad,
@@ -540,7 +540,7 @@ const Whiteboard: React.FC<WhiteboardProps> = ({
         <button
           onClick={handleErase}
           disabled={!hasContent}
-          className="absolute top-2 right-2 z-10 text-xs px-2.5 py-1 rounded bg-[#8B6914]/20 text-[#8B6914] hover:bg-[#8B6914]/30 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+          className="absolute top-2 right-2 z-10 text-xs px-2.5 py-1 rounded bg-[#F5F0E8]/15 text-[#F5F0E8] hover:bg-[#F5F0E8]/25 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
           aria-label="Erase whiteboard"
         >
           🧽 Erase
@@ -548,10 +548,11 @@ const Whiteboard: React.FC<WhiteboardProps> = ({
 
         {activeData?.title && (
           <div
-            className="text-lg mb-1"
+            className="mb-1"
             style={{
               fontFamily: "'Caveat', cursive",
-              color: "#8B6914",
+              fontSize: 16,
+              color: "#F5F0E8",
               opacity: phase === "fading-out" ? 0 : 1,
               transition: "opacity 0.3s ease",
             }}
@@ -636,7 +637,7 @@ const Whiteboard: React.FC<WhiteboardProps> = ({
             className="flex items-center justify-center text-2xl lg:text-3xl"
             style={{
               fontFamily: "'Caveat', cursive",
-              color: "#8B6914",
+              color: "#F5F0E8",
               opacity: 0.4,
               position: "absolute",
               top: "45%",

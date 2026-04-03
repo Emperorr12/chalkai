@@ -136,13 +136,13 @@ const HeroWhiteboardDemo: React.FC = () => {
         <span className="text-foreground font-medium">"What is a derivative?"</span>
       </div>
 
-      {/* Whiteboard */}
-      <div className="whiteboard-surface relative overflow-hidden" style={{ minHeight: 260 }}>
+      {/* Chalkboard */}
+      <div className="relative overflow-hidden" style={{ backgroundColor: "#1C2E28", border: "8px solid #8B6914", borderRadius: 6, boxShadow: "0 4px 20px -4px rgba(0, 0, 0, 0.15)", minHeight: 260 }}>
         <svg viewBox="0 0 310 150" className="w-full h-auto" style={{ minHeight: 208 }}>
           {/* Axes */}
           <path
             d={AXIS_X}
-            stroke="#1A1A1A"
+            stroke="#F5F0E8"
             strokeWidth="1.5"
             fill="none"
             strokeLinecap="round"
@@ -150,7 +150,7 @@ const HeroWhiteboardDemo: React.FC = () => {
           />
           <path
             d={AXIS_Y}
-            stroke="#1A1A1A"
+            stroke="#F5F0E8"
             strokeWidth="1.5"
             fill="none"
             strokeLinecap="round"
@@ -160,7 +160,7 @@ const HeroWhiteboardDemo: React.FC = () => {
           {/* Main curve f(x) */}
           <path
             d={CURVE_PATH}
-            stroke="hsl(218, 55%, 51%)"
+            stroke="#F5F0E8"
             strokeWidth="2.5"
             fill="none"
             strokeLinecap="round"
@@ -171,7 +171,7 @@ const HeroWhiteboardDemo: React.FC = () => {
           {/* Tangent line */}
           <path
             d={TANGENT_PATH}
-            stroke="hsl(0, 68%, 60%)"
+            stroke="#E8C84A"
             strokeWidth="1.5"
             fill="none"
             strokeLinecap="round"
@@ -183,7 +183,7 @@ const HeroWhiteboardDemo: React.FC = () => {
             cx="90"
             cy="55"
             r="4"
-            fill="hsl(0, 68%, 60%)"
+            fill="#E8C84A"
             style={getDotOpacity()}
           />
 
@@ -195,7 +195,7 @@ const HeroWhiteboardDemo: React.FC = () => {
               y={l.y}
               className="font-chalk"
               fontSize="14"
-              fill={l.text.includes("slope") || l.text.includes("tangent") ? "hsl(0, 68%, 60%)" : "#1A1A1A"}
+              fill={l.text.includes("slope") || l.text.includes("tangent") ? "#E8C84A" : "#F5F0E8"}
               style={getLabelOpacity(l.delay)}
             >
               {l.text}
