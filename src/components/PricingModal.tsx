@@ -51,7 +51,7 @@ const tiers = [
       "Session memory",
     ],
     tierKey: "pro" as const,
-    highlight: true,
+    highlight: false,
   },
   {
     name: "Scholar",
@@ -67,7 +67,7 @@ const tiers = [
       "Priority Mr. White responses",
     ],
     tierKey: "scholar" as const,
-    highlight: false,
+    highlight: true,
   },
 ];
 
