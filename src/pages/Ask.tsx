@@ -419,7 +419,7 @@ const AskPage: React.FC = () => {
               </div>
             </div>
           </div>
-          <Whiteboard whiteboardData={whiteboardData} mrWhiteState={mrWhiteState} className="w-full min-h-[200px] lg:flex-1 lg:min-h-[0px] lg:h-full" onAskAbout={(text) => handleSend(`Can you explain this in more detail: "${text}"?`)} />
+          <Whiteboard whiteboardData={whiteboardData} mrWhiteState={mrWhiteState} videoUrl={videoUrl} videoLoading={videoLoading} className="w-full min-h-[200px] lg:flex-1 lg:min-h-[0px] lg:h-full" onAskAbout={(text) => handleSend(`Can you explain this in more detail: "${text}"?`)} />
         </div>
 
         {/* Toggle button - desktop only */}
