@@ -26,6 +26,9 @@ interface WhiteboardProps {
   mrWhiteState?: MrWhiteState;
   className?: string;
   onAskAbout?: (text: string) => void;
+  /** When provided, elements only animate when their index appears in this set.
+   *  The parent (Ask.tsx) drives this via the TimelineEngine. */
+  triggeredElements?: Set<number>;
 }
 
 const CHALK_COLORS: Record<string, string> = {
@@ -87,7 +90,7 @@ function getElementPosition(
   }
 }
 
-function buildElementsFromTemplate(template: string, labels: string[]): WhiteboardElement[] {
+export function buildElementsFromTemplate(template: string, labels: string[]): WhiteboardElement[] {
   switch (template.toUpperCase()) {
     case 'GRAPH':
       return [
@@ -183,6 +186,7 @@ const Whiteboard: React.FC<WhiteboardProps> = ({
   mrWhiteState = "idle",
   className = "",
   onAskAbout,
+  triggeredElements,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const svgContainerRef = useRef<HTMLDivElement>(null);
@@ -463,8 +467,15 @@ const Whiteboard: React.FC<WhiteboardProps> = ({
   (Whiteboard as any).resolveLayout = resolveLayout;
 
   const renderElement = (el: WhiteboardElement, index: number) => {
+    // When timeline-controlled, skip untriggered elements entirely so they
+    // remain invisible until the audio reaches their timestamp.
+    if (triggeredElements !== undefined && !triggeredElements.has(index)) {
+      return null;
+    }
+
     const color = CHALK_COLORS[el.color] || CHALK_COLORS.blue;
-    const delay = `${el.delay_seconds ?? index * 0.4}s`;
+    // When timeline-controlled the timing is driven externally — animate immediately.
+    const delay = triggeredElements !== undefined ? "0s" : `${el.delay_seconds ?? index * 0.4}s`;
     const fontSize = el.size === "large" ? 34 : el.size === "small" ? 22 : 28;
 
     // Common stroke-dasharray draw animation style

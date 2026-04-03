@@ -1,5 +1,7 @@
 import React, { useState, useCallback, useRef, useEffect, useMemo } from "react";
-import { resolveWhiteboardData } from "@/lib/resolveWhiteboardLayout";
+import { resolveWhiteboardData, resolveLayout } from "@/lib/resolveWhiteboardLayout";
+import { startTimeline } from "@/lib/TimelineEngine";
+import { buildElementsFromTemplate } from "@/components/Whiteboard";
 import { useSearchParams } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import { type MrWhiteState } from "../components/MrWhite";
@@ -53,7 +55,7 @@ const AskPage: React.FC = () => {
   const { user } = useAuth();
   const { trackTopic, trackSimplification, trackSession, getProfileSummary, markMastered } = useLearningProfile();
   const { saveConcept, concepts } = useSavedConcepts();
-  const { speak, stop: stopTTS, isPlaying: isTTSPlaying, voiceEnabled, setVoiceEnabled, volume, setVolume } = useTextToSpeech();
+  const { speak, stop: stopTTS, isPlaying: isTTSPlaying, voiceEnabled, setVoiceEnabled, volume, setVolume, audioRef } = useTextToSpeech();
   const { saveLesson } = useLessons();
   const { isPro, tier, startCheckout, refresh: refreshSubscription } = useSubscription();
 
@@ -87,13 +89,16 @@ const AskPage: React.FC = () => {
   const [showPricing, setShowPricing] = useState(false);
   
   const [chatOpen, setChatOpen] = useState(true);
+  const [triggeredElements, setTriggeredElements] = useState<Set<number>>(new Set());
+  const cancelTimelineRef = useRef<(() => void) | null>(null);
   const abortRef = useRef<AbortController | null>(null);
   const [searchParams, setSearchParams] = useSearchParams();
   const autoSentRef = useRef(false);
 
-  // Track session duration on unmount
+  // Track session duration on unmount; also cancel any running timeline.
   useEffect(() => {
     return () => {
+      cancelTimelineRef.current?.();
       const mins = Math.floor((Date.now() - startTime) / 60000);
       if (mins >= 1 && user) {
         trackSession(mins);
@@ -159,6 +164,8 @@ const AskPage: React.FC = () => {
     const profileSummary = user ? getProfileSummary() : "";
 
     abortRef.current?.abort();
+    cancelTimelineRef.current?.();
+    cancelTimelineRef.current = null;
     const controller = new AbortController();
     abortRef.current = controller;
 
@@ -214,6 +221,27 @@ const AskPage: React.FC = () => {
 
         if (wbData) {
           setWhiteboardData(wbData);
+
+          // Compute the final elements array the same way Whiteboard would.
+          let elements: WhiteboardElement[] = [];
+          if (wbData.template && (!wbData.elements || wbData.elements.length === 0)) {
+            elements = buildElementsFromTemplate(wbData.template, wbData.labels || []);
+          } else if (wbData.layout) {
+            elements = resolveLayout(wbData.layout, wbData.labels || [], wbData.colors || []);
+          } else if (wbData.elements && wbData.elements.length > 0) {
+            elements = wbData.elements;
+          }
+
+          // Start the audio-synchronized timeline if we have elements and audio.
+          cancelTimelineRef.current?.();
+          setTriggeredElements(new Set());
+          if (elements.length > 0 && audioRef.current) {
+            cancelTimelineRef.current = startTimeline(
+              audioRef.current,
+              elements,
+              (index) => setTriggeredElements((prev) => new Set([...prev, index])),
+            );
+          }
         }
       };
 
@@ -407,7 +435,7 @@ const AskPage: React.FC = () => {
               </div>
             </div>
           </div>
-          <Whiteboard whiteboardData={whiteboardData} mrWhiteState={mrWhiteState} className="w-full min-h-[200px] lg:flex-1 lg:min-h-[0px] lg:h-full" onAskAbout={(text) => handleSend(`Can you explain this in more detail: "${text}"?`)} />
+          <Whiteboard whiteboardData={whiteboardData} mrWhiteState={mrWhiteState} className="w-full min-h-[200px] lg:flex-1 lg:min-h-[0px] lg:h-full" onAskAbout={(text) => handleSend(`Can you explain this in more detail: "${text}"?`)} triggeredElements={triggeredElements} />
         </div>
 
         {/* Toggle button - desktop only */}

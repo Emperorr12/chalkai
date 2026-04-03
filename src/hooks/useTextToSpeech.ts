@@ -164,5 +164,5 @@ export function useTextToSpeech() {
     if (audioRef.current) audioRef.current.volume = clamped;
   }, []);
 
-  return { speak, stop, isPlaying, voiceEnabled, setVoiceEnabled, volume, setVolume };
+  return { speak, stop, isPlaying, voiceEnabled, setVoiceEnabled, volume, setVolume, audioRef };
 }
