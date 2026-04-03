@@ -599,7 +599,7 @@ const Whiteboard: React.FC<WhiteboardProps> = ({
                 {activeData!.elements.map((el, i) => {
                   if (el.kind !== "text") return null;
                   const y = getAutoY(i);
-                  const fs = el.size === "large" ? 28 : el.size === "small" ? 18 : 22;
+                  const fs = el.size === "large" ? 34 : el.size === "small" ? 22 : 28;
                   return (
                     <text
                       key={`sel-${i}`}
