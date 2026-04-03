@@ -192,12 +192,13 @@ const SlidesPage: React.FC = () => {
       setMrWhiteState("talking");
       setMessages((prev) => [...prev, { role: "mr_white", content: ai.message }]);
 
-      if (ai.whiteboard?.active && ai.whiteboard.elements) {
-        setWhiteboardData({ title: ai.whiteboard.title || "", elements: ai.whiteboard.elements });
+      const wbData2 = resolveWhiteboardData(ai.whiteboard);
+      if (wbData2) {
+        setWhiteboardData(wbData2);
         setMrWhiteState("drawing");
         setTimeout(() => {
           setMrWhiteState("idle");
-        }, (ai.whiteboard.elements.length || 1) * 800 + 3000);
+        }, (wbData2.elements.length || 1) * 800 + 3000);
       } else {
         setTimeout(() => setMrWhiteState("idle"), 3000);
       }

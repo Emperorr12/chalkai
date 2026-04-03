@@ -304,9 +304,10 @@ const AskPage: React.FC = () => {
         () => setMrWhiteState("talking"),
         () => {
           if (lesson.whiteboard && lesson.whiteboard.elements?.length > 0) {
-            setWhiteboardData(lesson.whiteboard);
+            const replayWb = resolveWhiteboardData(lesson.whiteboard) || lesson.whiteboard;
+            setWhiteboardData(replayWb);
             setMrWhiteState("drawing");
-            const dur = (lesson.whiteboard.elements.length || 1) * 800;
+            const dur = (replayWb.elements.length || 1) * 800;
             setTimeout(() => setMrWhiteState("idle"), dur);
           } else {
             setMrWhiteState("idle");
