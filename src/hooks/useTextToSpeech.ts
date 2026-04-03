@@ -10,6 +10,7 @@ const TTS_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/elevenlabs-tt
 export function useTextToSpeech() {
   const [isPlaying, setIsPlaying] = useState(false);
   const [voiceEnabled, setVoiceEnabled] = useState(true);
+  const [volume, setVolumeState] = useState(0.8);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const unlockedRef = useRef(false);
   const pendingRef = useRef<{ url: string; onStart?: () => void; onEnd?: () => void } | null>(null);
