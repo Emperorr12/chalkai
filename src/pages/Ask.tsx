@@ -56,7 +56,9 @@ const AskPage: React.FC = () => {
   const { saveLesson } = useLessons();
   const { isPro, tier, startCheckout, refresh: refreshSubscription } = useSubscription();
 
-  // Track if we're at desktop (lg) breakpoint
+  const [showVolSlider, setShowVolSlider] = useState(false);
+  const volTimeoutRef = useRef<number>(0);
+
   const [isDesktop, setIsDesktop] = useState(() => typeof window !== 'undefined' && window.innerWidth >= 1024);
   useEffect(() => {
     const mql = window.matchMedia('(min-width: 1024px)');
