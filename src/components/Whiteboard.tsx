@@ -677,6 +677,7 @@ const Whiteboard: React.FC<WhiteboardProps> = ({
               src={videoUrl}
               autoPlay
               controls
+              onEnded={onVideoEnded}
               style={{
                 width: "100%",
                 height: "100%",
