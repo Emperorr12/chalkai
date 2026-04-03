@@ -28,7 +28,6 @@ When a student profile summary is provided, USE it to personalize your response:
 ALWAYS return raw JSON only. No markdown. No code fences. Just the JSON:
 {
   "message": "Your response. 3-4 sentences. Warm, specific, conversational.",
-  "narration_script": "A longer, natural narration script (4-6 sentences) that Mr. White would speak aloud while teaching this concept with visuals. Written conversationally, as if lecturing at a whiteboard. Include pauses indicated by '...' for dramatic effect.",
   "mr_white_state": "talking",
   "topic_detected": "the specific topic being discussed",
   "whiteboard": {
@@ -91,164 +90,7 @@ WHITEBOARD RULES:
 - Color options: blue (default), white (dark text), red (emphasis), green (positive/correct), yellow (highlight/warning).
 
 mr_white_state options: talking, thinking, excited, celebrating, drawing
-topic_detected: always identify the specific topic — this is used to track the student's learning profile.
-
-NARRATION SCRIPT RULES:
-- The narration_script should be a natural, conversational version of the lesson — as if Mr. White is speaking to a student while drawing on the whiteboard.
-- It should cover the same content as "message" but expanded for voice delivery.
-- Include references to what's being drawn: "Let me show you on the board...", "See this line here?", "Notice how..."
-- Keep it under 200 words for a 60-90 second video.`;
-
-async function callClaude(messages: any[], systemPrompt: string, apiKey: string) {
-  const response = await fetch("https://api.anthropic.com/v1/messages", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "x-api-key": apiKey,
-      "anthropic-version": "2023-06-01",
-    },
-    body: JSON.stringify({
-      model: "claude-sonnet-4-20250514",
-      max_tokens: 2000,
-      system: systemPrompt,
-      messages,
-    }),
-  });
-
-  if (!response.ok) {
-    const errorText = await response.text();
-    console.error("Anthropic error:", response.status, errorText);
-    throw new Error(`Anthropic API error: ${response.status}`);
-  }
-
-  return await response.json();
-}
-
-async function generateHeyGenVideo(narrationScript: string, topic: string, heygenApiKey: string): Promise<string> {
-  // Step 1: Create the video
-  const createResponse = await fetch("https://api.heygen.com/v2/video/generate", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "X-Api-Key": heygenApiKey,
-    },
-    body: JSON.stringify({
-      video_inputs: [
-        {
-          character: {
-            type: "avatar",
-            avatar_id: "Daisy-inskirt-20220818",
-            avatar_style: "normal",
-          },
-          voice: {
-            type: "text",
-            input_text: narrationScript,
-            voice_id: "QngvLQR8bsLR5bzoa6Vv",
-          },
-          background: {
-            type: "color",
-            value: "#1E2D3A",
-          },
-        },
-      ],
-      dimension: {
-        width: 1280,
-        height: 720,
-      },
-      test: false,
-    }),
-  });
-
-  if (!createResponse.ok) {
-    const errBody = await createResponse.text();
-    console.error("HeyGen create error:", createResponse.status, errBody);
-    throw new Error(`HeyGen video creation failed: ${createResponse.status} - ${errBody}`);
-  }
-
-  const createData = await createResponse.json();
-  const videoId = createData.data?.video_id;
-
-  if (!videoId) {
-    throw new Error("HeyGen did not return a video_id");
-  }
-
-  console.log(`HeyGen video created: ${videoId}, polling for completion...`);
-
-  // Step 2: Poll for completion (max 3 minutes)
-  const maxAttempts = 36; // 36 * 5s = 180s
-  for (let attempt = 0; attempt < maxAttempts; attempt++) {
-    await new Promise((resolve) => setTimeout(resolve, 5000));
-
-    const statusResponse = await fetch(
-      `https://api.heygen.com/v1/video_status.get?video_id=${videoId}`,
-      {
-        headers: { "X-Api-Key": heygenApiKey },
-      }
-    );
-
-    if (!statusResponse.ok) {
-      console.error("HeyGen status check error:", statusResponse.status);
-      continue;
-    }
-
-    const statusData = await statusResponse.json();
-    const status = statusData.data?.status;
-
-    console.log(`HeyGen poll attempt ${attempt + 1}: status=${status}`);
-
-    if (status === "completed") {
-      return statusData.data.video_url;
-    }
-
-    if (status === "failed") {
-      throw new Error(`HeyGen video generation failed: ${statusData.data?.error || "unknown error"}`);
-    }
-  }
-
-  throw new Error("HeyGen video generation timed out after 3 minutes");
-}
-
-function buildUserContent(
-  question: string,
-  contextPrefix: string,
-  fileData?: string,
-  fileType?: string,
-  fileName?: string
-): any[] {
-  const userContent: any[] = [];
-
-  if (fileData && fileType) {
-    const isImage = fileType.startsWith("image/");
-    const base64Match = fileData.match(/^data:([^;]+);base64,(.+)$/);
-
-    if (base64Match) {
-      if (isImage) {
-        userContent.push({
-          type: "image",
-          source: { type: "base64", media_type: base64Match[1], data: base64Match[2] },
-        });
-      } else if (fileType === "application/pdf") {
-        userContent.push({
-          type: "document",
-          source: { type: "base64", media_type: "application/pdf", data: base64Match[2] },
-        });
-      } else {
-        const decoded = atob(base64Match[2]);
-        userContent.push({
-          type: "text",
-          text: `[File: ${fileName || "uploaded file"}]\n\n${decoded}`,
-        });
-      }
-    }
-  }
-
-  userContent.push({
-    type: "text",
-    text: `${contextPrefix}\n\nStudent question: ${question}\n\nRespond as Mr. White. Return raw JSON only.`,
-  });
-
-  return userContent;
-}
+topic_detected: always identify the specific topic — this is used to track the student's learning profile.`;
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -256,23 +98,26 @@ serve(async (req) => {
   }
 
   try {
-    const {
-      question, subject, history, confusion_detected,
-      is_first_question, file_data, file_type, file_name,
-      student_profile, generate_video,
-    } = await req.json();
+    const { question, subject, history, confusion_detected, is_first_question, file_data, file_type, file_name, student_profile } = await req.json();
 
     const ANTHROPIC_API_KEY = Deno.env.get("ANTHROPIC_API_KEY");
-    if (!ANTHROPIC_API_KEY) throw new Error("ANTHROPIC_API_KEY is not set");
+    if (!ANTHROPIC_API_KEY) {
+      throw new Error("ANTHROPIC_API_KEY is not set in Supabase secrets");
+    }
 
-    // Build context prefix
+    // Build context
     let contextPrefix = `Subject: ${subject || "General"}`;
     if (is_first_question) contextPrefix += " | First question in session";
-    if (confusion_detected) contextPrefix += " | Student seems confused — try a completely different angle";
-    if (student_profile) contextPrefix += ` | ${student_profile}`;
+    if (confusion_detected) {
+      contextPrefix += " | Student seems confused — try a completely different angle";
+    }
+    if (student_profile) {
+      contextPrefix += ` | ${student_profile}`;
+    }
 
     // Build conversation history
     const messages: Array<{ role: string; content: any }> = [];
+
     if (history && Array.isArray(history)) {
       for (const msg of history.slice(-6)) {
         messages.push({
@@ -282,49 +127,111 @@ serve(async (req) => {
       }
     }
 
-    const userContent = buildUserContent(question, contextPrefix, file_data, file_type, file_name);
-    messages.push({ role: "user", content: userContent });
-
-    // Step 1: Claude generates the lesson
-    const data = await callClaude(messages, SYSTEM_PROMPT, ANTHROPIC_API_KEY);
-    const rawText = data.content[0].text;
-
-    let parsed;
-    try {
-      parsed = JSON.parse(rawText);
-    } catch {
-      parsed = {
-        message: rawText,
-        narration_script: rawText,
-        mr_white_state: "talking",
-        whiteboard: { active: false, type: "none", title: "", elements: [] },
-        quick_chips: ["Explain it simpler", "Go deeper", "Show me an example", "Quiz me"],
-      };
-    }
-
-    // Step 2: If video generation requested, send to HeyGen
-    if (generate_video) {
-      const HEYGEN_API_KEY = Deno.env.get("HEYGEN_API_KEY");
-      if (!HEYGEN_API_KEY) {
-        console.warn("HEYGEN_API_KEY not set, skipping video generation");
-        parsed.video_url = null;
-        parsed.video_error = "Video generation not configured";
+    // Build current user message content blocks
+    const userContent: any[] = [];
+    
+    if (file_data && file_type) {
+      const isImage = file_type.startsWith("image/");
+      
+      if (isImage) {
+        // Extract base64 from data URL
+        const base64Match = file_data.match(/^data:([^;]+);base64,(.+)$/);
+        if (base64Match) {
+          userContent.push({
+            type: "image",
+            source: {
+              type: "base64",
+              media_type: base64Match[1],
+              data: base64Match[2],
+            },
+          });
+        }
       } else {
-        try {
-          const narration = parsed.narration_script || parsed.message;
-          const topic = parsed.topic_detected || question;
-          const videoUrl = await generateHeyGenVideo(narration, topic, HEYGEN_API_KEY);
-          parsed.video_url = videoUrl;
-        } catch (videoErr) {
-          console.error("HeyGen video error:", videoErr);
-          parsed.video_url = null;
-          parsed.video_error = videoErr instanceof Error ? videoErr.message : "Video generation failed";
+        // For documents (PDF, text, etc.) — extract text content
+        const base64Match = file_data.match(/^data:([^;]+);base64,(.+)$/);
+        if (base64Match) {
+          if (file_type === "application/pdf") {
+            // Send PDF as document to Claude
+            userContent.push({
+              type: "document",
+              source: {
+                type: "base64",
+                media_type: "application/pdf",
+                data: base64Match[2],
+              },
+            });
+          } else {
+            // Text-based files — decode and send as text
+            const decoded = atob(base64Match[2]);
+            userContent.push({
+              type: "text",
+              text: `[File: ${file_name || "uploaded file"}]\n\n${decoded}`,
+            });
+          }
         }
       }
     }
 
+    // Add the question text
+    userContent.push({
+      type: "text",
+      text: `${contextPrefix}\n\nStudent question: ${question}\n\nRespond as Mr. White. Return raw JSON only.`,
+    });
+
+    messages.push({
+      role: "user",
+      content: userContent,
+    });
+
+    // Call Claude
+    const response = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-api-key": ANTHROPIC_API_KEY,
+        "anthropic-version": "2023-06-01",
+      },
+      body: JSON.stringify({
+        model: "claude-sonnet-4-20250514",
+        max_tokens: 2000,
+        system: SYSTEM_PROMPT,
+        messages: messages,
+      }),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error("Anthropic error:", response.status, errorText);
+      throw new Error(`Anthropic API error: ${response.status}`);
+    }
+
+    const data = await response.json();
+    const rawText = data.content[0].text;
+
+    // Parse JSON response from Mr. White
+    let parsed;
+    try {
+      parsed = JSON.parse(rawText);
+    } catch (e) {
+      // Fallback if Claude returns something unexpected
+      parsed = {
+        message: rawText,
+        mr_white_state: "talking",
+        whiteboard: {
+          active: false,
+          type: "none",
+          title: "",
+          elements: [],
+        },
+        quick_chips: ["Explain it simpler", "Go deeper", "Show me an example", "Quiz me"],
+      };
+    }
+
     return new Response(JSON.stringify(parsed), {
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
+      headers: {
+        ...corsHeaders,
+        "Content-Type": "application/json",
+      },
     });
   } catch (e) {
     console.error("mr-white-chat error:", e);
