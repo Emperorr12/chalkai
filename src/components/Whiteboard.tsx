@@ -375,7 +375,8 @@ const Whiteboard: React.FC<WhiteboardProps> = ({
         } else {
           const y = getAutoY(index);
           rx = pad; ry = y - 20; rw = 140; rh = 40;
-          label = el.content;
+          // Strip leading coordinate-like patterns (e.g. "180,60 Label") to show only the text
+          label = el.content.replace(/^[\d.,\s]+/, "").trim() || el.content;
         }
         return (
           <g key={index}>
