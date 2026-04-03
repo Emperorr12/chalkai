@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef, useCallback, useMemo } from "react"
 import MrWhite, { type MrWhiteState } from "./MrWhite";
 import HighlightAskTooltip from "./HighlightAskTooltip";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { resolveLayout } from "@/lib/resolveWhiteboardLayout";
 
 export interface WhiteboardElement {
   kind: "text" | "line" | "curve" | "circle" | "rect" | "axis" | "point" | "arrow" | "path";
