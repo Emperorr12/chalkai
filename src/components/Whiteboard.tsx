@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef, useCallback, useMemo } from "react"
 import MrWhite, { type MrWhiteState } from "./MrWhite";
 import HighlightAskTooltip from "./HighlightAskTooltip";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { resolveLayout } from "@/lib/resolveWhiteboardLayout";
 
 export interface WhiteboardElement {
   kind: "text" | "line" | "curve" | "circle" | "rect" | "axis" | "point" | "arrow" | "path";
@@ -13,7 +14,10 @@ export interface WhiteboardElement {
 
 export interface WhiteboardData {
   title?: string;
-  elements: WhiteboardElement[];
+  elements?: WhiteboardElement[];
+  layout?: string;
+  labels?: string[];
+  colors?: string[];
 }
 
 interface WhiteboardProps {
@@ -106,23 +110,47 @@ const Whiteboard: React.FC<WhiteboardProps> = ({
     if (whiteboardData === prevDataRef.current) return;
     prevDataRef.current = whiteboardData;
 
-    if (!whiteboardData || whiteboardData.elements.length === 0) {
+    if (!whiteboardData) {
       setPhase("idle");
       setActiveData(null);
       setActiveElementIndex(-1);
       return;
     }
 
-    if (activeData && activeData.elements.length > 0) {
+    // Resolve layout-based data into elements, or use elements directly
+    let resolvedElements: WhiteboardElement[] = [];
+    if (whiteboardData.layout) {
+      resolvedElements = resolveLayout(
+        whiteboardData.layout,
+        whiteboardData.labels || [],
+        whiteboardData.colors || [],
+      );
+    } else if (whiteboardData.elements) {
+      resolvedElements = whiteboardData.elements;
+    }
+
+    if (resolvedElements.length === 0) {
+      setPhase("idle");
+      setActiveData(null);
+      setActiveElementIndex(-1);
+      return;
+    }
+
+    const resolved: WhiteboardData = {
+      title: whiteboardData.title,
+      elements: resolvedElements,
+    };
+
+    if (activeData && activeData.elements && activeData.elements.length > 0) {
       setPhase("fading-out");
       const t = setTimeout(() => {
-        setActiveData(whiteboardData);
+        setActiveData(resolved);
         setDrawKey((k) => k + 1);
         setPhase("drawing");
       }, 300);
       return () => clearTimeout(t);
     } else {
-      setActiveData(whiteboardData);
+      setActiveData(resolved);
       setDrawKey((k) => k + 1);
       setPhase("drawing");
     }
