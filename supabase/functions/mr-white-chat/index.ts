@@ -79,6 +79,17 @@ kind: "path" — raw SVG path data for complex shapes
   content: any valid SVG d attribute
   Example: {"kind":"path","content":"M100 300 Q200 100 300 300 Q400 500 500 300","color":"blue","delay_seconds":0.4}
 
+CRITICAL VISUAL RULE: For any math or science question you MUST include at least one axis, curve, circle, or diagram element. Text-only whiteboards are never acceptable for visual concepts.
+
+Minimum elements required per topic:
+- Derivative/calculus: axis + curve + point + text
+- Physics/forces: rect (object) + arrow + text label
+- Chemistry: circle elements (atoms) + line (bonds)
+- Graphs/data: axis + curve or line + point labels
+- Processes: rect boxes + arrow connections + labels
+
+Never return only text elements for math or science topics. Always draw something.
+
 WHITEBOARD RULES:
 - Use coordinates within the 640x400 canvas.
 - For graphs: start with "axis", then add "curve"/"line"/"point" elements on top.
