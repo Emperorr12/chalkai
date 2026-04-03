@@ -1,4 +1,5 @@
 import React, { useState, useCallback, useRef, useEffect, useMemo } from "react";
+import { resolveWhiteboardData } from "@/lib/resolveWhiteboardLayout";
 import { useSearchParams } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import { type MrWhiteState } from "../components/MrWhite";
@@ -194,9 +195,7 @@ const AskPage: React.FC = () => {
       const aiResponse: AIResponse = JSON.parse(rawText);
 
       // Save lesson data
-      const wbData = aiResponse.whiteboard?.active && aiResponse.whiteboard.elements
-        ? { title: aiResponse.whiteboard.title || "", elements: aiResponse.whiteboard.elements }
-        : null;
+      const wbData = resolveWhiteboardData(aiResponse.whiteboard);
 
       saveLesson({
         question: message,
@@ -306,9 +305,10 @@ const AskPage: React.FC = () => {
         () => setMrWhiteState("talking"),
         () => {
           if (lesson.whiteboard && lesson.whiteboard.elements?.length > 0) {
-            setWhiteboardData(lesson.whiteboard);
+            const replayWb = resolveWhiteboardData(lesson.whiteboard) || lesson.whiteboard;
+            setWhiteboardData(replayWb);
             setMrWhiteState("drawing");
-            const dur = (lesson.whiteboard.elements.length || 1) * 800;
+            const dur = (replayWb.elements.length || 1) * 800;
             setTimeout(() => setMrWhiteState("idle"), dur);
           } else {
             setMrWhiteState("idle");

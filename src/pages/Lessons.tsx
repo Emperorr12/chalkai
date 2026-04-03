@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { resolveWhiteboardData } from "@/lib/resolveWhiteboardLayout";
 import { useNavigate } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Whiteboard, { type WhiteboardData } from "@/components/Whiteboard";
@@ -26,10 +27,11 @@ const Lessons: React.FC = () => {
         () => setMrWhiteState("talking"),
         () => {
           // After voice, draw whiteboard
-          if (lesson.whiteboard && lesson.whiteboard.elements.length > 0) {
-            setWhiteboardData(lesson.whiteboard);
+          const wbData = resolveWhiteboardData(lesson.whiteboard);
+          if (wbData && wbData.elements.length > 0) {
+            setWhiteboardData(wbData);
             setMrWhiteState("drawing");
-            const dur = (lesson.whiteboard.elements.length || 1) * 800;
+            const dur = (wbData.elements.length || 1) * 800;
             setTimeout(() => {
               setMrWhiteState("idle");
               setReplayingId(null);
