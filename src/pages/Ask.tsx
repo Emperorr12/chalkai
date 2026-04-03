@@ -2,7 +2,8 @@ import React, { useState, useCallback, useRef, useEffect, useMemo } from "react"
 import { useSearchParams } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import { type MrWhiteState } from "../components/MrWhite";
-import Whiteboard, { type WhiteboardElement } from "../components/Whiteboard";
+import { type WhiteboardElement } from "../components/Whiteboard";
+import AnimatedWhiteboard from "../components/AnimatedWhiteboard";
 import ChatPanel, { type ChatMessage } from "../components/ChatPanel";
 import { toast } from "sonner";
 import { MessageSquare, PanelRightClose, Volume2, VolumeX } from "lucide-react";
