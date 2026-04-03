@@ -146,10 +146,12 @@ const PricingModal: React.FC<PricingModalProps> = ({ open, onOpenChange, isPro, 
               <div
                 key={tier.name}
                 className={`rounded-xl border p-4 flex flex-col gap-3 ${
-                  tier.highlight
-                    ? "border-primary bg-primary/5 ring-1 ring-primary/20"
+                  tier.tierKey === "scholar"
+                    ? "border-primary bg-primary/5 ring-2 ring-primary/30"
+                    : tier.highlight
+                    ? "border-primary/50 bg-primary/5"
                     : "border-border"
-                } ${isCurrent ? "ring-2 ring-primary" : ""}`}
+                }`}
               >
                 {isCurrent && (
                   <span className="text-[10px] font-semibold text-primary uppercase tracking-wider">Your Plan</span>
