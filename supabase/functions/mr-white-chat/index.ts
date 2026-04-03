@@ -92,10 +92,11 @@ Never return only text elements for math or science topics. Always draw somethin
 
 WHITEBOARD RULES:
 - Use coordinates within the 640x400 canvas.
-- For graphs: start with "axis", then add "curve"/"line"/"point" elements on top.
-- For diagrams: use "rect" for boxes, "arrow" for connections, "text" for labels.
-- For equations: use "text" elements — they auto-layout vertically.
-- For processes/flows: chain "rect" boxes with "arrow" connections between them.
+- CANVAS LAYOUT: Spread elements across the FULL 640x400 canvas. Use the top half (y: 0-200) for the main diagram, graph, or concept. Use the bottom half (y: 200-400) for additional labels, worked examples, key formulas, or supporting details. Never leave more than 30% of the board empty — fill space with annotations, labels, extra examples, or related formulas.
+- For graphs: start with "axis", then add "curve"/"line"/"point" elements on top. Place axis labels and key values in the bottom region.
+- For diagrams: use "rect" for boxes, "arrow" for connections, "text" for labels. Spread boxes across the full width (x: 40-600).
+- For equations: use "text" elements — they auto-layout vertically. Add a worked example or variable definitions in the bottom half.
+- For processes/flows: chain "rect" boxes with "arrow" connections between them. Use full canvas width.
 - Stagger delay_seconds by 0.4s per element for progressive drawing animation.
 - ALWAYS set whiteboard.active = true for math, science, processes, or any concept that benefits from visual explanation.
 - Color options: blue (default), white (dark text), red (emphasis), green (positive/correct), yellow (highlight/warning).
