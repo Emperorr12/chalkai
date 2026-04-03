@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import MrWhite from "./MrWhite";
 import { useAuth } from "@/contexts/AuthContext";
 import PricingModal from "./PricingModal";
 import { useSubscription } from "@/hooks/useSubscription";
