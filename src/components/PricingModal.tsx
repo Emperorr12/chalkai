@@ -153,7 +153,6 @@ const PricingModal: React.FC<PricingModalProps> = ({ open, onOpenChange, isPro, 
                       : "border-border"
                 } ${isCurrent ? "ring-2 ring-primary" : ""}`}
               >
-              >
                 {isCurrent && (
                   <span className="text-[10px] font-semibold text-primary uppercase tracking-wider">Your Plan</span>
                 )}
