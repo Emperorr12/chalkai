@@ -384,8 +384,8 @@ const AskPage: React.FC = () => {
                 )}
               </button>
               {/* Volume slider popup on hover */}
-              <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 opacity-0 pointer-events-none group-hover/vol:opacity-100 group-hover/vol:pointer-events-auto transition-opacity duration-200 z-50">
-                <div className="bg-background border border-border rounded-lg shadow-lg px-3 py-4 flex flex-col items-center gap-2" style={{ width: 40, height: 120 }}>
+              <div className="absolute left-full top-1/2 -translate-y-1/2 ml-2 opacity-0 pointer-events-none group-hover/vol:opacity-100 group-hover/vol:pointer-events-auto transition-opacity duration-200 z-50">
+                <div className="bg-background border border-border rounded-lg shadow-lg px-3 py-2 flex items-center gap-2" style={{ width: 140 }}>
                   <input
                     type="range"
                     min={0}
@@ -393,10 +393,9 @@ const AskPage: React.FC = () => {
                     value={Math.round(volume * 100)}
                     onChange={(e) => setVolume(Number(e.target.value) / 100)}
                     className="w-20 accent-primary cursor-pointer"
-                    style={{ writingMode: "vertical-lr", direction: "rtl", height: 80 }}
                     aria-label="Volume"
                   />
-                  <span className="text-[10px] text-muted-foreground">{Math.round(volume * 100)}%</span>
+                  <span className="text-[10px] text-muted-foreground whitespace-nowrap">{Math.round(volume * 100)}%</span>
                 </div>
               </div>
             </div>
