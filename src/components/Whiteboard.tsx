@@ -87,6 +87,8 @@ function getElementPosition(
 const Whiteboard: React.FC<WhiteboardProps> = ({
   whiteboardData,
   mrWhiteState = "idle",
+  videoUrl,
+  videoLoading = false,
   className = "",
   onAskAbout,
 }) => {
