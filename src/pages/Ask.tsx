@@ -245,7 +245,7 @@ const AskPage: React.FC = () => {
         setQuickChips(defaultChips);
       }
 
-      setChalkedCount((c) => c + 1);
+      
     } catch (err: unknown) {
       if (err instanceof Error && err.name === "AbortError") return;
       console.error("Chat error:", err);
