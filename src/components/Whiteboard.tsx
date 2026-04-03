@@ -474,7 +474,7 @@ const Whiteboard: React.FC<WhiteboardProps> = ({
           label = parts[3] || "";
         } else {
           px = svgW / 2; py = getAutoY(index);
-          label = el.content;
+          label = el.content.replace(/^[\d.,\s]+/, "").trim() || el.content;
         }
         return (
           <g key={index}>
