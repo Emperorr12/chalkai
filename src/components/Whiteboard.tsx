@@ -637,7 +637,7 @@ const Whiteboard: React.FC<WhiteboardProps> = ({
             className="flex items-center justify-center text-2xl lg:text-3xl"
             style={{
               fontFamily: "'Caveat', cursive",
-              color: "#8B6914",
+              color: "#F5F0E8",
               opacity: 0.4,
               position: "absolute",
               top: "45%",
