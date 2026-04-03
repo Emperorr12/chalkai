@@ -81,6 +81,8 @@ const AskPage: React.FC = () => {
   const [quickChips, setQuickChips] = useState(defaultChips);
   const [isTyping, setIsTyping] = useState(false);
   const [whiteboardData, setWhiteboardData] = useState<{ title: string; elements: WhiteboardElement[] } | null>(null);
+  const [videoUrl, setVideoUrl] = useState<string | null>(null);
+  const [videoLoading, setVideoLoading] = useState(false);
   const [chalkedCount, setChalkedCount] = useState(0);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [startTime] = useState(Date.now());
