@@ -548,10 +548,11 @@ const Whiteboard: React.FC<WhiteboardProps> = ({
 
         {activeData?.title && (
           <div
-            className="text-lg mb-1"
+            className="mb-1"
             style={{
               fontFamily: "'Caveat', cursive",
-              color: "#8B6914",
+              fontSize: 16,
+              color: "#F5F0E8",
               opacity: phase === "fading-out" ? 0 : 1,
               transition: "opacity 0.3s ease",
             }}
