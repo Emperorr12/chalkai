@@ -184,7 +184,7 @@ const Whiteboard: React.FC<WhiteboardProps> = ({
   const renderElement = (el: WhiteboardElement, index: number) => {
     const color = CHALK_COLORS[el.color] || CHALK_COLORS.blue;
     const delay = `${el.delay_seconds ?? index * 0.4}s`;
-    const fontSize = el.size === "large" ? 28 : el.size === "small" ? 18 : 22;
+    const fontSize = el.size === "large" ? 34 : el.size === "small" ? 22 : 28;
 
     // Common stroke-dasharray draw animation style
     const drawAnim = (dur = "1.2s"): React.CSSProperties => ({
