@@ -44,7 +44,7 @@ function getElementPosition(
   pad: number,
   isMobile: boolean,
 ): { x: number; y: number } {
-  const autoY = (isMobile ? 44 : 56) + index * (isMobile ? 42 : 50);
+  const autoY = (isMobile ? 44 : 60) + index * (isMobile ? 48 : 58);
 
   switch (el.kind) {
     case "text":
@@ -162,7 +162,7 @@ const Whiteboard: React.FC<WhiteboardProps> = ({
 
   // Compute Mr. White's position as CSS percentages within the container
   const mrWhitePosition = useMemo(() => {
-    const dynamicH = isMobile ? svgH : Math.max(SVG_H, (activeData?.elements.length || 0) * 50 + 80);
+    const dynamicH = isMobile ? svgH : Math.max(200, (activeData?.elements.length || 0) * 58 + 100);
     // Default: bottom-right
     if (activeElementIndex < 0 || !activeData || activeElementIndex >= activeData.elements.length) {
       return { bottom: isMobile ? 4 : 8, right: isMobile ? 8 : 16, top: "auto" as const, left: "auto" as const };
@@ -179,12 +179,12 @@ const Whiteboard: React.FC<WhiteboardProps> = ({
   }, [activeElementIndex, activeData, svgW, svgH, pad, isMobile]);
 
   // Auto-layout: compute Y positions for elements that don't specify coordinates
-  const getAutoY = (index: number) => (isMobile ? 44 : 56) + index * (isMobile ? 42 : 50);
+  const getAutoY = (index: number) => (isMobile ? 44 : 60) + index * (isMobile ? 48 : 58);
 
   const renderElement = (el: WhiteboardElement, index: number) => {
     const color = CHALK_COLORS[el.color] || CHALK_COLORS.blue;
     const delay = `${el.delay_seconds ?? index * 0.4}s`;
-    const fontSize = el.size === "large" ? 28 : el.size === "small" ? 18 : 22;
+    const fontSize = el.size === "large" ? 34 : el.size === "small" ? 22 : 28;
 
     // Common stroke-dasharray draw animation style
     const drawAnim = (dur = "1.2s"): React.CSSProperties => ({
@@ -502,7 +502,14 @@ const Whiteboard: React.FC<WhiteboardProps> = ({
   };
 
   const hasContent = activeData && activeData.elements.length > 0;
-  const dynamicSvgH = isMobile ? svgH : Math.max(SVG_H, (activeData?.elements.length || 0) * 50 + 80);
+  const contentBottomY = activeData && activeData.elements.length > 0 ? Math.max(
+    ...activeData.elements.map((el, i) => {
+      if (el.kind === "text") return getAutoY(i) + 20;
+      return getAutoY(i) + 30;
+    }),
+    120
+  ) : SVG_H;
+  const dynamicSvgH = isMobile ? svgH : Math.min(Math.max(contentBottomY + 40, 200), SVG_H);
 
   return (
     <div className={`relative ${className}`} style={{ width: "100%", height: isMobile ? undefined : "100%" }}>
@@ -592,7 +599,7 @@ const Whiteboard: React.FC<WhiteboardProps> = ({
                 {activeData!.elements.map((el, i) => {
                   if (el.kind !== "text") return null;
                   const y = getAutoY(i);
-                  const fs = el.size === "large" ? 28 : el.size === "small" ? 18 : 22;
+                  const fs = el.size === "large" ? 34 : el.size === "small" ? 22 : 28;
                   return (
                     <text
                       key={`sel-${i}`}
