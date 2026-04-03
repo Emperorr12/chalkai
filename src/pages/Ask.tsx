@@ -56,7 +56,9 @@ const AskPage: React.FC = () => {
   const { saveLesson } = useLessons();
   const { isPro, tier, startCheckout, refresh: refreshSubscription } = useSubscription();
 
-  // Track if we're at desktop (lg) breakpoint
+  const [showVolSlider, setShowVolSlider] = useState(false);
+  const volTimeoutRef = useRef<number>(0);
+
   const [isDesktop, setIsDesktop] = useState(() => typeof window !== 'undefined' && window.innerWidth >= 1024);
   useEffect(() => {
     const mql = window.matchMedia('(min-width: 1024px)');
@@ -366,7 +368,11 @@ const AskPage: React.FC = () => {
                 </button>
               ))}
             </div>
-            <div className="relative flex-shrink-0 group/vol">
+            <div
+              className="relative flex-shrink-0"
+              onMouseEnter={() => { clearTimeout(volTimeoutRef.current); setShowVolSlider(true); }}
+              onMouseLeave={() => { volTimeoutRef.current = window.setTimeout(() => setShowVolSlider(false), 1000); }}
+            >
               <button
                 onClick={() => { setVoiceEnabled((v) => !v); if (isTTSPlaying) stopTTS(); }}
                 className={`p-1.5 rounded-full border transition-colors ${
@@ -383,8 +389,8 @@ const AskPage: React.FC = () => {
                   <VolumeX className="w-4 h-4" />
                 )}
               </button>
-              {/* Volume slider popup on hover */}
-              <div className="absolute left-full top-1/2 -translate-y-1/2 ml-2 opacity-0 pointer-events-none group-hover/vol:opacity-100 group-hover/vol:pointer-events-auto transition-opacity duration-200 z-50">
+              {/* Volume slider popup */}
+              <div className={`absolute left-full top-1/2 -translate-y-1/2 ml-2 transition-opacity duration-200 z-50 ${showVolSlider ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"}`}>
                 <div className="bg-background border border-border rounded-lg shadow-lg px-3 py-2 flex items-center gap-2" style={{ width: 140 }}>
                   <input
                     type="range"
