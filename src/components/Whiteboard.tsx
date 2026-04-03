@@ -501,7 +501,8 @@ const Whiteboard: React.FC<WhiteboardProps> = ({
     }
   };
 
-  const contentBottomY = activeData ? Math.max(
+  const hasContent = activeData && activeData.elements.length > 0;
+  const contentBottomY = activeData && activeData.elements.length > 0 ? Math.max(
     ...activeData.elements.map((el, i) => {
       if (el.kind === "text") return getAutoY(i) + 20;
       return getAutoY(i) + 30;
