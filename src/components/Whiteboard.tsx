@@ -24,11 +24,11 @@ interface WhiteboardProps {
 }
 
 const CHALK_COLORS: Record<string, string> = {
-  blue: "#3B6FCA",
-  white: "#5A5A50",
-  red: "#E05252",
-  green: "#4CAF50",
-  yellow: "#D4A017",
+  blue: "#F5F0E8",
+  white: "#F5F0E8",
+  red: "#E8C84A",
+  green: "#F5F0E8",
+  yellow: "#E8C84A",
 };
 
 const SVG_W = 640;
