@@ -2,10 +2,11 @@ import React, { useState, useCallback, useRef, useEffect, useMemo } from "react"
 import { resolveWhiteboardData, resolveLayout } from "@/lib/resolveWhiteboardLayout";
 import { startTimeline } from "@/lib/TimelineEngine";
 import { buildElementsFromTemplate } from "@/components/Whiteboard";
+import { renderScene, type Scene } from "@/lib/SceneRenderer";
 import { useSearchParams } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import { type MrWhiteState } from "../components/MrWhite";
-import Whiteboard, { type WhiteboardElement } from "../components/Whiteboard";
+import Whiteboard, { type WhiteboardElement, type WhiteboardData } from "../components/Whiteboard";
 import ChatPanel, { type ChatMessage } from "../components/ChatPanel";
 import { toast } from "sonner";
 import { MessageSquare, PanelRightClose, Volume2, VolumeX, Volume1 } from "lucide-react";
@@ -40,12 +41,16 @@ function detectSimplification(text: string): boolean {
 interface AIResponse {
   message: string;
   mr_white_state?: MrWhiteState;
+  /** Option B stub — kept active:false so resolveWhiteboardData returns null;
+   *  lesson replay still reads this field for legacy lessons. */
   whiteboard?: {
     active: boolean;
     type?: string;
     title?: string;
     elements?: WhiteboardElement[];
   };
+  /** New structured scene — SceneRenderer converts this to precise WhiteboardElements. */
+  scene?: Scene;
   quick_chips?: string[];
   follow_up_hint?: string;
   topic_detected?: string;
@@ -80,7 +85,7 @@ const AskPage: React.FC = () => {
   const [mrWhiteState, setMrWhiteState] = useState<MrWhiteState>("idle");
   const [quickChips, setQuickChips] = useState(defaultChips);
   const [isTyping, setIsTyping] = useState(false);
-  const [whiteboardData, setWhiteboardData] = useState<{ title: string; elements: WhiteboardElement[] } | null>(null);
+  const [whiteboardData, setWhiteboardData] = useState<WhiteboardData | null>(null);
   const [chalkedCount, setChalkedCount] = useState(0);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [startTime] = useState(Date.now());
@@ -223,16 +228,24 @@ const AskPage: React.FC = () => {
 
       // Voice + whiteboard draw simultaneously, then settle when voice ends
       const onVoiceStart = () => {
-        // Reveal message text + start whiteboard drawing at the same time as voice
         setIsTyping(false);
         setMessages((prev) => [...prev, { role: "mr_white", content: aiResponse.message, timestamp: Date.now() }]);
         setMrWhiteState("talking");
 
-        if (wbData) {
-          setWhiteboardData(wbData);
+        let elements: WhiteboardElement[] = [];
 
-          // Compute the final elements array the same way Whiteboard would.
-          let elements: WhiteboardElement[] = [];
+        if (aiResponse.scene) {
+          // ── New scene path ──────────────────────────────────────────────
+          // SceneRenderer converts the structured scene to precise elements.
+          const sceneData: WhiteboardData = {
+            title: aiResponse.scene.title,
+            scene: aiResponse.scene,
+          };
+          setWhiteboardData(sceneData);
+          elements = renderScene(aiResponse.scene);
+        } else if (wbData) {
+          // ── Legacy template / layout path (backward compat) ─────────────
+          setWhiteboardData(wbData);
           if (wbData.template && (!wbData.elements || wbData.elements.length === 0)) {
             elements = buildElementsFromTemplate(wbData.template, wbData.labels || []);
           } else if (wbData.layout) {
@@ -240,17 +253,17 @@ const AskPage: React.FC = () => {
           } else if (wbData.elements && wbData.elements.length > 0) {
             elements = wbData.elements;
           }
+        }
 
-          // Start the audio-synchronized timeline if we have elements and audio.
-          cancelTimelineRef.current?.();
-          setTriggeredElements(new Set());
-          if (elements.length > 0 && audioRef.current) {
-            cancelTimelineRef.current = startTimeline(
-              audioRef.current,
-              elements,
-              (index) => setTriggeredElements((prev) => new Set([...prev, index])),
-            );
-          }
+        // Start audio-synchronized timeline for whichever path produced elements
+        cancelTimelineRef.current?.();
+        setTriggeredElements(new Set());
+        if (elements.length > 0 && audioRef.current) {
+          cancelTimelineRef.current = startTimeline(
+            audioRef.current,
+            elements,
+            (index) => setTriggeredElements((prev) => new Set([...prev, index])),
+          );
         }
       };
 

@@ -3,6 +3,7 @@ import MrWhite, { type MrWhiteState } from "./MrWhite";
 import HighlightAskTooltip from "./HighlightAskTooltip";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { resolveLayout } from "@/lib/resolveWhiteboardLayout";
+import { renderScene, type Scene } from "@/lib/SceneRenderer";
 
 export interface WhiteboardElement {
   kind: "text" | "line" | "curve" | "circle" | "rect" | "axis" | "point" | "arrow" | "path";
@@ -19,6 +20,8 @@ export interface WhiteboardData {
   layout?: string;
   labels?: string[];
   colors?: string[];
+  /** Structured scene description — rendered by SceneRenderer into precise elements. */
+  scene?: Scene;
 }
 
 interface WhiteboardProps {
@@ -204,6 +207,18 @@ const Whiteboard: React.FC<WhiteboardProps> = ({
 
   useEffect(() => {
     if (whiteboardData === prevDataRef.current) return;
+
+    // Scene path — structured scene object rendered to precise elements
+    if (whiteboardData?.scene) {
+      const elements = renderScene(whiteboardData.scene);
+      if (elements.length > 0) {
+        prevDataRef.current = whiteboardData;
+        setActiveData({ title: whiteboardData.title || whiteboardData.scene.title || "", elements });
+        setDrawKey(k => k + 1);
+        setPhase("drawing");
+        return;
+      }
+    }
 
     if (whiteboardData?.template && (!whiteboardData.elements || whiteboardData.elements.length === 0)) {
       const elements = buildElementsFromTemplate(whiteboardData.template, whiteboardData.labels || []);
@@ -492,19 +507,24 @@ const Whiteboard: React.FC<WhiteboardProps> = ({
 
     switch (el.kind) {
       case "text": {
-        const y = getAutoY(index);
+        // SceneRenderer prefixes text with "x,y content" for precise placement.
+        // Legacy text (plain labels) falls back to auto-layout.
+        const coordMatch = el.content.match(/^(\d{2,3}),(\d{2,3})\s+([\s\S]+)/);
+        const textX       = coordMatch ? Number(coordMatch[1]) : pad;
+        const textY       = coordMatch ? Number(coordMatch[2]) : getAutoY(index);
+        const textContent = coordMatch ? coordMatch[3] : el.content;
         return (
           <text
             key={index}
-            x={pad}
-            y={y}
+            x={textX}
+            y={textY}
             fill={color}
             fontSize={fontSize}
             fontFamily="'Caveat', cursive"
             fontWeight={700}
             style={fadeAnim}
           >
-            {el.content}
+            {textContent}
           </text>
         );
       }
