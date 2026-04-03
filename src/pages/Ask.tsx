@@ -262,6 +262,7 @@ const AskPage: React.FC = () => {
       if (err instanceof Error && err.name === "AbortError") return;
       console.error("Chat error:", err);
       setIsTyping(false);
+      setVideoLoading(false);
       setErrorMessage("Something went wrong");
       setMrWhiteState("idle");
     }
