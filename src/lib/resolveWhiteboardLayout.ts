@@ -146,7 +146,7 @@ export function resolveWhiteboardData(
     colors?: string[];
     elements?: WhiteboardElement[];
   } | null | undefined,
-): WhiteboardData | null {
+): { title: string; elements: WhiteboardElement[] } | null {
   if (!wb?.active) return null;
 
   // New layout-based system
