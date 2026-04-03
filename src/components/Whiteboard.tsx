@@ -19,6 +19,8 @@ export interface WhiteboardData {
 interface WhiteboardProps {
   whiteboardData: WhiteboardData | null;
   mrWhiteState?: MrWhiteState;
+  videoUrl?: string | null;
+  videoLoading?: boolean;
   className?: string;
   onAskAbout?: (text: string) => void;
 }
@@ -85,6 +87,8 @@ function getElementPosition(
 const Whiteboard: React.FC<WhiteboardProps> = ({
   whiteboardData,
   mrWhiteState = "idle",
+  videoUrl,
+  videoLoading = false,
   className = "",
   onAskAbout,
 }) => {
@@ -633,7 +637,56 @@ const Whiteboard: React.FC<WhiteboardProps> = ({
           />
         </div>
 
-        {!hasContent && phase === "idle" && (
+        {/* Video loading state */}
+        {videoLoading && !videoUrl && (
+          <div
+            className="flex flex-col items-center justify-center gap-3"
+            style={{
+              position: "absolute",
+              top: "45%",
+              left: "50%",
+              transform: "translate(-50%, -50%)",
+              zIndex: 5,
+            }}
+          >
+            <div className="w-8 h-8 border-2 border-[#F5F0E8]/30 border-t-[#F5F0E8] rounded-full animate-spin" />
+            <p style={{ fontFamily: "'Caveat', cursive", fontSize: 22, color: "#F5F0E8", opacity: 0.8 }}>
+              Creating your visual lesson...
+            </p>
+            <p style={{ fontFamily: "'Caveat', cursive", fontSize: 16, color: "#F5F0E8", opacity: 0.5 }}>
+              Usually ready in 60-90 seconds
+            </p>
+          </div>
+        )}
+
+        {/* Video player */}
+        {videoUrl && (
+          <div
+            style={{
+              position: "absolute",
+              top: pad,
+              left: pad,
+              right: pad + mrWhiteSize + 8,
+              bottom: pad,
+              zIndex: 5,
+            }}
+          >
+            <video
+              src={videoUrl}
+              autoPlay
+              controls
+              style={{
+                width: "100%",
+                height: "100%",
+                borderRadius: 4,
+                objectFit: "contain",
+                backgroundColor: "transparent",
+              }}
+            />
+          </div>
+        )}
+
+        {!hasContent && !videoUrl && !videoLoading && phase === "idle" && (
           <div
             className="flex items-center justify-center text-2xl lg:text-3xl"
             style={{
