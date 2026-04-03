@@ -283,6 +283,10 @@ const AskPage: React.FC = () => {
     // Note: setIsTyping(false) is handled by onVoiceStart callback, not here
   }, [messages, activeSubject, user, currentTopic, trackTopic, trackSimplification, getProfileSummary]);
 
+  const handleVideoEnded = useCallback(() => {
+    setMrWhiteState("idle");
+  }, []);
+
   const handleRetry = useCallback(() => {
     if (lastQuestion) {
       setErrorMessage(null);
