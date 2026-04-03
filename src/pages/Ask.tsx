@@ -185,6 +185,7 @@ const AskPage: React.FC = () => {
           file_type: fileData?.type || undefined,
           file_name: fileData?.name || undefined,
           student_profile: profileSummary || undefined,
+          generate_video: true,
         }),
         signal: controller.signal,
       });
