@@ -44,7 +44,7 @@ function getElementPosition(
   pad: number,
   isMobile: boolean,
 ): { x: number; y: number } {
-  const autoY = (isMobile ? 44 : 56) + index * (isMobile ? 42 : 50);
+  const autoY = (isMobile ? 44 : 60) + index * (isMobile ? 48 : 58);
 
   switch (el.kind) {
     case "text":
