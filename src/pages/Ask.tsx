@@ -52,7 +52,7 @@ const AskPage: React.FC = () => {
   const { user } = useAuth();
   const { trackTopic, trackSimplification, trackSession, getProfileSummary, markMastered } = useLearningProfile();
   const { saveConcept, concepts } = useSavedConcepts();
-  const { speak, stop: stopTTS, isPlaying: isTTSPlaying, voiceEnabled, setVoiceEnabled } = useTextToSpeech();
+  const { speak, stop: stopTTS, isPlaying: isTTSPlaying, voiceEnabled, setVoiceEnabled, volume, setVolume } = useTextToSpeech();
   const { saveLesson } = useLessons();
   const { isPro, tier, startCheckout, refresh: refreshSubscription } = useSubscription();
 
