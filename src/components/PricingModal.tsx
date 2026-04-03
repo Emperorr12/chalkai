@@ -51,7 +51,7 @@ const tiers = [
       "Session memory",
     ],
     tierKey: "pro" as const,
-    highlight: true,
+    highlight: false,
   },
   {
     name: "Scholar",
@@ -67,7 +67,7 @@ const tiers = [
       "Priority Mr. White responses",
     ],
     tierKey: "scholar" as const,
-    highlight: false,
+    highlight: true,
   },
 ];
 
@@ -148,7 +148,9 @@ const PricingModal: React.FC<PricingModalProps> = ({ open, onOpenChange, isPro, 
                 className={`rounded-xl border p-4 flex flex-col gap-3 ${
                   tier.highlight
                     ? "border-primary bg-primary/5 ring-1 ring-primary/20"
-                    : "border-border"
+                    : tier.tierKey === "free"
+                      ? "border-border/60 bg-muted/30 opacity-80"
+                      : "border-border"
                 } ${isCurrent ? "ring-2 ring-primary" : ""}`}
               >
                 {isCurrent && (
