@@ -23,6 +23,7 @@ interface WhiteboardProps {
   videoLoading?: boolean;
   className?: string;
   onAskAbout?: (text: string) => void;
+  onVideoEnded?: () => void;
 }
 
 const CHALK_COLORS: Record<string, string> = {
@@ -91,6 +92,7 @@ const Whiteboard: React.FC<WhiteboardProps> = ({
   videoLoading = false,
   className = "",
   onAskAbout,
+  onVideoEnded,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const svgContainerRef = useRef<HTMLDivElement>(null);
@@ -675,6 +677,7 @@ const Whiteboard: React.FC<WhiteboardProps> = ({
               src={videoUrl}
               autoPlay
               controls
+              onEnded={onVideoEnded}
               style={{
                 width: "100%",
                 height: "100%",

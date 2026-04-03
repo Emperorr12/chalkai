@@ -83,6 +83,7 @@ const AskPage: React.FC = () => {
   const [whiteboardData, setWhiteboardData] = useState<{ title: string; elements: WhiteboardElement[] } | null>(null);
   const [videoUrl, setVideoUrl] = useState<string | null>(null);
   const [videoLoading, setVideoLoading] = useState(false);
+  const [videoHistory, setVideoHistory] = useState<Array<{ url: string; question: string; topic: string }>>([]);
   const [chalkedCount, setChalkedCount] = useState(0);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [startTime] = useState(Date.now());
@@ -233,6 +234,11 @@ const AskPage: React.FC = () => {
         }
       };
 
+      // Save previous video to history before replacing
+      if (videoUrl) {
+        setVideoHistory((prev) => [...prev, { url: videoUrl, question: lastQuestion?.text || "", topic: currentTopic }]);
+      }
+
       // Handle video URL
       if (aiResponse.video_url) {
         setVideoUrl(aiResponse.video_url);
@@ -246,15 +252,23 @@ const AskPage: React.FC = () => {
 
       speak(aiResponse.message, onVoiceStart, onVoiceEnd);
 
+      const detectedTopic = aiResponse.topic_detected || currentTopic;
       if (aiResponse.topic_detected && user) {
-        setCurrentTopic(aiResponse.topic_detected);
-        trackTopic(aiResponse.topic_detected, activeSubject);
+        setCurrentTopic(detectedTopic);
+        trackTopic(detectedTopic, activeSubject);
       }
 
+      // Set contextual chips based on the lesson — will be shown after video ends
       if (aiResponse.quick_chips && aiResponse.quick_chips.length > 0) {
         setQuickChips(aiResponse.quick_chips);
       } else {
-        setQuickChips(defaultChips);
+        // Generate contextual follow-up chips
+        const topicLabel = detectedTopic || "this";
+        setQuickChips([
+          `I'm still confused about ${topicLabel}`,
+          "Show me a different example",
+          "Quiz me on this",
+        ]);
       }
 
       setChalkedCount((c) => c + 1);
@@ -268,6 +282,10 @@ const AskPage: React.FC = () => {
     }
     // Note: setIsTyping(false) is handled by onVoiceStart callback, not here
   }, [messages, activeSubject, user, currentTopic, trackTopic, trackSimplification, getProfileSummary]);
+
+  const handleVideoEnded = useCallback(() => {
+    setMrWhiteState("idle");
+  }, []);
 
   const handleRetry = useCallback(() => {
     if (lastQuestion) {
@@ -419,7 +437,7 @@ const AskPage: React.FC = () => {
               </div>
             </div>
           </div>
-          <Whiteboard whiteboardData={whiteboardData} mrWhiteState={mrWhiteState} videoUrl={videoUrl} videoLoading={videoLoading} className="w-full min-h-[200px] lg:flex-1 lg:min-h-[0px] lg:h-full" onAskAbout={(text) => handleSend(`Can you explain this in more detail: "${text}"?`)} />
+          <Whiteboard whiteboardData={whiteboardData} mrWhiteState={mrWhiteState} videoUrl={videoUrl} videoLoading={videoLoading} onVideoEnded={handleVideoEnded} className="w-full min-h-[200px] lg:flex-1 lg:min-h-[0px] lg:h-full" onAskAbout={(text) => handleSend(`Can you explain this in more detail: "${text}"?`)} />
         </div>
 
         {/* Toggle button - desktop only */}
