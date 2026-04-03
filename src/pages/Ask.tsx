@@ -194,9 +194,7 @@ const AskPage: React.FC = () => {
       const aiResponse: AIResponse = JSON.parse(rawText);
 
       // Save lesson data
-      const wbData = aiResponse.whiteboard?.active && aiResponse.whiteboard.elements
-        ? { title: aiResponse.whiteboard.title || "", elements: aiResponse.whiteboard.elements }
-        : null;
+      const wbData = resolveWhiteboardData(aiResponse.whiteboard);
 
       saveLesson({
         question: message,
