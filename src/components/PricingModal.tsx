@@ -146,9 +146,9 @@ const PricingModal: React.FC<PricingModalProps> = ({ open, onOpenChange, isPro, 
               <div
                 key={tier.name}
                 className={`rounded-xl border p-4 flex flex-col gap-3 ${
-                  tier.tierKey === "scholar"
+                  tier.tierKey === "pro"
                     ? "border-primary bg-primary/5 ring-2 ring-primary/30"
-                    : tier.highlight
+                    : tier.tierKey === "scholar"
                     ? "border-primary/50 bg-primary/5"
                     : "border-border"
                 }`}
