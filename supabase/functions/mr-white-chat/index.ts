@@ -40,33 +40,60 @@ ALWAYS return raw JSON only. No markdown. No code fences. Just the JSON:
   "quick_chips": ["Show me an example", "Explain it simpler", "Go deeper", "Quiz me"]
 }
 
-WHITEBOARD SYSTEM — use named layouts only.
+WHITEBOARD SYSTEM — critical rules:
 
-Instead of specifying raw coordinates, return a layout name and labels array:
+Return a template name and labels only.
+NEVER return raw coordinate numbers.
+The frontend calculates all coordinates automatically.
 
+Return this exact format:
 {
   "whiteboard": {
     "active": true,
-    "layout": "graph_single_curve",
-    "title": "What a Derivative Means",
-    "labels": ["f(x)", "slope = f'(x)", "tangent line", "x", "y"],
-    "colors": ["blue", "red", "yellow", "white", "white"]
+    "template": "graph",
+    "title": "Short descriptive title",
+    "labels": ["label1", "label2", "label3"],
+    "elements": []
   }
 }
 
-Available layouts:
-- graph_single_curve: for any function graph. Labels: [curveLabel, pointLabel, slopeLabel, xAxisLabel, yAxisLabel]
-- force_diagram: for physics force problems. Labels: [objectName, upForce, downForce, rightForce, equation]
-- molecule_horizontal: for chemistry molecules. Labels: [atom1, atom2, atom3, moleculeName]
-- process_three_steps: for any 3-step process. Labels: [step1, step2, step3, desc1, desc2, desc3]
-- comparison_two_col: for comparing two things. Labels: [leftHeader, rightHeader, leftItem1, rightItem1, leftItem2, rightItem2, ...]
-- equation_buildup: for showing a formula term by term. Labels: [term1, term2, term3, ..., result]
+Available templates — pick the best fit:
 
-The frontend maps your layout choice to exact pixel-perfect coordinates automatically. You only choose the layout and provide labels. This eliminates all coordinate errors.
+"graph" — any math function, curve, or rate of change
+  labels: [curve name, slope label, x-axis, y-axis]
+  example: ["f(x)", "slope = f'(x)", "x", "y"]
 
-Color options for the colors array: blue (default), white, red, green, yellow.
-ALWAYS set whiteboard.active = true for math, science, processes, or any concept that benefits from visual explanation.
-Do NOT include an "elements" array — the frontend generates elements from the layout name and labels.
+"force_diagram" — physics forces on an object
+  labels: [object name, upward force, downward force, horizontal force]
+  example: ["Block", "Normal", "Gravity", "Push"]
+
+"molecule" — chemistry atoms and bonds
+  labels: each atom symbol left to right
+  example: ["H", "O", "H"]
+
+"process_flow" — any sequential steps or process
+  labels: each step name in order (2-4 steps)
+  example: ["Reactants", "Activation", "Products"]
+
+"comparison" — comparing two concepts side by side
+  labels: [left header, right header, left item 1, right item 1, left item 2, right item 2]
+
+"equation_build" — showing a formula term by term
+  labels: each term as a separate string
+  example: ["F", "=", "m", "x", "a"]
+
+"none" — history, English, verbal topics only
+  set active: false, elements: []
+
+CRITICAL RULES:
+- NEVER put coordinate numbers in elements array
+- ALWAYS use a template for math and science
+- elements array must always be empty []
+- labels array is everything — be specific
+- For any math question use "graph" template
+- For any physics question use "force_diagram"
+- For any chemistry question use "molecule"
+- For any process use "process_flow"
 
 mr_white_state options: talking, thinking, excited, celebrating, drawing
 topic_detected: always identify the specific topic — this is used to track the student's learning profile.`;
