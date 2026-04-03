@@ -143,6 +143,8 @@ const AskPage: React.FC = () => {
     setMrWhiteState("thinking");
     setIsTyping(true);
     setErrorMessage(null);
+    setVideoUrl(null);
+    setVideoLoading(true);
 
     // Detect simplification requests and track them
     const isSimplification = detectSimplification(message);
