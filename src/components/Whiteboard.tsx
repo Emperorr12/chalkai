@@ -902,29 +902,62 @@ const Whiteboard: React.FC<WhiteboardProps> = ({
             preserveAspectRatio="xMidYMin meet"
             style={{ display: "block" }}
           >
-            {activeData?.layout === "comparison_two_col" && activeData.labels ? (() => {
-              const labs = activeData.labels!;
-              const items = labs.slice(2);
-              const leftItems = items.filter((_, i) => i % 2 === 0);
-              const rightItems = items.filter((_, i) => i % 2 !== 0);
-              return (
-                <g style={{ opacity: 0, animation: "chalk-fade 0.6s ease-out forwards" }}>
-                  <line x1="50%" y1="40" x2="50%" y2="380" stroke="#F5F0E8" strokeWidth="1" />
-                  <line x1="5%" y1="80" x2="95%" y2="80" stroke="#E8C44A" strokeWidth="1" />
-                  <text x="25%" y="60" textAnchor="middle" fill="#3B6FCA" fontFamily="Caveat, cursive" fontSize="26" fontWeight="700">{labs[0]}</text>
-                  <text x="75%" y="60" textAnchor="middle" fill="#E8C44A" fontFamily="Caveat, cursive" fontSize="26" fontWeight="700">{labs[1]}</text>
-                  {leftItems.map((item, i) => (
-                    <text key={`l${i}`} x="25%" y={115 + i * 60} textAnchor="middle" fill="#F5F0E8" fontFamily="Caveat, cursive" fontSize="22" fontWeight="700"
-                      style={{ opacity: 0, animation: `chalk-fade 0.6s ease-out ${1.0 + i * 0.4}s forwards` }}>{item}</text>
-                  ))}
-                  {rightItems.map((item, i) => (
-                    <text key={`r${i}`} x="75%" y={115 + i * 60} textAnchor="middle" fill="#E8C44A" fontFamily="Caveat, cursive" fontSize="22" fontWeight="700"
-                      style={{ opacity: 0, animation: `chalk-fade 0.6s ease-out ${1.4 + i * 0.4}s forwards` }}>{item}</text>
-                  ))}
-                </g>
-              );
-            })() : activeData?.elements.map((el, i) => renderElement(el, i))}
+            {activeData?.layout !== "comparison_two_col" && activeData?.elements.map((el, i) => renderElement(el, i))}
           </svg>
+
+          {activeData?.layout === "comparison_two_col" && activeData.labels && (() => {
+            const labs = activeData.labels!;
+            const items = labs.slice(2);
+            const leftItems = items.filter((_, i) => i % 2 === 0);
+            const rightItems = items.filter((_, i) => i % 2 !== 0);
+            return (
+              <div style={{
+                position: "absolute", inset: 0,
+                display: "grid", gridTemplateColumns: "1fr 1fr",
+                fontFamily: "'Caveat', cursive",
+                padding: "16px 24px",
+                background: "rgba(0,0,0,0)",
+              }}>
+                {/* Left column */}
+                <div style={{
+                  borderRight: "1px solid #F5F0E8",
+                  paddingRight: 16,
+                  display: "flex", flexDirection: "column", alignItems: "center",
+                  gap: 12,
+                }}>
+                  <div style={{
+                    fontSize: 26, fontWeight: 700, color: "#3B6FCA",
+                    borderBottom: "1px solid #E8C44A", paddingBottom: 8, width: "100%", textAlign: "center",
+                    opacity: 0, animation: "chalk-fade 0.6s ease-out 0.3s forwards",
+                  }}>{labs[0]}</div>
+                  {leftItems.map((item, i) => (
+                    <div key={i} style={{
+                      fontSize: 22, fontWeight: 700, color: "#F5F0E8", textAlign: "center",
+                      opacity: 0, animation: `chalk-fade 0.6s ease-out ${1.0 + i * 0.4}s forwards`,
+                    }}>{item}</div>
+                  ))}
+                </div>
+                {/* Right column */}
+                <div style={{
+                  paddingLeft: 16,
+                  display: "flex", flexDirection: "column", alignItems: "center",
+                  gap: 12,
+                }}>
+                  <div style={{
+                    fontSize: 26, fontWeight: 700, color: "#E8C44A",
+                    borderBottom: "1px solid #E8C44A", paddingBottom: 8, width: "100%", textAlign: "center",
+                    opacity: 0, animation: "chalk-fade 0.6s ease-out 0.5s forwards",
+                  }}>{labs[1]}</div>
+                  {rightItems.map((item, i) => (
+                    <div key={i} style={{
+                      fontSize: 22, fontWeight: 700, color: "#E8C44A", textAlign: "center",
+                      opacity: 0, animation: `chalk-fade 0.6s ease-out ${1.4 + i * 0.4}s forwards`,
+                    }}>{item}</div>
+                  ))}
+                </div>
+              </div>
+            );
+          })()}
 
           {hasContent && onAskAbout && (
             <div
