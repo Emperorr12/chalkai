@@ -511,7 +511,6 @@ const Whiteboard: React.FC<WhiteboardProps> = ({
         // Legacy text (plain labels) falls back to auto-layout.
         const coordMatch = el.content.match(/^(\d{2,3}),(\d{2,3})\s+([\s\S]+)/);
         const textX       = coordMatch ? Number(coordMatch[1]) : pad;
-        console.log('TEXT:', el.content, 'x:', textX, 'y:', textY);
         const textY       = coordMatch ? Number(coordMatch[2]) : getAutoY(index);
         const textContent = coordMatch ? coordMatch[3] : el.content;
         return (
