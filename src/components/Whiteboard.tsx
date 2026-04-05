@@ -495,6 +495,7 @@ const Whiteboard: React.FC<WhiteboardProps> = ({
       animation: `chalk-fade 0.6s ease-out ${delay} forwards`,
     };
 
+    switch (el.kind) {
       case "comparison_columns": {
         let cols: { leftItems: string[]; rightItems: string[] };
         try { cols = JSON.parse(el.content); } catch { cols = { leftItems: [], rightItems: [] }; }
@@ -518,7 +519,6 @@ const Whiteboard: React.FC<WhiteboardProps> = ({
         );
       }
 
-    switch (el.kind) {
       case "text": {
         // Supports two content prefixes:
         //   "20%,55 Label"  — percentage x (comparison columns)
