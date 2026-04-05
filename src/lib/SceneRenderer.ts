@@ -65,7 +65,19 @@ function applyTimings(elements: PreElement[]): WhiteboardElement[] {
 // Two-column comparison with a vertical divider and a header row.
 // Left column blue, right column yellow. Items interleaved for pacing.
 
-function renderComparisonTable(content: ComparisonTableContent): WhiteboardElement[] {
+function renderComparisonTable(rawContent: ComparisonTableContent): WhiteboardElement[] {
+  // Normalize flat labels[] sent by edge function:
+  // [leftHeader, rightHeader, leftItem0, rightItem0, leftItem1, rightItem1, ...]
+  const flat = (rawContent as ComparisonTableContent & { labels?: string[] }).labels;
+  const content: ComparisonTableContent = Array.isArray(flat) && flat.length >= 2
+    ? {
+        left_header:  flat[0] ?? "",
+        right_header: flat[1] ?? "",
+        left_items:   flat.filter((_, i) => i >= 2 && i % 2 === 0),
+        right_items:  flat.filter((_, i) => i >= 2 && i % 2 !== 0),
+      }
+    : rawContent;
+
   const els: PreElement[] = [];
 
   // Structural lines first
