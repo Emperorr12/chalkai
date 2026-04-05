@@ -262,6 +262,8 @@ const Whiteboard: React.FC<WhiteboardProps> = ({
     const resolved: WhiteboardData = {
       title: whiteboardData.title,
       elements: resolvedElements,
+      layout: whiteboardData.layout,
+      labels: whiteboardData.labels,
     };
 
     if (activeData && activeData.elements && activeData.elements.length > 0) {
