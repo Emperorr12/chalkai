@@ -66,44 +66,34 @@ function applyTimings(elements: PreElement[]): WhiteboardElement[] {
 // Left column blue, right column yellow. Items interleaved for pacing.
 
 function renderComparisonTable(rawContent: ComparisonTableContent): WhiteboardElement[] {
-  // Normalize flat labels[] sent by edge function:
-  // [leftHeader, rightHeader, leftItem0, rightItem0, leftItem1, rightItem1, ...]
-  const flat = (rawContent as ComparisonTableContent & { labels?: string[] }).labels;
-  const content: ComparisonTableContent = Array.isArray(flat) && flat.length >= 2
-    ? {
-        left_header:  flat[0] ?? "",
-        right_header: flat[1] ?? "",
-        left_items:   flat.filter((_, i) => i >= 2 && i % 2 === 0),
-        right_items:  flat.filter((_, i) => i > 2 && i % 2 !== 0),
-      }
-    : rawContent;
-    console.log('COMPARISON DATA:', JSON.stringify(content));
+  let left_header = rawContent.left_header || '';
+  let right_header = rawContent.right_header || '';
+  let left_items = rawContent.left_items || [];
+  let right_items = rawContent.right_items || [];
+
+  const flat = (rawContent as any).labels;
+  if (Array.isArray(flat) && flat.length >= 2) {
+    left_header  = flat[0] || '';
+    right_header = flat[1] || '';
+    left_items   = flat.filter((_: any, i: number) => i >= 2 && i % 2 === 0);
+    right_items  = flat.filter((_: any, i: number) => i > 2 && i % 2 !== 0);
+  }
 
   const els: PreElement[] = [];
+  els.push({ kind: "line", content: "320,40 to 320,370", color: "white" });
+  els.push({ kind: "line", content: "40,80 to 600,80",   color: "white" });
+  els.push({ kind: "text", content: `160,55 ${left_header}`,  color: "blue"   });
+  els.push({ kind: "text", content: `430,55 ${right_header}`, color: "yellow" });
 
-  // Structural lines first
-  els.push({ kind: "line", content: "320,40 to 320,370",  color: "white" });
-  els.push({ kind: "line", content: "40,80 to 600,80",    color: "white" });
-
-  // Column headers
-  els.push({ kind: "text", content: `160,55 ${content.left_header}`,  color: "blue" });
-  els.push({ kind: "text", content: `430,55 ${content.right_header}`, color: "yellow" });
-
-  // Body rows — interleave left and right so both columns grow together
-  const maxRows = Math.max(content.left_items.length, content.right_items.length);
+  const maxRows = Math.max(left_items.length, right_items.length);
   for (let i = 0; i < maxRows; i++) {
     const y = 115 + i * 60;
-    if (content.left_items[i]) {
-      els.push({ kind: "text", content: `100,${y} ${content.left_items[i]}`,  color: "white" });
-    }
-    if (content.right_items[i]) {
-      els.push({ kind: "text", content: `370,${y} ${content.right_items[i]}`, color: "yellow" });
-    }
+    if (left_items[i])  els.push({ kind: "text", content: `100,${y} ${left_items[i]}`,  color: "white"  });
+    if (right_items[i]) els.push({ kind: "text", content: `370,${y} ${right_items[i]}`, color: "yellow" });
   }
 
   return applyTimings(els);
 }
-
 // ─── Renderer: step_sequence ─────────────────────────────────────────────────
 // N boxes evenly spaced across the canvas with connecting arrows.
 

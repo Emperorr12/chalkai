@@ -1,4 +1,4 @@
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+ { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -294,6 +294,18 @@ serve(async (req) => {
       };
     }
 
+    if (parsed && parsed.scene && parsed.scene.type === 'comparison_table') {
+      const c = parsed.scene.content;
+      const flat = c.labels;
+      if (Array.isArray(flat) && flat.length >= 2) {
+        parsed.scene.content = {
+          left_header:  flat[0] || '',
+          right_header: flat[1] || '',
+          left_items:   flat.filter((_, i) => i >= 2 && i % 2 === 0),
+          right_items:  flat.filter((_, i) => i > 2 && i % 2 !== 0),
+        };
+      }
+    }
     return new Response(JSON.stringify(parsed), {
       headers: {
         ...corsHeaders,
