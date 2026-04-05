@@ -436,7 +436,7 @@ const Whiteboard: React.FC<WhiteboardProps> = ({
         ];
         leftItems.forEach((item, i) => {
           elements.push({
-            kind: "text", content: `120,${115 + i * 60} ${item}`, color: "white", size: "small",
+            kind: "text", content: `100,${115 + i * 60} ${item}`, color: "white", size: "small",
             delay_seconds: 1.0 + i * 0.4,
           });
         });
