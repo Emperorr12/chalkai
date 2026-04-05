@@ -431,18 +431,18 @@ const Whiteboard: React.FC<WhiteboardProps> = ({
         const elements: WhiteboardElement[] = [
           { kind: "line", content: "320,40 to 320,370", color: c(0) || "white", delay_seconds: 0.0 },
           { kind: "line", content: "40,80 to 600,80",   color: c(1) || "white", delay_seconds: 0.3 },
-          { kind: "text", content: `160,55 ${lHead}`, color: c(2) || "blue",   size: "medium", delay_seconds: 0.6 },
-          { kind: "text", content: `430,55 ${rHead}`, color: c(3) || "yellow", size: "medium", delay_seconds: 0.8 },
+          { kind: "text", content: `20%,55 ${lHead}`, color: c(2) || "blue",   size: "medium", delay_seconds: 0.6 },
+          { kind: "text", content: `60%,55 ${rHead}`, color: c(3) || "yellow", size: "medium", delay_seconds: 0.8 },
         ];
         leftItems.forEach((item, i) => {
           elements.push({
-            kind: "text", content: `100,${115 + i * 60} ${item}`, color: c(4) || "white", size: "small",
+            kind: "text", content: `20%,${115 + i * 60} ${item}`, color: c(4) || "white", size: "small",
             delay_seconds: 1.0 + i * 0.4,
           });
         });
         rightItems.forEach((item, i) => {
           elements.push({
-            kind: "text", content: `370,${115 + i * 60} ${item}`, color: c(5) || "yellow", size: "small",
+            kind: "text", content: `60%,${115 + i * 60} ${item}`, color: c(5) || "yellow", size: "small",
             delay_seconds: 1.4 + i * 0.4,
           });
         });
@@ -507,12 +507,21 @@ const Whiteboard: React.FC<WhiteboardProps> = ({
 
     switch (el.kind) {
       case "text": {
-        // SceneRenderer prefixes text with "x,y content" for precise placement.
-        // Legacy text (plain labels) falls back to auto-layout.
-        const coordMatch = el.content.match(/^(\d+),(\d+)\s+([\s\S]+)/);
-        const textX       = coordMatch ? Number(coordMatch[1]) : 60;
-        const textY       = coordMatch ? Number(coordMatch[2]) : getAutoY(index);
-        const textContent = coordMatch ? coordMatch[3] : el.content;
+        // Supports two content prefixes:
+        //   "20%,55 Label"  — percentage x (comparison columns)
+        //   "370,115 Label" — absolute x (SceneRenderer)
+        // Falls back to auto-layout when no coordinate prefix is present.
+        const pctMatch = el.content.match(/^(\d+)%,(\d+)\s+([\s\S]+)/);
+        const absMatch = el.content.match(/^(\d+),(\d+)\s+([\s\S]+)/);
+        const textX       = pctMatch ? `${pctMatch[1]}%`
+                          : absMatch ? Number(absMatch[1])
+                          : 60;
+        const textY       = pctMatch ? Number(pctMatch[2])
+                          : absMatch ? Number(absMatch[2])
+                          : getAutoY(index);
+        const textContent = pctMatch ? pctMatch[3]
+                          : absMatch ? absMatch[3]
+                          : el.content;
         return (
           <text
             key={index}
