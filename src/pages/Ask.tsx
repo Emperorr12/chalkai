@@ -1,7 +1,6 @@
 import React, { useState, useCallback, useRef, useEffect, useMemo } from "react";
-import { resolveWhiteboardData, resolveLayout } from "@/lib/resolveWhiteboardLayout";
+import { resolveWhiteboardData } from "@/lib/resolveWhiteboardLayout";
 import { startTimeline } from "@/lib/TimelineEngine";
-import { buildElementsFromTemplate } from "@/components/Whiteboard";
 import { renderScene, type Scene } from "@/lib/SceneRenderer";
 import { useSearchParams } from "react-router-dom";
 import Navbar from "../components/Navbar";
@@ -244,13 +243,9 @@ const AskPage: React.FC = () => {
           setWhiteboardData(sceneData);
           elements = renderScene(aiResponse.scene);
         } else if (wbData) {
-          // ── Legacy template / layout path (backward compat) ─────────────
+          // ── Legacy / resolved whiteboard path ───────────────────────────
           setWhiteboardData(wbData);
-          if (wbData.template && (!wbData.elements || wbData.elements.length === 0)) {
-            elements = buildElementsFromTemplate(wbData.template, wbData.labels || []);
-          } else if (wbData.layout) {
-            elements = resolveLayout(wbData.layout, wbData.labels || [], wbData.colors || []);
-          } else if (wbData.elements && wbData.elements.length > 0) {
+          if (wbData.elements && wbData.elements.length > 0) {
             elements = wbData.elements;
           }
         }
