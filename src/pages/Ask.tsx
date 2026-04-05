@@ -1,7 +1,6 @@
 import React, { useState, useCallback, useRef, useEffect, useMemo } from "react";
-import { resolveWhiteboardData, resolveLayout } from "@/lib/resolveWhiteboardLayout";
+import { resolveWhiteboardData } from "@/lib/resolveWhiteboardLayout";
 import { startTimeline } from "@/lib/TimelineEngine";
-import { buildElementsFromTemplate } from "@/components/Whiteboard";
 import { renderScene, type Scene } from "@/lib/SceneRenderer";
 import { useSearchParams } from "react-router-dom";
 import Navbar from "../components/Navbar";
