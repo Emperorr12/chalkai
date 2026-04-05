@@ -495,30 +495,31 @@ const Whiteboard: React.FC<WhiteboardProps> = ({
       animation: `chalk-fade 0.6s ease-out ${delay} forwards`,
     };
 
-    switch (el.kind) {
-      case "comparison_columns": {
-        let cols: { leftItems: string[]; rightItems: string[] };
-        try { cols = JSON.parse(el.content); } catch { cols = { leftItems: [], rightItems: [] }; }
-        return (
-          <g key={index} style={fadeAnim}>
-            <foreignObject x={40} y={85} width={260} height={300}>
-              <div xmlns="http://www.w3.org/1999/xhtml" style={{ display: "flex", flexDirection: "column", gap: "12px", fontFamily: "'Caveat', cursive", fontSize: "20px", fontWeight: 700, color: "#F5F0E8" }}>
-                {cols.leftItems.map((item, i) => (
-                  <div key={i}>{item}</div>
-                ))}
-              </div>
-            </foreignObject>
-            <foreignObject x={360} y={85} width={260} height={300}>
-              <div xmlns="http://www.w3.org/1999/xhtml" style={{ display: "flex", flexDirection: "column", gap: "12px", fontFamily: "'Caveat', cursive", fontSize: "20px", fontWeight: 700, color: "#E8C44A" }}>
-                {cols.rightItems.map((item, i) => (
-                  <div key={i}>{item}</div>
-                ))}
-              </div>
-            </foreignObject>
-          </g>
-        );
-      }
+    // Handle comparison_columns (foreignObject-based) before the typed switch
+    if ((el.kind as string) === "comparison_columns") {
+      let cols: { leftItems: string[]; rightItems: string[] };
+      try { cols = JSON.parse(el.content); } catch { cols = { leftItems: [], rightItems: [] }; }
+      return (
+        <g key={index} style={fadeAnim}>
+          <foreignObject x={40} y={85} width={260} height={300}>
+            <div style={{ display: "flex", flexDirection: "column", gap: "12px", fontFamily: "'Caveat', cursive", fontSize: "20px", fontWeight: 700, color: "#F5F0E8" }}>
+              {cols.leftItems.map((item, i) => (
+                <div key={i}>{item}</div>
+              ))}
+            </div>
+          </foreignObject>
+          <foreignObject x={360} y={85} width={260} height={300}>
+            <div style={{ display: "flex", flexDirection: "column", gap: "12px", fontFamily: "'Caveat', cursive", fontSize: "20px", fontWeight: 700, color: "#E8C44A" }}>
+              {cols.rightItems.map((item, i) => (
+                <div key={i}>{item}</div>
+              ))}
+            </div>
+          </foreignObject>
+        </g>
+      );
+    }
 
+    switch (el.kind) {
       case "text": {
         // Supports two content prefixes:
         //   "20%,55 Label"  — percentage x (comparison columns)
