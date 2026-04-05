@@ -431,21 +431,11 @@ const Whiteboard: React.FC<WhiteboardProps> = ({
         const elements: WhiteboardElement[] = [
           { kind: "line", content: "320,40 to 320,370", color: c(0) || "white", delay_seconds: 0.0 },
           { kind: "line", content: "40,80 to 600,80",   color: c(1) || "white", delay_seconds: 0.3 },
-          { kind: "text", content: `20%,55 ${lHead}`, color: c(2) || "blue",   size: "medium", delay_seconds: 0.6 },
-          { kind: "text", content: `60%,55 ${rHead}`, color: c(3) || "yellow", size: "medium", delay_seconds: 0.8 },
+          { kind: "text", content: `120,55 ${lHead}`, color: c(2) || "blue",   size: "medium", delay_seconds: 0.6 },
+          { kind: "text", content: `430,55 ${rHead}`, color: c(3) || "yellow", size: "medium", delay_seconds: 0.8 },
+          // foreignObject-based columns to bypass SVG text positioning issues
+          { kind: "comparison_columns" as any, content: JSON.stringify({ leftItems, rightItems }), color: "white", delay_seconds: 1.0 },
         ];
-        leftItems.forEach((item, i) => {
-          elements.push({
-            kind: "text", content: `100,${115 + i * 60} ${item}`, color: "white", size: "small",
-            delay_seconds: 1.0 + i * 0.4,
-          });
-        });
-        rightItems.forEach((item, i) => {
-          elements.push({
-            kind: "text", content: `430,${115 + i * 60} ${item}`, color: "yellow", size: "small",
-            delay_seconds: 1.4 + i * 0.4,
-          });
-        });
         return elements;
       }
 
