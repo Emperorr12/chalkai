@@ -74,9 +74,10 @@ function renderComparisonTable(rawContent: ComparisonTableContent): WhiteboardEl
         left_header:  flat[0] ?? "",
         right_header: flat[1] ?? "",
         left_items:   flat.filter((_, i) => i >= 2 && i % 2 === 0),
-        right_items:  flat.filter((_, i) => i >= 2 && i % 2 !== 0),
+        right_items:  flat.filter((_, i) => i > 2 && i % 2 !== 0),
       }
     : rawContent;
+    console.log('COMPARISON DATA:', JSON.stringify(content));
 
   const els: PreElement[] = [];
 

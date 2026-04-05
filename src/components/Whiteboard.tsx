@@ -510,7 +510,7 @@ const Whiteboard: React.FC<WhiteboardProps> = ({
         // SceneRenderer prefixes text with "x,y content" for precise placement.
         // Legacy text (plain labels) falls back to auto-layout.
         const coordMatch = el.content.match(/^(\d+),(\d+)\s+([\s\S]+)/);
-        const textX       = coordMatch ? Number(coordMatch[1]) : pad;
+        const textX       = coordMatch ? Number(coordMatch[1]) : 60;
         const textY       = coordMatch ? Number(coordMatch[2]) : getAutoY(index);
         const textContent = coordMatch ? coordMatch[3] : el.content;
         return (
