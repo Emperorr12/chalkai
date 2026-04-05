@@ -436,13 +436,13 @@ const Whiteboard: React.FC<WhiteboardProps> = ({
         ];
         leftItems.forEach((item, i) => {
           elements.push({
-            kind: "text", content: `20%,${115 + i * 60} ${item}`, color: c(4) || "white", size: "small",
+            kind: "text", content: `120,${115 + i * 60} ${item}`, color: "white", size: "small",
             delay_seconds: 1.0 + i * 0.4,
           });
         });
         rightItems.forEach((item, i) => {
           elements.push({
-            kind: "text", content: `60%,${115 + i * 60} ${item}`, color: c(5) || "yellow", size: "small",
+            kind: "text", content: `430,${115 + i * 60} ${item}`, color: "yellow", size: "small",
             delay_seconds: 1.4 + i * 0.4,
           });
         });
