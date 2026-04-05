@@ -959,6 +959,7 @@ const Whiteboard: React.FC<WhiteboardProps> = ({
             );
           })()}
 
+          {hasContent && onAskAbout && (
             <div
               ref={containerRef}
               className="absolute inset-0 pointer-events-auto"
