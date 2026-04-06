@@ -902,7 +902,7 @@ const Whiteboard: React.FC<WhiteboardProps> = ({
             preserveAspectRatio="xMidYMin meet"
             style={{ display: "block" }}
           >
-            {activeData?.layout !== "comparison_two_col" && activeData?.elements.map((el, i) => renderElement(el, i))}
+            {activeData?.elements.map((el, i) => renderElement(el, i))}
           </svg>
 
           {activeData?.layout === "comparison_two_col" && activeData.labels && (() => {
