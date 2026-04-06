@@ -905,59 +905,6 @@ const Whiteboard: React.FC<WhiteboardProps> = ({
             {activeData?.elements.map((el, i) => renderElement(el, i))}
           </svg>
 
-          {activeData?.layout === "comparison_two_col" && activeData.labels && (() => {
-            const labs = activeData.labels!;
-            const items = labs.slice(2);
-            const leftItems = items.filter((_, i) => i % 2 === 0);
-            const rightItems = items.filter((_, i) => i % 2 !== 0);
-            return (
-              <div style={{
-                position: "absolute", inset: 0,
-                display: "grid", gridTemplateColumns: "1fr 1fr",
-                fontFamily: "'Caveat', cursive",
-                padding: "16px 24px",
-                background: "rgba(0,0,0,0)",
-              }}>
-                {/* Left column */}
-                <div style={{
-                  borderRight: "1px solid #F5F0E8",
-                  paddingRight: 16,
-                  display: "flex", flexDirection: "column", alignItems: "center",
-                  gap: 12,
-                }}>
-                  <div style={{
-                    fontSize: 26, fontWeight: 700, color: "#3B6FCA",
-                    borderBottom: "1px solid #E8C44A", paddingBottom: 8, width: "100%", textAlign: "center",
-                    opacity: 0, animation: "chalk-fade 0.6s ease-out 0.3s forwards",
-                  }}>{labs[0]}</div>
-                  {leftItems.map((item, i) => (
-                    <div key={i} style={{
-                      fontSize: 22, fontWeight: 700, color: "#F5F0E8", textAlign: "center",
-                      opacity: 0, animation: `chalk-fade 0.6s ease-out ${1.0 + i * 0.4}s forwards`,
-                    }}>{item}</div>
-                  ))}
-                </div>
-                {/* Right column */}
-                <div style={{
-                  paddingLeft: 16,
-                  display: "flex", flexDirection: "column", alignItems: "center",
-                  gap: 12,
-                }}>
-                  <div style={{
-                    fontSize: 26, fontWeight: 700, color: "#E8C44A",
-                    borderBottom: "1px solid #E8C44A", paddingBottom: 8, width: "100%", textAlign: "center",
-                    opacity: 0, animation: "chalk-fade 0.6s ease-out 0.5s forwards",
-                  }}>{labs[1]}</div>
-                  {rightItems.map((item, i) => (
-                    <div key={i} style={{
-                      fontSize: 22, fontWeight: 700, color: "#E8C44A", textAlign: "center",
-                      opacity: 0, animation: `chalk-fade 0.6s ease-out ${1.4 + i * 0.4}s forwards`,
-                    }}>{item}</div>
-                  ))}
-                </div>
-              </div>
-            );
-          })()}
 
           {hasContent && onAskAbout && (
             <div
