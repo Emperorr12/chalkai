@@ -902,7 +902,27 @@ const Whiteboard: React.FC<WhiteboardProps> = ({
             preserveAspectRatio="xMidYMin meet"
             style={{ display: "block" }}
           >
-            {activeData?.elements.map((el, i) => renderElement(el, i))}
+            {activeData?.layout === "comparison_two_col" && activeData.labels ? (() => {
+              const labs = activeData.labels!;
+              const lHead = labs[0] || '';
+              const rHead = labs[1] || '';
+              const leftItems = labs.filter((_: string, i: number) => i >= 2 && i % 2 === 0);
+              const rightItems = labs.filter((_: string, i: number) => i >= 3 && i % 2 === 1);
+              return (
+                <g>
+                  <line x1="320" y1="40" x2="320" y2="380" stroke="#F5F0E8" strokeWidth="1" opacity="0.8"/>
+                  <line x1="40" y1="80" x2="600" y2="80" stroke="#E8C44A" strokeWidth="1" opacity="0.8"/>
+                  <text x="160" y="62" textAnchor="middle" fill="#3B6FCA" fontSize="26" fontFamily="Caveat, cursive" fontWeight="700">{lHead}</text>
+                  <text x="480" y="62" textAnchor="middle" fill="#E8C44A" fontSize="26" fontFamily="Caveat, cursive" fontWeight="700">{rHead}</text>
+                  {leftItems.map((item: string, i: number) => (
+                    <text key={`l${i}`} x="160" y={115 + i * 58} textAnchor="middle" fill="#F5F0E8" fontSize="22" fontFamily="Caveat, cursive">{item}</text>
+                  ))}
+                  {rightItems.map((item: string, i: number) => (
+                    <text key={`r${i}`} x="480" y={115 + i * 58} textAnchor="middle" fill="#E8C44A" fontSize="22" fontFamily="Caveat, cursive">{item}</text>
+                  ))}
+                </g>
+              );
+            })() : activeData?.elements.map((el, i) => renderElement(el, i))}
           </svg>
 
 
